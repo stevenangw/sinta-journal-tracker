@@ -1,91 +1,82 @@
-# SINTA Journal Accreditation Rank Tracker & Dashboard
+# SINTA Journal Accreditation Rank Tracker
 
-Sinta Tracker is a premium, lightweight, automated system designed to monitor, track, and alert you on data integrity changes of **SINTA (Science and Technology Index)** journal accreditation ranks. It filters specifically for IT-related journals and displays them in a gorgeous real-time interactive dashboard.
-
-Features include multi-platform webhook notifications (Discord & Telegram) when an accreditation rank changes, automated database sync, session-aware bulk crawling, and a highly polished, premium glassmorphic web interface.
+A Python-based automated monitoring system to track and alert on accreditation rank changes in SINTA (Science and Technology Index) journals. Specifically filtered for IT, Computer Science, and Engineering topics, this system keeps records in a local SQLite database and serves them through a lightweight web dashboard.
 
 ---
 
-## 🌟 Key Features
+## 🛠️ Core Features
 
-* **Smart Bulk Crawling & Seeding**:
-  - Automatically queries SINTA's journal databases by Subject Area Category IDs (e.g., Science and Engineering).
-  - Performs intelligent client-side keyword matching for IT/Computer Science topics to build a targeted monitoring list.
-  - Features session restoration to prevent context loss during pagination.
+* **Targeted Crawling & Seeding**:
+  - Automatically queries SINTA categories (e.g., Science and Engineering).
+  - Filters journals based on client-side keyword matching for IT/Computer Science topics.
+  - Built-in session state restoration to safely handle SINTA pagination.
 
-* **Precise Accreditation Monitoring**:
-  - Leverages robust targeted scraping to verify the exact current rank directly from SINTA journal profile pages.
-  - Automatically records historical data and saves updates to a local SQLite database.
-  - Protects SINTA's servers with built-in rate-limiting, request retries, and timing jitter.
+* **Monitoring & Data Integrity**:
+  - Scrapes SINTA journal profile pages to verify current accreditation ranks (S1–S6).
+  - Stores historical ranks and scrape logs in SQLite.
+  - Implements rate-limiting, requests retries, and jitter delays to protect upstream SINTA servers.
 
-* **Instant Webhook Alerts**:
-  - Dispatches immediate structured rich embed alerts to **Discord** and HTML-formatted notifications to **Telegram** when a change is detected.
-  - Built-in high-severity notifications if the ratio of "Unknown" ranks exceeds 10%, indicating SINTA site layout changes or potential rate limit blocking.
+* **Notifications & Alerts**:
+  - Sends immediate detailed alerts via Discord rich embeds or Telegram HTML messages when a rank change is detected.
+  - Notifies on scraping anomalies (e.g., if >10% of queries yield "Unknown", indicating potential IP blocks or layout changes).
 
-* **Premium Interactive Dashboard**:
-  - Built using Flask and a beautifully designed custom dark-mode theme.
-  - Features real-time live data queries, searchable journal indices, pagination, filterable categories, and instant configuration inspection (with masked secure webhooks).
-
----
-
-## 🛠️ Architecture & Tech Stack
-
-* **Backend**: Python 3, Flask, SQLite, BeautifulSoup4, Requests
-* **Deployment**: Configured for standard WSGI servers, compatible with Nixpacks, Docker, and direct Procfile runners (Railway, Heroku, Render)
-* **Design & Frontend**: Modern HTML5, custom styled Tailwind CSS, high-performance vanilla JS dynamic data tables
+* **Web Dashboard**:
+  - Lightweight Flask backend with a responsive academic-style dark/light interface.
+  - Interactive searchable data table with fast server-side pagination (Alpine.js + DataTables).
+  - Secure configuration viewer with masked credentials.
 
 ---
 
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-Make sure you have **Python 3.8+** installed.
+- **Python 3.8+**
+- **SQLite3**
 
 ### 2. Installation
-Clone this repository and install the dependencies:
+Clone the repository and install the dependencies:
 ```bash
-git clone https://github.com/your-username/deteksi-perubahan-jurnal.git
-cd deteksi-perubahan-jurnal
+git clone https://github.com/stevenangw/sinta-journal-tracker.git
+cd sinta-journal-tracker
 pip install -r requirements.txt
 ```
 
-### 3. Environment & Configuration
-Copy the `.env.example` file to `.env`:
-```bash
-cp .env.example .env
-```
-
-Configure your Discord and Telegram webhooks in `config.json`:
-```json
-{
-    "webhook": {
-        "discord_url": "YOUR_DISCORD_WEBHOOK_URL",
-        "telegram_bot_token": "YOUR_TELEGRAM_BOT_TOKEN",
-        "telegram_chat_id": "YOUR_TELEGRAM_CHAT_ID"
-    },
-    "scraping": {
-        "timeout_seconds": 10,
-        "delay_between_requests": 2.0,
-        "max_retries": 3,
-        "loop_interval_seconds": 86400
-    }
-}
-```
+### 3. Configuration
+1. Copy the example environment template:
+   ```bash
+   cp .env.example .env
+   ```
+2. Configure webhook integrations and scrapers in `config.json`:
+   ```json
+   {
+       "webhook": {
+           "discord_url": "YOUR_DISCORD_WEBHOOK_URL",
+           "telegram_bot_token": "YOUR_TELEGRAM_BOT_TOKEN",
+           "telegram_chat_id": "YOUR_TELEGRAM_CHAT_ID"
+       },
+       "scraping": {
+           "timeout_seconds": 10,
+           "delay_between_requests": 2.0,
+           "max_retries": 3,
+           "loop_interval_seconds": 86400
+       }
+   }
+   ```
 
 ---
 
-## 🕹️ CLI Usage Instructions
+## 🕹️ CLI Usage
 
-The monitoring engine `sinta_tracker.py` is fully command-line driven. Run it with the following options:
+The core engine `sinta_tracker.py` is fully command-line driven.
 
 * **Initialize Database & Seed Journals**:
-  Crawls SINTA categories, filters for IT relevance, writes to the SQLite database, and populates `config.json`:
+  Crawls SINTA categories, filters for IT relevance, and writes them to the SQLite database:
   ```bash
   python sinta_tracker.py --init
   ```
 
-* **Manually Trigger a Scraping Verification Cycle**:
-  Scrapes each monitored journal's profile page and updates the database, dispatching webhook notifications on rank mismatches:
+* **Trigger a Scraping Verification Cycle**:
+  Scrapes each monitored journal's profile page and updates the database, dispatching webhook notifications on rank changes:
   ```bash
   python sinta_tracker.py --scrape
   ```
@@ -107,14 +98,14 @@ The monitoring engine `sinta_tracker.py` is fully command-line driven. Run it wi
 
 ## 🖥️ Running the Dashboard
 
-Launch the gorgeous interactive Flask dashboard:
+Launch the Flask web dashboard:
 ```bash
 python dashboard.py
 ```
 By default, the server will start at `http://localhost:5000`.
 
-* In production, the port can be custom configured via the `PORT` environment variable.
-* Flask debug mode can be enabled by setting the environment variable `FLASK_DEBUG=1`.
+- In production, specify the port using the `PORT` environment variable.
+- Flask debug mode can be enabled by setting `FLASK_DEBUG=1`.
 
 ---
 
@@ -122,11 +113,11 @@ By default, the server will start at `http://localhost:5000`.
 
 ```
 ├── templates/
-│   └── dashboard.html       # Single Page Interactive Web App Template
+│   └── dashboard.html       # Web App Frontend (Alpine.js + DataTables)
 ├── dashboard.py             # Flask Web Server
 ├── sinta_tracker.py         # Crawler, Scraper, CLI Engine & Alerts
 ├── config.json              # Scraping rules and target SINTA journal lists
-├── Procfile                 # Deployment process declaration for Railway/Heroku
+├── Procfile                 # Process runner config (Railway/Heroku)
 ├── railway.json             # Deployment settings for Railway
 ├── .env.example             # Template for local environment configs
 ├── .gitignore               # Strict exclude patterns for database, logs, temp files
