@@ -1,0 +1,45 @@
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+pyvenv.cfg
+.python-version
+
+# Python compilation & caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases & local state
+sinta_tracker.db
+sinta_tracker.db-journal
+sinta_tracker.db-wal
+sinta_tracker.db-shm
+
+# Application logs
+tracker.log
+tracker.log.*
+*.log
+
+# Environment variables & secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Scraper / Browser session leftovers
+chrome_profile/
+console_logs.txt
+rendered.html
+rendered_body.html
+
+# IDEs & Editor configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

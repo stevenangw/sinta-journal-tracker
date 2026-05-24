@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SINTA Tracker Dashboard</title>
+
+  <!-- Google Fonts: Spectral, Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- jQuery & DataTables via CDN -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+  <!-- Alpine.js via CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Custom Theme Configurations -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bgApp: '#f5f3ee',
+            bgCard: '#ffffff',
+            borderApp: '#ddd9d0',
+            textMain: '#1a1916',
+            textMuted: '#6b6860',
+            textTertiary: '#aaa89f',
+            accentGold: '#b8963e',
+          },
+          fontFamily: {
+            sans: ['"Spectral"', 'serif'],
+            pjs: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Spectral', Georgia, serif;
+      background-color: #f5f3ee;
+      color: #1a1916;
+      margin: 0;
+      padding: 0;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .font-sans {
+      font-family: 'Spectral', Georgia, serif;
+    }
+
+    .font-pjs {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Style resets for DataTables to integrate with the Academic Editorial theme */
+    table.dataTable {
+      border-collapse: collapse !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+
+    table.dataTable thead th {
+      border-bottom: 1px solid #ddd9d0 !important;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #888580 !important;
+      background-color: #f5f3ee !important;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      text-align: center !important;
+    }
+
+    table.dataTable tbody tr {
+      border-bottom: 1px solid #edeae4 !important;
+      background-color: #ffffff !important;
+      transition: background-color 0.15s ease;
+    }
+    
+    table.dataTable tbody tr:hover {
+      background-color: #faf9f5 !important;
+    }
+
+    table.dataTable tbody td {
+      border-bottom: none !important; /* Handled by tr border */
+      padding-top: 11px !important;
+      padding-bottom: 11px !important;
+      font-size: 14px;
+      color: #1a1916;
+      background-color: transparent !important;
+    }
+
+    /* Column-specific padding for visual balance and compactness */
+    table.dataTable th:first-child,
+    table.dataTable td:first-child {
+      padding-left: 24px !important;
+      padding-right: 8px !important;
+    }
+    table.dataTable th:nth-child(2),
+    table.dataTable td:nth-child(2) {
+      padding-left: 8px !important;
+      padding-right: 24px !important;
+    }
+    table.dataTable th:nth-child(3),
+    table.dataTable td:nth-child(3),
+    table.dataTable th:nth-child(4),
+    table.dataTable td:nth-child(4) {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+    table.dataTable th:last-child,
+    table.dataTable td:last-child {
+      padding-left: 16px !important;
+      padding-right: 24px !important;
+    }
+
+    table.dataTable.no-footer {
+      border-bottom: none !important;
+    }
+    
+    .dataTables_wrapper {
+      background-color: transparent !important;
+      display: block !important;
+    }
+    
+    /* Info Count styling in bottom bar */
+    .dataTables_info {
+      float: left !important;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #6b6860 !important;
+      padding: 11px 24px !important;
+      margin: 0 !important;
+      background-color: #f5f3ee;
+      border-top: 1px solid #ddd9d0;
+      width: 50%;
+      box-sizing: border-box;
+    }
+    
+    /* Pagination Button styling in bottom bar */
+    .dataTables_paginate {
+      float: right !important;
+      display: flex !important;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 24px !important;
+      margin: 0 !important;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background-color: #f5f3ee;
+      border-top: 1px solid #ddd9d0;
+      width: 50%;
+      box-sizing: border-box;
+    }
+    
+    .dataTables_paginate .paginate_button {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px !important;
+      height: 28px !important;
+      padding: 0 4px !important;
+      box-sizing: border-box;
+      border: 1px solid #ddd9d0 !important;
+      background-color: #ffffff !important;
+      color: #1a1916 !important;
+      border-radius: 3px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease;
+      font-size: 11px !important;
+      font-family: 'JetBrains Mono', monospace;
+      margin: 0 !important;
+    }
+    
+    .dataTables_paginate .paginate_button:hover:not(.disabled) {
+      background-color: #1a1916 !important;
+      color: #ffffff !important;
+      border-color: #1a1916 !important;
+    }
+    
+    .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+      background-color: #1a1916 !important;
+      color: #ffffff !important;
+      border-color: #1a1916 !important;
+      font-weight: 700;
+    }
+    
+    .dataTables_paginate .paginate_button.disabled {
+      opacity: 0.3 !important;
+      cursor: not-allowed !important;
+      background-color: #ffffff !important;
+      color: #1a1916 !important;
+      border-color: #ddd9d0 !important;
+    }
+
+    /* Custom Sort Icons (SVG) */
+    table.dataTable thead th.sorting {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%23888580'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9' /%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 0.85rem;
+      padding-right: 1.75rem !important;
+      cursor: pointer;
+    }
+    table.dataTable thead th.sorting_asc {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%23b8963e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4.5 15.75l7.5-7.5 7.5 7.5' /%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 0.85rem;
+      padding-right: 1.75rem !important;
+      cursor: pointer;
+    }
+    table.dataTable thead th.sorting_desc {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%23b8963e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 0.85rem;
+      padding-right: 1.75rem !important;
+      cursor: pointer;
+    }
+
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="bg-bgApp text-textMain min-h-screen">
+
+  <!-- Inject config and route metadata from Flask -->
+  <script>
+    window.CONFIG_DATA = {{ config_data|tojson|safe if config_data else 'null' }};
+    window.ACTIVE_TAB = "{{ active_tab }}";
+  </script>
+
+  <div x-data="appState()">
+    
+    <!-- 1. Header Bar -->
+    <header class="px-6 py-4 flex justify-between items-center bg-[#1a1916] text-[#f5f3ee] transition-colors duration-200">
+      <div class="flex items-center text-[13px] font-pjs font-bold tracking-wider uppercase">
+        <!-- Logo mark: small gold square outline with gold fill inside -->
+        <span class="inline-flex items-center justify-center w-3.5 h-3.5 border border-[#b8963e] mr-2">
+          <span class="w-1.5 h-1.5 bg-[#b8963e]"></span>
+        </span>
+        SINTA Tracker
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <!-- Live Dot -->
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10b981] opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10b981]"></span>
+        </span>
+        <!-- Last scrape timestamp in JetBrains Mono -->
+        <span class="font-mono text-[11px] text-[#aaa89f]">Last scraped: <span class="font-medium" x-text="lastScrape === 'N/A' ? '2026-05-23 18:02:14' : lastScrape">2026-05-23 18:02:14</span></span>
+      </div>
+    </header>
+
+    <!-- 2. Nav Tabs -->
+    <nav class="flex items-center border-b border-borderApp bg-white px-6 py-2.5 gap-2 transition-colors duration-200">
+      <button @click="navigate('dashboard')" 
+              class="px-4 py-2 text-[12px] font-pjs font-bold uppercase tracking-wider rounded-[4px] transition-all duration-200 focus:outline-none"
+              :class="activeTab === 'dashboard' ? 'bg-bgApp text-textMain' : 'text-textMuted hover:text-textMain hover:bg-bgApp/40'">
+        Dashboard
+      </button>
+      <button @click="navigate('config')" 
+              class="px-4 py-2 text-[12px] font-pjs font-bold uppercase tracking-wider rounded-[4px] transition-all duration-200 focus:outline-none"
+              :class="activeTab === 'config' ? 'bg-bgApp text-textMain' : 'text-textMuted hover:text-textMain hover:bg-bgApp/40'">
+        Webhook Config
+      </button>
+    </nav>
+
+    <!-- 3. Dashboard View -->
+    <div x-show="activeTab === 'dashboard'" x-cloak class="bg-bgApp">
+      
+      <!-- Hero section -->
+      <div class="px-6 pb-5 pt-8 bg-white transition-colors duration-200">
+        <h1 class="text-[28px] font-bold text-textMain leading-none">Journal Accreditation Monitor</h1>
+        <p class="text-[15px] text-textMuted italic mt-2">Institutional monitoring system and accreditation audit logging for IT, Computer Science, and Engineering journals registered in SINTA.</p>
+        
+        <!-- Metadata row -->
+        <div class="flex flex-wrap items-center gap-2 mt-3.5 text-[11px] font-pjs font-semibold uppercase tracking-wider text-textMuted/90">
+          <span>Journals Indexed: <span class="font-bold text-textMain" x-text="stats.total">0</span></span>
+          <span class="text-borderApp">&middot;</span>
+          <span>Refresh Rate: <span class="font-bold text-textMain">24 Hours</span></span>
+          <span class="text-borderApp">&middot;</span>
+          <span>Source URL: <a href="https://sinta.kemdiktisaintek.go.id" target="_blank" class="font-bold text-[#185FA5] hover:underline inline-flex items-center gap-0.5">sinta.kemdiktisaintek.go.id ↗</a></span>
+        </div>
+      </div>
+      <!-- Separator line -->
+      <hr class="border-t border-borderApp mx-6">
+
+      <!-- Stat Cards Row -->
+      <div class="grid grid-cols-1 md:grid-cols-8 gap-4 px-6 py-6">
+        <!-- Total -->
+        <div @click="setFilter('All')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-2 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'All' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-textMuted/90 leading-none">All Journals</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold text-textMain leading-none font-pjs" x-text="stats.total">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs">100%</div>
+          </div>
+        </div>
+        <!-- S1 -->
+        <div @click="setFilter('S1')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-1 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'S1' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-[#6d28d9]/90 leading-none">S1</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold leading-none font-pjs text-[#6d28d9]" x-text="stats.s1">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs" x-text="(stats.total > 0 ? Math.round(stats.s1 / stats.total * 100) : 0) + '%'">0%</div>
+          </div>
+        </div>
+        <!-- S2 -->
+        <div @click="setFilter('S2')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-1 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'S2' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-[#0f766e]/90 leading-none">S2</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold leading-none font-pjs text-[#0f766e]" x-text="stats.s2">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs" x-text="(stats.total > 0 ? Math.round(stats.s2 / stats.total * 100) : 0) + '%'">0%</div>
+          </div>
+        </div>
+        <!-- S3 -->
+        <div @click="setFilter('S3')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-1 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'S3' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-[#1d4ed8]/90 leading-none">S3</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold leading-none font-pjs text-[#1d4ed8]" x-text="stats.s3">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs" x-text="(stats.total > 0 ? Math.round(stats.s3 / stats.total * 100) : 0) + '%'">0%</div>
+          </div>
+        </div>
+        <!-- S4 -->
+        <div @click="setFilter('S4')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-1 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'S4' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-[#b45309]/90 leading-none">S4</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold leading-none font-pjs text-[#b45309]" x-text="stats.s4">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs" x-text="(stats.total > 0 ? Math.round(stats.s4 / stats.total * 100) : 0) + '%'">0%</div>
+          </div>
+        </div>
+        <!-- S5 -->
+        <div @click="setFilter('S5')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-1 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'S5' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-[#b91c1c]/90 leading-none">S5</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold leading-none font-pjs text-[#b91c1c]" x-text="stats.s5">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs" x-text="(stats.total > 0 ? Math.round(stats.s5 / stats.total * 100) : 0) + '%'">0%</div>
+          </div>
+        </div>
+        <!-- S6 -->
+        <div @click="setFilter('S6')"
+             class="border p-4 transition-all duration-200 cursor-pointer relative rounded-md bg-white border-borderApp/80 hover:border-textTertiary col-span-1 md:col-span-1 flex flex-col justify-between h-[102px]"
+             :class="activeFilter === 'S6' ? 'border-accentGold bg-[#fffdf7]' : ''">
+          <div class="text-[11px] font-bold font-pjs uppercase tracking-wider text-[#be185d]/90 leading-none">S6</div>
+          <div class="flex items-baseline justify-between mt-auto">
+            <div class="text-[28px] font-bold leading-none font-pjs text-[#be185d]" x-text="stats.s6">0</div>
+            <div class="text-[11px] font-medium text-textMuted/80 leading-none font-pjs" x-text="(stats.total > 0 ? Math.round(stats.s6 / stats.total * 100) : 0) + '%'">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar Row -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-6 py-3.5 bg-white border-y border-borderApp transition-colors duration-200">
+        <!-- Search bar with icon and clear button -->
+        <div class="relative flex-1 max-w-md" x-data="{ searchVal: '' }">
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted/80">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input type="text" id="searchInput" x-model="searchVal"
+                 @input="searchVal = $event.target.value; activeFilter = 'All'"
+                 placeholder="Search journal database..." 
+                 class="w-full pl-9 pr-8 py-2 text-[13px] font-pjs border border-borderApp/80 bg-white text-textMain focus:outline-none focus:border-textTertiary rounded-md placeholder-textMuted/70 transition-colors duration-200">
+          <!-- Clear Button -->
+          <button x-show="searchVal.length > 0" @click="searchVal = ''; clearSearch();"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-md font-semibold focus:outline-none">
+            &times;
+          </button>
+        </div>
+        
+        <!-- Filter pills with live counts in monospace -->
+        <div class="flex flex-wrap gap-1.5">
+          <template x-for="pill in getFilterPills()">
+            <button @click="setFilter(pill.id)"
+                    class="px-2.5 py-1.5 text-[11px] font-pjs font-bold uppercase tracking-wider transition-all duration-200 focus:outline-none flex items-center gap-1.5 border rounded-md"
+                    :class="getPillClasses(pill.id)">
+              <span x-text="pill.label"></span>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono"
+                    :class="activeFilter === pill.id ? 'bg-[#ffffff]/20 text-[#ffffff]' : 'bg-bgApp text-textMuted'"
+                    x-text="pill.count"></span>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Journal Table Section -->
+      <div class="px-6 py-6">
+        <div class="bg-white border border-borderApp rounded-[4px] overflow-hidden">
+          <table id="journalTable" class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-borderApp bg-bgApp/50 transition-colors duration-200">
+                <th class="py-3" style="width: 6%;">ID</th>
+                <th class="py-3" style="width: 62%;">Journal Name</th>
+                <th class="py-3" style="width: 8%;">Rank</th>
+                <th class="py-3" style="width: 12%;">Last Updated</th>
+                <th class="py-3" style="width: 12%;">Profile</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y border-b border-borderApp">
+              <!-- Populated dynamically by DataTables -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Table Legend / Footer -->
+      <div class="mx-6 mb-8 px-5 py-3 flex flex-col md:flex-row justify-between items-center gap-2 border border-borderApp bg-white rounded-md text-[12px] text-textMuted font-pjs font-medium transition-colors duration-200">
+        <div>* SINTA accreditation status is monitored in real-time.</div>
+        <div class="flex items-center gap-2">
+          <span class="inline-block text-[10px] font-bold tracking-wider text-[#27500A] bg-[#EAF3DE] px-1.5 py-0.5 rounded-[3px] font-pjs uppercase">CHANGED</span>
+          <span class="text-[11px] font-mono text-textMuted/90 font-semibold">(UPDATED &le; 7 DAYS)</span>
+        </div>
+      </div>
+
+    </div>    <!-- 4. Webhook Config View -->
+    <div x-show="activeTab === 'config'" x-cloak class="bg-bgApp min-h-screen transition-colors duration-200">
+      <div class="max-w-3xl mx-auto px-6 py-10">
+        <div class="mb-8">
+          <h2 class="text-[28px] font-bold text-textMain leading-none">Webhook Configuration</h2>
+          <p class="text-[15px] text-textMuted mt-2">Notification destinations for SINTA rank changes and system events.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-6">
+          <!-- Discord Webhook Card -->
+          <div class="bg-white border border-borderApp p-5 rounded-md">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-[13px] font-bold uppercase tracking-wider font-pjs text-textMain">Discord Webhook</span>
+                <!-- Status Badge -->
+                <span class="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-[3px] text-[10px] font-bold uppercase tracking-wider font-pjs"
+                      :class="config.webhook && config.webhook.discord_url ? 'bg-[#EAF3DE] text-[#27500A]' : 'bg-red-50 text-red-800 border border-red-100'">
+                  <span class="w-1.5 h-1.5 rounded-full" :class="config.webhook && config.webhook.discord_url ? 'bg-[#27500A]' : 'bg-red-600'"></span>
+                  <span x-text="config.webhook && config.webhook.discord_url ? 'Active' : 'Inactive'"></span>
+                </span>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2" x-show="config.webhook && config.webhook.discord_url">
+                <button @click="testWebhook('discord')" 
+                        class="px-2.5 py-1 text-[11px] font-pjs font-bold uppercase tracking-wider text-accentGold border border-accentGold/30 hover:border-accentGold rounded-md transition-colors duration-200">
+                  Test Connection
+                </button>
+                <button @click="editDiscord = !editDiscord; discordUrlInput = ''" 
+                        class="px-2.5 py-1 text-[11px] font-pjs font-bold uppercase tracking-wider text-textMuted border border-borderApp hover:border-textTertiary rounded-md transition-colors duration-200"
+                        x-text="editDiscord ? 'Cancel' : 'Edit'"></button>
+              </div>
+            </div>
+            
+            <div class="space-y-3">
+              <label class="block text-[10px] font-bold font-pjs text-textMuted/80 uppercase tracking-wider">Webhook URL</label>
+              
+              <!-- Display Masked URL -->
+              <div x-show="config.webhook && config.webhook.discord_url && !editDiscord"
+                   class="font-mono text-[13px] text-textMain bg-bgApp p-3 border border-borderApp/80 rounded-md break-all" 
+                   x-text="config.webhook.discord_url"></div>
+                   
+              <!-- Input field for new URL -->
+              <div x-show="!config.webhook || !config.webhook.discord_url || editDiscord">
+                <input type="url" x-model="discordUrlInput" placeholder="Paste your Discord Webhook URL (https://discord.com/api/webhooks/...)" 
+                       class="w-full font-mono text-[13px] text-textMain bg-white p-3 border border-borderApp/80 rounded-md focus:outline-none focus:border-textTertiary">
+              </div>
+            </div>
+          </div>
+
+          <!-- Telegram Config Card -->
+          <div class="bg-white border border-borderApp p-5 rounded-md">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-[13px] font-bold uppercase tracking-wider font-pjs text-textMain">Telegram Notifications</span>
+                <!-- Status Badge -->
+                <span class="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-[3px] text-[10px] font-bold uppercase tracking-wider font-pjs"
+                      :class="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'bg-[#EAF3DE] text-[#27500A]' : 'bg-red-50 text-red-800 border border-red-100'">
+                  <span class="w-1.5 h-1.5 rounded-full" :class="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'bg-[#27500A]' : 'bg-red-600'"></span>
+                  <span x-text="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'Active' : 'Inactive'"></span>
+                </span>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2" x-show="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id">
+                <button @click="testWebhook('telegram')" 
+                        class="px-2.5 py-1 text-[11px] font-pjs font-bold uppercase tracking-wider text-accentGold border border-accentGold/30 hover:border-accentGold rounded-md transition-colors duration-200">
+                  Test Connection
+                </button>
+                <button @click="editTelegram = !editTelegram; telegramBotInput = ''; telegramChatInput = ''" 
+                        class="px-2.5 py-1 text-[11px] font-pjs font-bold uppercase tracking-wider text-textMuted border border-borderApp hover:border-textTertiary rounded-md transition-colors duration-200"
+                        x-text="editTelegram ? 'Cancel' : 'Edit'"></button>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Bot Token field -->
+              <div class="space-y-2">
+                <label class="block text-[10px] font-bold font-pjs text-textMuted/80 uppercase tracking-wider">Bot Token</label>
+                
+                <!-- Display Masked Token -->
+                <div x-show="config.webhook && config.webhook.telegram_bot_token && !editTelegram"
+                     class="font-mono text-[13px] text-textMain bg-bgApp p-3 border border-borderApp/80 rounded-md" 
+                     x-text="config.webhook.telegram_bot_token"></div>
+                     
+                <!-- Input field for Token -->
+                <div x-show="!config.webhook || !config.webhook.telegram_bot_token || editTelegram">
+                  <input type="text" x-model="telegramBotInput" placeholder="Enter Bot Token" 
+                         class="w-full font-mono text-[13px] text-textMain bg-white p-3 border border-borderApp/80 rounded-md focus:outline-none focus:border-textTertiary">
+                </div>
+              </div>
+              
+              <!-- Chat ID field -->
+              <div class="space-y-2">
+                <label class="block text-[10px] font-bold font-pjs text-textMuted/80 uppercase tracking-wider">Chat ID</label>
+                
+                <!-- Display Masked Chat ID -->
+                <div x-show="config.webhook && config.webhook.telegram_chat_id && !editTelegram"
+                     class="font-mono text-[13px] text-textMain bg-bgApp p-3 border border-borderApp/80 rounded-md" 
+                     x-text="config.webhook.telegram_chat_id"></div>
+                     
+                <!-- Input field for Chat ID -->
+                <div x-show="!config.webhook || !config.webhook.telegram_chat_id || editTelegram">
+                  <input type="text" x-model="telegramChatInput" placeholder="Enter Chat ID" 
+                         class="w-full font-mono text-[13px] text-textMain bg-white p-3 border border-borderApp/80 rounded-md focus:outline-none focus:border-textTertiary">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Save Changes Button Bar (Visible when editing or not configured) -->
+          <div class="flex items-center justify-between p-4 border border-borderApp/80 rounded-md bg-white transition-all duration-300"
+               x-show="(!config.webhook || !config.webhook.discord_url || editDiscord) || (!config.webhook || !config.webhook.telegram_bot_token || !config.webhook.telegram_chat_id || editTelegram)">
+            <div class="text-[13px] font-pjs font-semibold text-textMuted">You have unsaved changes.</div>
+            <div class="flex items-center gap-3">
+              <button @click="resetForm()" 
+                      class="px-4 py-2 text-[12px] font-pjs font-bold uppercase tracking-wider text-textMuted hover:text-textMain transition-colors duration-200">
+                Cancel
+              </button>
+              <button @click="saveWebhookConfig()" :disabled="isSaving"
+                      class="px-4 py-2 text-[12px] font-pjs font-bold uppercase tracking-wider bg-accentGold text-white hover:bg-accentGold/90 rounded-md transition-all duration-200 flex items-center gap-2">
+                <span x-text="isSaving ? 'Saving...' : 'Save Configuration'"></span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Status Toast / Alert -->
+          <div x-show="saveMessage" 
+               class="p-4 rounded-md border flex items-center gap-3 transition-all duration-300"
+               :class="saveSuccess ? 'bg-[#EAF3DE] border-[#27500A]/30 text-[#27500A]' : 'bg-red-50 border-red-200 text-red-800'">
+            <span class="text-[13px] font-pjs font-bold" x-text="saveMessage"></span>
+          </div>
+
+          <!-- Instructions Alert -->
+          <div class="border border-borderApp p-5 rounded-md bg-white flex items-start gap-3">
+            <span class="text-accentGold mt-0.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </span>
+            <div class="text-[13px] text-textMuted">
+              <span class="font-bold text-textMain">To modify these configurations:</span> Webhook configurations are managed securely via environment variables, this interactive dashboard form, or by editing the <code class="font-mono bg-bgApp px-1.5 py-0.5 border border-borderApp rounded text-[12px] text-textMain">config.json</code> file in your server directory.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Set DataTables error mode to console to prevent blocking alert dialogs
+    $.fn.dataTable.ext.errMode = 'console';
+
+    // Tailwind Class names for ranks mapping (Automatic colors)
+    const rankStripeClasses = {
+      'S1': 'bg-[#6d28d9]',
+      'S2': 'bg-[#0f766e]',
+      'S3': 'bg-[#1d4ed8]',
+      'S4': 'bg-[#b45309]',
+      'S5': 'bg-[#b91c1c]',
+      'S6': 'bg-[#be185d]'
+    };
+
+    const rankTextColors = {
+      'S1': '#6d28d9',
+      'S2': '#0f766e',
+      'S3': '#1d4ed8',
+      'S4': '#b45309',
+      'S5': '#b91c1c',
+      'S6': '#be185d'
+    };
+
+    function getRankBadgeHTML(rank) {
+      if (!rank || rank === 'Unknown') return '';
+      const color = rankTextColors[rank] || '#1a1916';
+      return `<span class="font-bold font-pjs text-[14px]" style="color: ${color};">${rank}</span>`;
+    }
+
+    function toRelativeTime(dateStr) {
+      if (!dateStr) return '-';
+      const cleanStr = dateStr.replace(' ', 'T');
+      const lastUpdated = new Date(cleanStr);
+      
+      const now = new Date();
+      const diffMs = now - lastUpdated;
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHour = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHour / 24);
+      const diffMonth = Math.floor(diffDay / 30);
+
+      if (diffMs < 0) return 'just now';
+      if (diffSec < 5) return 'just now';
+      if (diffSec < 60) return `${diffSec}s ago`;
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHour < 24) return `${diffHour}h ago`;
+      if (diffDay < 30) return `${diffDay}d ago`;
+      if (diffMonth < 12) return `${diffMonth}mo ago`;
+      return `${Math.floor(diffDay / 365)}y ago`;
+    }
+
+    function isUpdatedWithin7Days(lastUpdatedStr) {
+      if (!lastUpdatedStr) return false;
+      const lastUpdated = new Date(lastUpdatedStr.replace(' ', 'T'));
+      const now = new Date();
+      const diffTime = Math.abs(now - lastUpdated);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 7;
+    }
+
+    function appState() {
+      return {
+        activeTab: 'dashboard',
+        journals: [],
+        stats: {
+          total: 0,
+          s1: 0,
+          s2: 0,
+          s3: 0,
+          s4: 0,
+          s5: 0,
+          s6: 0
+        },
+        activeFilter: 'All',
+        lastScrape: 'N/A',
+        config: {},
+        dataTableInstance: null,
+        
+        editDiscord: false,
+        editTelegram: false,
+        discordUrlInput: '',
+        telegramBotInput: '',
+        telegramChatInput: '',
+        isSaving: false,
+        saveMessage: '',
+        saveSuccess: true,
+
+        init() {
+          this.activeTab = window.ACTIVE_TAB;
+          if (this.activeTab === 'dashboard') {
+            this.fetchJournals();
+          } else {
+            this.config = window.CONFIG_DATA || {};
+          }
+        },
+
+        resetForm() {
+          this.editDiscord = false;
+          this.editTelegram = false;
+          this.discordUrlInput = '';
+          this.telegramBotInput = '';
+          this.telegramChatInput = '';
+          this.saveMessage = '';
+        },
+
+        saveWebhookConfig() {
+          this.isSaving = true;
+          this.saveMessage = '';
+          
+          const payload = {};
+          if (!this.config.webhook || !this.config.webhook.discord_url || this.editDiscord) {
+            payload.discord_url = this.discordUrlInput;
+          }
+          if (!this.config.webhook || !this.config.webhook.telegram_bot_token || !this.config.webhook.telegram_chat_id || this.editTelegram) {
+            payload.telegram_bot_token = this.telegramBotInput;
+            payload.telegram_chat_id = this.telegramChatInput;
+          }
+          
+          fetch('/api/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+          .then(res => res.json())
+          .then(data => {
+            this.isSaving = false;
+            if (data.success) {
+              this.saveSuccess = true;
+              this.saveMessage = 'Configuration saved successfully!';
+              this.config = data.config;
+              this.resetForm();
+              setTimeout(() => { this.saveMessage = ''; }, 3000);
+            } else {
+              this.saveSuccess = false;
+              this.saveMessage = data.error || 'Failed to save configuration.';
+            }
+          })
+          .catch(err => {
+            this.isSaving = false;
+            this.saveSuccess = false;
+            this.saveMessage = 'Network error occurred.';
+          });
+        },
+
+        testWebhook(platform) {
+          this.saveMessage = '';
+          fetch('/api/config/test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ platform: platform })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              this.saveSuccess = true;
+              this.saveMessage = `Test alert sent successfully to ${platform}!`;
+              setTimeout(() => { this.saveMessage = ''; }, 3000);
+            } else {
+              this.saveSuccess = false;
+              this.saveMessage = data.error || `Failed to send test alert to ${platform}.`;
+            }
+          })
+          .catch(err => {
+            this.saveSuccess = false;
+            this.saveMessage = 'Network error occurred while testing.';
+          });
+        },
+
+        getFilterPills() {
+          const changedCount = this.journals.filter(j => isUpdatedWithin7Days(j.last_updated)).length;
+          return [
+            { id: 'All', label: 'All', count: this.journals.length },
+            { id: 'S1', label: 'S1', count: this.stats.s1 },
+            { id: 'S2', label: 'S2', count: this.stats.s2 },
+            { id: 'S3', label: 'S3', count: this.stats.s3 },
+            { id: 'S4', label: 'S4', count: this.stats.s4 },
+            { id: 'S5', label: 'S5', count: this.stats.s5 },
+            { id: 'S6', label: 'S6', count: this.stats.s6 },
+            { id: 'Changed', label: 'Changed', count: changedCount }
+          ];
+        },
+
+        getPillClasses(pillId) {
+          const colorMap = {
+            'S1': { active: 'bg-[#6d28d9] text-[#ffffff] border-[#6d28d9]', inactive: 'bg-[#ffffff] text-[#6d28d9] border-[#6d28d9]/30 hover:border-[#6d28d9]' },
+            'S2': { active: 'bg-[#0f766e] text-[#ffffff] border-[#0f766e]', inactive: 'bg-[#ffffff] text-[#0f766e] border-[#0f766e]/30 hover:border-[#0f766e]' },
+            'S3': { active: 'bg-[#1d4ed8] text-[#ffffff] border-[#1d4ed8]', inactive: 'bg-[#ffffff] text-[#1d4ed8] border-[#1d4ed8]/30 hover:border-[#1d4ed8]' },
+            'S4': { active: 'bg-[#b45309] text-[#ffffff] border-[#b45309]', inactive: 'bg-[#ffffff] text-[#b45309] border-[#b45309]/30 hover:border-[#b45309]' },
+            'S5': { active: 'bg-[#b91c1c] text-[#ffffff] border-[#b91c1c]', inactive: 'bg-[#ffffff] text-[#b91c1c] border-[#b91c1c]/30 hover:border-[#b91c1c]' },
+            'S6': { active: 'bg-[#be185d] text-[#ffffff] border-[#be185d]', inactive: 'bg-[#ffffff] text-[#be185d] border-[#be185d]/30 hover:border-[#be185d]' },
+            'Changed': { active: 'bg-[#27500A] text-[#ffffff] border-[#27500A]', inactive: 'bg-[#ffffff] text-[#27500A] border-[#27500A]/30 hover:border-[#27500A]' },
+            'All': { active: 'bg-[#1a1916] text-[#ffffff] border-[#1a1916]', inactive: 'bg-[#ffffff] text-textMain border-borderApp hover:border-textTertiary' },
+          };
+          const entry = colorMap[pillId] || colorMap['All'];
+          return this.activeFilter === pillId ? entry.active : entry.inactive;
+        },
+
+        fetchJournals() {
+          fetch('/api/journals')
+            .then(res => res.json())
+            .then(data => {
+              this.journals = data;
+              this.calculateStats();
+              this.initDataTable();
+            });
+        },
+
+        calculateStats() {
+          this.stats.total = this.journals.length;
+          this.stats.s1 = 0;
+          this.stats.s2 = 0;
+          this.stats.s3 = 0;
+          this.stats.s4 = 0;
+          this.stats.s5 = 0;
+          this.stats.s6 = 0;
+          
+          let latestTime = null;
+          
+          this.journals.forEach(j => {
+            const r = j.current_rank;
+            if (r === 'S1') this.stats.s1++;
+            else if (r === 'S2') this.stats.s2++;
+            else if (r === 'S3') this.stats.s3++;
+            else if (r === 'S4') this.stats.s4++;
+            else if (r === 'S5') this.stats.s5++;
+            else if (r === 'S6') this.stats.s6++;
+            
+            if (j.last_updated) {
+              const t = new Date(j.last_updated.replace(' ', 'T'));
+              if (!latestTime || t > latestTime) {
+                latestTime = t;
+              }
+            }
+          });
+          
+          if (latestTime) {
+            const pad = (n) => String(n).padStart(2, '0');
+            this.lastScrape = `${latestTime.getFullYear()}-${pad(latestTime.getMonth()+1)}-${pad(latestTime.getDate())} ${pad(latestTime.getHours())}:${pad(latestTime.getMinutes())}:${pad(latestTime.getSeconds())}`;
+          }
+        },
+
+        initDataTable() {
+          const self = this;
+          
+          // Step 1: Destroy previous instance if it exists, so we can rebuild the DOM
+          if ($.fn.DataTable.isDataTable('#journalTable')) {
+            $('#journalTable').DataTable().destroy();
+          }
+
+          // Step 2: Populate <tbody> rows directly in DOM
+          const tbody = document.querySelector('#journalTable tbody');
+          if (tbody) {
+            tbody.innerHTML = '';
+            
+            this.journals.forEach(j => {
+              const tr = document.createElement('tr');
+              
+              const isRecent = isUpdatedWithin7Days(j.last_updated);
+              
+              // Rank Text
+              const rankBadge = (j.current_rank && j.current_rank !== 'Unknown') ? getRankBadgeHTML(j.current_rank) : '';
+              
+              // Rank Stripe 3px x 14px
+              const stripeClass = rankStripeClasses[j.current_rank] || 'bg-slate-400';
+              const stripe = `<span class="inline-block w-[3px] h-[14px] rounded-[1px] flex-shrink-0 ${stripeClass}"></span>`;
+              
+              // Changed badge inside cell (compact modern badge)
+              const changedBadge = isRecent ? `<span class="inline-block text-[10px] font-bold tracking-wider text-[#27500A] bg-[#EAF3DE] px-1.5 py-0.5 rounded-[3px] font-pjs uppercase ml-2">CHANGED</span>` : '';
+              
+              // Formatting dates and urls
+              const relativeDate = toRelativeTime(j.last_updated);
+              const formattedDate = j.last_updated ? j.last_updated.replace('T', ' ').substring(0, 19) : '';
+              
+              const sintaId = j.sinta_url ? j.sinta_url.split('/').pop() : '';
+              const profileLink = `<a href="${j.sinta_url}" target="_blank" class="inline-flex items-center text-[#185FA5] hover:underline font-mono text-[12px]">
+                <span>sinta/${sintaId} ↗</span>
+              </a>`;
+              
+              tr.innerHTML = `
+                <td class="font-mono text-[#aaa89f] py-[11px] text-[11px] text-center">${j.id}</td>
+                <td class="py-[11px] text-[14px] font-semibold text-textMain font-pjs">
+                  <div class="flex items-center gap-3">
+                    ${stripe}
+                    <span>${j.journal_name}</span>
+                    ${changedBadge}
+                  </div>
+                </td>
+                <td class="py-[11px] text-center">${rankBadge}</td>
+                <td class="font-mono text-[#6b6860] py-[11px] text-[12px] text-center" data-order="${j.last_updated || ''}" title="${formattedDate}">${relativeDate}</td>
+                <td class="py-[11px] text-center">${profileLink}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+
+          // Step 3: Initialize DataTables inside a nextTick to let DOM settle, guarded
+          this.$nextTick(() => {
+            if (!$.fn.DataTable.isDataTable('#journalTable')) {
+              // Clear previous search filters
+              $.fn.dataTable.ext.search = [];
+              
+              const table = $('#journalTable').DataTable({
+                dom: 'rtip',
+                pageLength: 10,
+                language: {
+                  info: 'Showing _START_ to _END_ of _TOTAL_ journals',
+                  infoFiltered: '(filtered from _MAX_ total journals)',
+                  paginate: {
+                    previous: '←',
+                    next: '→'
+                  }
+                }
+              });
+
+              // Search filtering by Journal Name (column 1)
+              $('#searchInput').on('input', function() {
+                self.activeFilter = 'All'; // Search input resets active pill to "All"
+                table.column(1).search(this.value).draw();
+              });
+
+              // DataTables custom filter setup
+              $.fn.dataTable.ext.search.push(function(settings, searchData, dataIndex, rowData) {
+                if (self.activeFilter === 'All') return true;
+                
+                // Get the original journal object by parsing ID (column 0)
+                const journalId = parseInt(searchData[0], 10);
+                const journal = self.journals.find(j => j.id === journalId);
+                if (!journal) return true;
+
+                if (self.activeFilter === 'Changed') {
+                  return isUpdatedWithin7Days(journal.last_updated);
+                }
+                
+                return journal.current_rank === self.activeFilter;
+              });
+
+              self.dataTableInstance = table;
+            }
+          });
+        },
+
+        setFilter(filterName) {
+          this.activeFilter = filterName;
+          if (this.dataTableInstance) {
+            this.dataTableInstance.draw();
+          }
+        },
+
+        clearSearch() {
+          this.activeFilter = 'All';
+          const searchInput = document.getElementById('searchInput');
+          if (searchInput) {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        },
+
+        navigate(tab) {
+          if (tab === 'dashboard') {
+            window.location.href = '/';
+          } else if (tab === 'config') {
+            window.location.href = '/config';
+          }
+        }
+      };
+    }
+  </script>
+</body>
+</html>
