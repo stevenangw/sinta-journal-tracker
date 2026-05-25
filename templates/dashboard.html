@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SINTA Journal Rank Monitor</title>
+  <title>SINTA Journal Accreditation Rank Monitor</title>
 
-  <!-- Synchronously check and apply dark theme immediately to prevent FOUC / white flash -->
+  <!-- Prevent FOUC (Flash of Unstyled Content) by setting dark theme instantly -->
   <script>
     if (localStorage.getItem('theme') === 'dark' || 
         (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -15,7 +15,7 @@
     }
   </script>
 
-  <!-- Google Fonts: Spectral for editorial headings, Plus Jakarta Sans for UI elements, JetBrains Mono for data -->
+  <!-- Google Fonts: Editorial Serif and Technical pairings -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Spectral:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -26,20 +26,18 @@
   <!-- Alpine.js via CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-  <!-- Custom Theme Configurations using Tailwind Config -->
+  <!-- Tailored visual variables & extended configurations -->
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            // Using OKLCH mapped values as CSS variables for perfect light/dark dynamic themes
             appBg: 'var(--color-app-bg)',
             cardBg: 'var(--color-card-bg)',
             cardBorder: 'var(--color-card-border)',
             textMain: 'var(--color-text-main)',
             textMuted: 'var(--color-text-muted)',
-            textTeal: 'var(--color-text-teal)',
             brandGold: 'var(--color-brand-gold)',
             brandGoldHover: 'var(--color-brand-gold-hover)',
           },
@@ -53,54 +51,57 @@
     }
   </script>
 
-  <!-- Premium Design System (OKLCH Dynamic Theme Tokens) -->
+  <!-- Premium Design Styling -->
   <style>
     :root {
-      --color-app-bg: oklch(97.5% 0.004 85);       /* Sleek soft warm cream-grey */
-      --color-card-bg: oklch(100% 0 0);           /* Pure white card base */
-      --color-card-border: oklch(90% 0.008 85);     /* Elegant light grey border */
-      --color-text-main: oklch(15% 0.01 85);       /* Deep obsidian charcoal text */
-      --color-text-muted: oklch(50% 0.015 85);     /* Slate muted text */
-      --color-brand-gold: oklch(62% 0.12 85);      /* Premium bronze-gold accent */
-      --color-brand-gold-hover: oklch(55% 0.12 85);
-      --color-text-teal: oklch(45% 0.15 190);      /* Editorial link teal */
+      --color-app-bg: oklch(98.2% 0.003 85);       /* Subtle warm paper cream background */
+      --color-card-bg: oklch(100% 0 0);           /* Pure alabaster white */
+      --color-card-border: oklch(91.5% 0.006 85);   /* Fine hairline border */
+      --color-text-main: oklch(18% 0.012 85);      /* Deep carbon charcoal */
+      --color-text-muted: oklch(52% 0.015 85);     /* Soft editorial graphite */
+      --color-brand-gold: oklch(62% 0.11 85);      /* Muted premium gold-bronze */
+      --color-brand-gold-hover: oklch(56% 0.11 85);
     }
 
     .dark {
-      --color-app-bg: oklch(12% 0.015 260);        /* Deep ink midnight base */
-      --color-card-bg: oklch(16% 0.018 260);       /* Solid graphite card panels */
-      --color-card-border: oklch(24% 0.02 260);    /* Clean high-contrast dark border */
-      --color-text-main: oklch(95% 0.005 85);      /* Clean cream-white text */
-      --color-text-muted: oklch(65% 0.01 260);     /* Soft grey-blue muted text */
-      --color-brand-gold: oklch(75% 0.12 85);      /* Highly visible premium gold */
-      --color-brand-gold-hover: oklch(80% 0.12 85);
-      --color-text-teal: oklch(75% 0.12 190);      /* Luminous teal link */
+      --color-app-bg: oklch(13.5% 0.014 260);     /* Ink-obsidian night sky */
+      --color-card-bg: oklch(17.5% 0.017 260);    /* Premium slate graphite panel */
+      --color-card-border: oklch(25% 0.018 260);   /* Muted obsidian separator */
+      --color-text-main: oklch(95% 0.004 85);      /* Luminous cream-white */
+      --color-text-muted: oklch(66% 0.012 260);    /* Velvet slate blue-grey */
+      --color-brand-gold: oklch(76% 0.11 85);      /* Warm antique bronze gold */
+      --color-brand-gold-hover: oklch(81% 0.11 85);
     }
 
     body {
       background-color: var(--color-app-bg);
       color: var(--color-text-main);
-      transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     [x-cloak] {
       display: none !important;
     }
 
-    /* Elegant custom scrollbar */
+    /* Asymmetric, ultra-premium editorial scrollbars */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background: oklch(75% 0.01 85 / 0.3);
-      border-radius: 9999px;
+      background: oklch(75% 0.01 85 / 0.25);
+      border-radius: 10px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: oklch(75% 0.01 85 / 0.6);
+      background: oklch(75% 0.01 85 / 0.5);
+    }
+
+    /* Soft transition curves */
+    .premium-transition {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
   </style>
 </head>
@@ -114,14 +115,14 @@
 
   <!-- 1. Floating Glassmorphic Header -->
   <header class="sticky top-0 z-40 w-full bg-cardBg/80 dark:bg-cardBg/70 border-b border-cardBorder backdrop-blur-md transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <!-- Logo mark: Premium asymmetric geometric design -->
-        <span class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-brandGold text-white shadow-md shadow-brandGold/20 font-serif font-bold text-lg">
+        <span class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-brandGold text-white shadow-md shadow-brandGold/20 font-serif font-bold text-xl premium-transition transform active:scale-95">
           S
         </span>
         <div>
-          <h1 class="text-[15px] font-extrabold uppercase tracking-wider font-sans leading-none text-textMain">
+          <h1 class="text-[14px] sm:text-[15px] font-extrabold uppercase tracking-widest font-sans leading-none text-textMain">
             SINTA Tracker
           </h1>
           <span class="text-[9px] font-mono tracking-widest uppercase text-textMuted leading-none block mt-0.5">
@@ -131,7 +132,7 @@
       </div>
       
       <!-- System status and Actions -->
-      <div class="flex items-center gap-6">
+      <div class="flex items-center gap-4 sm:gap-6">
         <div class="hidden sm:flex items-center gap-2.5">
           <!-- Pulse status light -->
           <span class="relative flex h-2 w-2">
@@ -144,68 +145,73 @@
           </span>
         </div>
 
-        <!-- Dark mode toggle & Profile actions -->
-        <div class="flex items-center gap-2">
-          <button @click="toggleTheme()" 
-                  id="themeToggleBtn"
-                  class="p-2 rounded-lg border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain transition-all duration-200 focus:outline-none"
-                  aria-label="Toggle visual theme">
-            <!-- Light icon -->
-            <svg x-show="!darkMode" class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L5.636 5.636M12 8a4 4 0 100 8 4 4 0 000-8z" />
-            </svg>
-            <!-- Dark icon -->
-            <svg x-show="darkMode" x-cloak class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </button>
-        </div>
+        <!-- Theme preference toggle button -->
+        <button @click="toggleTheme()" 
+                id="themeToggleBtn"
+                class="p-2 rounded-lg border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+                aria-label="Toggle visual theme">
+          <!-- Light icon -->
+          <svg x-show="!darkMode" class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L5.636 5.636M12 8a4 4 0 100 8 4 4 0 000-8z" />
+          </svg>
+          <!-- Dark icon -->
+          <svg x-show="darkMode" x-cloak class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- 2. Minimal Navigation Bar -->
+  <!-- 2. Minimalist Navigation Bar -->
   <nav class="bg-cardBg border-b border-cardBorder w-full transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-6 py-2 flex items-center gap-1">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-1.5">
       <button @click="navigate('dashboard')" 
               id="navDashboardBtn"
-              class="relative px-4 py-2.5 text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none"
+              class="relative px-3.5 sm:px-4 py-2.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
               :class="activeTab === 'dashboard' ? 'bg-appBg text-textMain' : 'text-textMuted hover:text-textMain hover:bg-appBg/40'">
         Dashboard
-        <span x-show="activeTab === 'dashboard'" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-3.5 h-0.5 bg-brandGold rounded-full"></span>
+        <span x-show="activeTab === 'dashboard'" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-brandGold rounded-full"></span>
       </button>
       <button @click="navigate('config')" 
               id="navConfigBtn"
-              class="relative px-4 py-2.5 text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none"
+              class="relative px-3.5 sm:px-4 py-2.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
               :class="activeTab === 'config' ? 'bg-appBg text-textMain' : 'text-textMuted hover:text-textMain hover:bg-appBg/40'">
         Webhook Settings
-        <span x-show="activeTab === 'config'" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-3.5 h-0.5 bg-brandGold rounded-full"></span>
+        <span x-show="activeTab === 'config'" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-brandGold rounded-full"></span>
       </button>
     </div>
   </nav>
 
   <!-- Main Workspace -->
-  <main class="flex-grow w-full max-w-7xl mx-auto px-6 py-8">
+  <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
     
     <!-- 3. Dashboard View -->
     <div x-show="activeTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
       
-      <!-- Premium Hero Section -->
-      <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all duration-300">
-        <div class="space-y-2 max-w-2xl">
-          <h2 class="text-2xl md:text-3xl font-serif font-bold text-textMain tracking-tight leading-tight">Journal Rank Change Engine</h2>
-          <p class="text-[14px] text-textMuted leading-relaxed">
-            Autonomous scraping & historical audit daemon tracking accreditation shifts (S1–S6) for Computer Science, Information Systems, and Engineering publications indexed by SINTA.
+      <!-- Asymmetric Premium Hero Banner -->
+      <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all duration-300">
+        <div class="space-y-2.5 max-w-2xl">
+          <h2 class="text-2xl sm:text-3xl font-serif font-bold text-textMain tracking-tight leading-tight">
+            Journal Accreditation Tracker
+          </h2>
+          <p class="text-[13px] sm:text-[14px] text-textMuted leading-relaxed">
+            Monitor and track data integrity of SINTA journal accreditation ranks. This daemon runs scheduled crawler sweeps to detect any grade shifts and immediately dispatches alerts to structured Discord or Telegram notification channels.
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-4 border-t md:border-t-0 md:border-l border-cardBorder pt-4 md:pt-0 md:pl-6">
-          <div class="text-center md:text-left min-w-[100px]">
-            <span class="text-[10px] font-bold font-sans uppercase tracking-widest text-textMuted block">Daemon Mode</span>
-            <span class="text-[13px] font-extrabold text-emerald-500 dark:text-emerald-400 font-sans tracking-wide">ACTIVE</span>
+        <div class="flex flex-row items-center gap-6 border-t lg:border-t-0 lg:border-l border-cardBorder pt-4 lg:pt-0 lg:pl-8">
+          <div class="min-w-[100px]">
+            <span class="text-[9px] font-bold font-sans uppercase tracking-widest text-textMuted block">Daemon Status</span>
+            <span class="text-[12px] font-extrabold text-emerald-500 dark:text-emerald-400 font-sans tracking-wide flex items-center gap-1.5 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              ONLINE
+            </span>
           </div>
-          <div class="text-center md:text-left min-w-[100px]">
-            <span class="text-[10px] font-bold font-sans uppercase tracking-widest text-textMuted block">Audit Interval</span>
-            <span class="text-[13px] font-extrabold text-textMain font-sans tracking-wide">24 Hours</span>
+          <div class="min-w-[100px]">
+            <span class="text-[9px] font-bold font-sans uppercase tracking-widest text-textMuted block">Audit Interval</span>
+            <span class="text-[12px] font-extrabold text-textMain font-sans tracking-wide block mt-0.5">
+              24 Hours
+            </span>
           </div>
         </div>
       </div>
@@ -216,23 +222,26 @@
         <!-- MAIN PANEL (70% - Columns 1 to 7) -->
         <div class="lg:col-span-7 space-y-6">
           
-          <!-- Interactive Visual Stats Grid -->
-          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
+          <!-- Interactive Visual Stats Grid (Mobile-friendly: Wrap dynamically, custom shadows) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            <!-- ALL button -->
             <button @click="setFilter('All')"
-                 id="statAllBtn"
-                 class="border p-3 transition-all duration-300 cursor-pointer rounded-xl bg-cardBg border-cardBorder hover:border-brandGold flex flex-col justify-between items-start text-left shadow-sm group"
-                 :class="activeFilter === 'All' ? 'ring-2 ring-brandGold border-transparent' : ''">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-textMuted leading-none">ALL</span>
-              <span class="text-[20px] font-extrabold text-textMain leading-none mt-3 font-sans group-hover:scale-105 transition-transform" x-text="stats.total">0</span>
+                    id="statAllBtn"
+                    class="p-3.5 transition-all duration-300 rounded-xl bg-cardBg border flex flex-col justify-between items-start text-left shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:shadow-lg active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40"
+                    :class="activeFilter === 'All' ? 'ring-2 ring-brandGold border-transparent' : 'border-cardBorder hover:border-brandGold/40'">
+              <span class="text-[9px] font-bold uppercase tracking-widest text-textMuted leading-none">ALL</span>
+              <span class="text-[20px] font-extrabold text-textMain leading-none mt-3.5 font-sans group-hover:translate-x-0.5 premium-transition" x-text="stats.total">0</span>
             </button>
+            <!-- S1 to S6 buttons with dynamically calculated oklch shadow glows and borders -->
             <template x-for="rank in ['S1','S2','S3','S4','S5','S6']">
               <button @click="setFilter(rank)"
-                   :id="'stat' + rank + 'Btn'"
-                   class="border p-3 transition-all duration-300 cursor-pointer rounded-xl bg-cardBg border-cardBorder hover:border-brandGold flex flex-col justify-between items-start text-left shadow-sm group"
-                   :class="activeFilter === rank ? 'ring-2 ring-brandGold border-transparent' : ''">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider leading-none" :style="'color: ' + getRankColor(rank)" x-text="rank"></span>
-                <div class="flex items-baseline justify-between w-full mt-3">
-                  <span class="text-[20px] font-extrabold leading-none font-sans group-hover:scale-105 transition-transform" :style="'color: ' + getRankColor(rank)" x-text="stats[rank.toLowerCase()]">0</span>
+                      :id="'stat' + rank + 'Btn'"
+                      class="p-3.5 transition-all duration-300 rounded-xl bg-cardBg border flex flex-col justify-between items-start text-left shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:shadow-lg active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40"
+                      :style="activeFilter === rank ? 'border-color: ' + getRankColor(rank) + '; box-shadow: 0 8px 24px -6px color-mix(in oklch, ' + getRankColor(rank) + ' 25%, transparent); border-width: 2px' : 'border-color: var(--color-card-border);'"
+                      :class="activeFilter === rank ? '' : 'hover:border-brandGold/30'">
+                <span class="text-[9px] font-extrabold uppercase tracking-widest leading-none" :style="'color: ' + getRankColor(rank)" x-text="rank"></span>
+                <div class="flex items-baseline justify-between w-full mt-3.5">
+                  <span class="text-[20px] font-extrabold leading-none font-sans group-hover:translate-x-0.5 premium-transition" :style="'color: ' + getRankColor(rank)" x-text="stats[rank.toLowerCase()]">0</span>
                   <span class="text-[9px] font-mono text-textMuted" x-text="(stats.total > 0 ? Math.round(stats[rank.toLowerCase()] / stats.total * 100) : 0) + '%'"></span>
                 </div>
               </button>
@@ -240,21 +249,21 @@
           </div>
 
           <!-- Toolbar Row -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-sm transition-all duration-300">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
             <!-- Search bar with icon and clear button -->
-            <div class="relative flex-1 max-w-md">
+            <div class="relative flex-1 max-w-md w-full">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </span>
               <input type="text" id="searchInput" x-model="searchVal" @input="currentPage = 1"
-                     placeholder="Search database (e.g. 'Sistem Informasi')..." 
-                     class="w-full pl-10 pr-8 py-2 text-[13px] font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold rounded-lg placeholder-textMuted/60 transition-all duration-200">
+                     placeholder="Search journal name or rank..." 
+                     class="w-full pl-10 pr-8 py-2 text-[13px] font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-lg placeholder-textMuted/60 premium-transition">
               <!-- Clear Button -->
-              <button x-show="searchVal.length > 0" @click="searchVal = ''"
+              <button x-show="searchVal.length > 0" @click="searchVal = ''; currentPage = 1"
                       id="searchClearBtn"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-lg font-bold focus:outline-none">
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-lg font-bold focus:outline-none focus-visible:text-brandGold">
                 &times;
               </button>
             </div>
@@ -263,8 +272,8 @@
             <div class="flex items-center gap-2">
               <button @click="toggleChangedFilter()"
                       id="filterChangedBtn"
-                      class="px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 focus:outline-none flex items-center gap-2 border rounded-lg shadow-sm"
-                      :class="activeFilter === 'Changed' ? 'bg-[#27500A] text-white border-transparent' : 'bg-cardBg text-textMain border-cardBorder hover:border-textMuted'">
+                      class="px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center gap-2 border rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.01)]"
+                      :class="activeFilter === 'Changed' ? 'bg-[#27500A] dark:bg-emerald-800 text-white border-transparent' : 'bg-cardBg text-textMain border-cardBorder hover:border-textMuted hover:bg-appBg/30'">
                 <span>Rank Changed</span>
                 <span class="px-1.5 py-0.5 rounded text-[9px] font-bold font-mono"
                       :class="activeFilter === 'Changed' ? 'bg-white/20 text-white' : 'bg-appBg text-textMuted'"
@@ -273,141 +282,197 @@
             </div>
           </div>
 
-          <!-- Clean Modern Table Container -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl overflow-hidden shadow-sm transition-all duration-300">
-            <div class="overflow-x-auto">
-              <table id="journalTable" class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="border-b border-cardBorder bg-appBg/30 text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
-                    <th class="py-4.5 px-5 text-center w-[8%]">ID</th>
-                    <th class="py-4.5 px-4 cursor-pointer hover:text-textMain transition-colors w-[60%]" @click="toggleSort('journal_name')">
-                      <div class="flex items-center gap-1.5">
-                        <span>Journal Title</span>
-                        <svg x-show="sortCol === 'journal_name' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                        <svg x-show="sortCol === 'journal_name' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                      </div>
-                    </th>
-                    <th class="py-4.5 px-4 text-center cursor-pointer hover:text-textMain transition-colors w-[12%]" @click="toggleSort('current_rank')">
-                      <div class="flex items-center justify-center gap-1.5">
-                        <span>Rank</span>
-                        <svg x-show="sortCol === 'current_rank' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                        <svg x-show="sortCol === 'current_rank' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                      </div>
-                    </th>
-                    <th class="py-4.5 px-5 text-center cursor-pointer hover:text-textMain transition-colors w-[20%]" @click="toggleSort('last_updated')">
-                      <div class="flex items-center justify-center gap-1.5">
-                        <span>Last Checked</span>
-                        <svg x-show="sortCol === 'last_updated' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                        <svg x-show="sortCol === 'last_updated' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-cardBorder font-sans">
-                  <!-- Empty Skeleton Loader -->
-                  <tr x-show="journals.length === 0">
-                    <td colspan="4" class="py-12 text-center text-textMuted font-mono text-[13px]">
-                      <div class="flex flex-col items-center justify-center gap-3">
-                        <!-- Modern premium skeleton visual -->
-                        <span class="relative flex h-3 w-3">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brandGold opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-brandGold"></span>
-                        </span>
-                        <span>Initializing journal records database...</span>
-                      </div>
-                    </td>
-                  </tr>
+          <!-- Adaptive Data List (Mobile: Cards, Desktop: Table) -->
+          <div class="space-y-4">
+            
+            <!-- MOBILE CARD VIEW (Block on <768px, Hidden on >=768px) -->
+            <div class="block md:hidden space-y-3">
+              <!-- Empty state loader / skeleton -->
+              <div x-show="journals.length === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted font-mono text-[12px] space-y-3">
+                <span class="relative flex h-3 w-3 mx-auto">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brandGold opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-brandGold"></span>
+                </span>
+                <p>Initializing database and loading records...</p>
+              </div>
 
-                  <!-- Reactive Data Listing -->
-                  <template x-for="j in pagedJournals" :key="j.id">
-                    <tr @click="openDrawer(j)" 
-                        :id="'journalRow' + j.id"
-                        class="hover:bg-appBg/30 cursor-pointer transition-colors duration-150 group">
-                      <td class="font-mono text-textMuted text-[11px] py-4 px-5 text-center" x-text="j.id"></td>
-                      <td class="py-4 px-4">
-                        <div class="flex items-center gap-3">
-                          <!-- Rank left accent stripe -->
-                          <span class="inline-block w-1 h-3 rounded-full flex-shrink-0" 
-                                :style="'background-color: ' + getRankColor(j.current_rank)"></span>
-                          <span class="text-[13px] font-semibold text-textMain group-hover:text-brandGold transition-colors font-sans" x-text="j.journal_name"></span>
-                          
-                          <!-- "Changed" notification tag -->
-                          <span x-show="isUpdatedWithin7Days(j.last_updated)" 
-                                class="text-[9px] font-extrabold tracking-widest text-[#27500A] bg-[#EAF3DE] dark:bg-[#27500A]/20 dark:text-emerald-400 px-1.5 py-0.5 rounded-[4px] font-sans uppercase">
-                            CHANGED
+              <!-- Main Loop Cards -->
+              <template x-for="j in pagedJournals" :key="j.id">
+                <div @click="openDrawer(j)" 
+                     class="bg-cardBg border border-cardBorder rounded-xl p-4.5 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-brandGold/60 premium-transition cursor-pointer active:scale-[0.99] group">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                      <!-- Accent Stripe -->
+                      <span class="w-1.5 h-3 rounded-full flex-shrink-0" :style="'background-color: ' + getRankColor(j.current_rank)"></span>
+                      <span class="text-[13px] font-bold text-textMain group-hover:text-brandGold premium-transition" x-text="j.journal_name"></span>
+                    </div>
+                    <span class="text-[12px] font-extrabold uppercase font-sans tracking-wide shrink-0 px-2.5 py-0.5 rounded-md" 
+                          :style="'color: ' + getRankColor(j.current_rank) + '; background-color: color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 10%, transparent)'"
+                          x-text="j.current_rank"></span>
+                  </div>
+
+                  <div class="flex justify-between items-center pt-2.5 border-t border-cardBorder/50 text-[11px] text-textMuted font-mono">
+                    <span class="font-medium" x-text="'ID: #' + j.id"></span>
+                    <span class="flex items-center gap-1.5">
+                      <span x-show="isUpdatedWithin7Days(j.last_updated)" 
+                            class="text-[9px] font-extrabold tracking-widest text-[#27500A] bg-[#EAF3DE] dark:bg-[#27500A]/20 dark:text-emerald-400 px-1.5 py-0.5 rounded-[4px] font-sans uppercase inline-block shrink-0">
+                        CHANGED
+                      </span>
+                      <span x-text="toRelativeTime(j.last_updated)"></span>
+                    </span>
+                  </div>
+                </div>
+              </template>
+
+              <!-- No records match -->
+              <div x-show="journals.length > 0 && filteredCount === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted text-[13px]">
+                No matching journal logs found in database.
+              </div>
+            </div>
+
+            <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
+            <div class="hidden md:block bg-cardBg border border-cardBorder rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+              <div class="overflow-x-auto">
+                <table id="journalTable" class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-cardBorder bg-appBg/30 text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
+                      <th class="py-4 px-5 text-center w-[8%]">ID</th>
+                      <th class="py-4 px-4 cursor-pointer hover:text-textMain premium-transition w-[58%]" @click="toggleSort('journal_name')">
+                        <div class="flex items-center gap-1.5">
+                          <span>Journal Title</span>
+                          <svg x-show="sortCol === 'journal_name' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                          <svg x-show="sortCol === 'journal_name' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                      </th>
+                      <th class="py-4 px-4 text-center cursor-pointer hover:text-textMain premium-transition w-[14%]" @click="toggleSort('current_rank')">
+                        <div class="flex items-center justify-center gap-1.5">
+                          <span>Accreditation</span>
+                          <svg x-show="sortCol === 'current_rank' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                          <svg x-show="sortCol === 'current_rank' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                      </th>
+                      <th class="py-4 px-5 text-center cursor-pointer hover:text-textMain premium-transition w-[20%]" @click="toggleSort('last_updated')">
+                        <div class="flex items-center justify-center gap-1.5">
+                          <span>Last Audited</span>
+                          <svg x-show="sortCol === 'last_updated' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                          <svg x-show="sortCol === 'last_updated' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-cardBorder/60 font-sans">
+                    <!-- Empty Skeleton Loader -->
+                    <tr x-show="journals.length === 0">
+                      <td colspan="4" class="py-16 text-center text-textMuted font-mono text-[12px]">
+                        <div class="flex flex-col items-center justify-center gap-3">
+                          <span class="relative flex h-3.5 w-3.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brandGold opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-brandGold"></span>
                           </span>
+                          <span>Hydrating system database records from SINTA core...</span>
                         </div>
                       </td>
-                      <td class="py-4 px-4 text-center">
-                        <span class="font-extrabold text-[13px] font-sans" 
-                              :style="'color: ' + getRankColor(j.current_rank)" 
-                              x-text="j.current_rank"></span>
-                      </td>
-                      <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-center" 
-                          :title="j.last_updated" 
-                          x-text="toRelativeTime(j.last_updated)"></td>
                     </tr>
-                  </template>
-                </tbody>
-              </table>
+
+                    <!-- Reactive Table Rows -->
+                    <template x-for="j in pagedJournals" :key="j.id">
+                      <tr @click="openDrawer(j)" 
+                          :id="'journalRow' + j.id"
+                          class="hover:bg-appBg/40 cursor-pointer transition-colors duration-150 group">
+                        <td class="font-mono text-textMuted text-[11px] py-4 px-5 text-center" x-text="j.id"></td>
+                        <td class="py-4 px-4">
+                          <div class="flex items-center gap-3">
+                            <!-- Accreditation rank colored accent indicator -->
+                            <span class="inline-block w-1 h-3.5 rounded-full flex-shrink-0" 
+                                  :style="'background-color: ' + getRankColor(j.current_rank)"></span>
+                            <span class="text-[13px] font-bold text-textMain group-hover:text-brandGold premium-transition" x-text="j.journal_name"></span>
+                            
+                            <!-- "Changed" notification tag -->
+                            <span x-show="isUpdatedWithin7Days(j.last_updated)" 
+                                  class="text-[9px] font-extrabold tracking-widest text-[#27500A] bg-[#EAF3DE] dark:bg-[#27500A]/20 dark:text-emerald-400 px-1.5 py-0.5 rounded-[4px] font-sans uppercase">
+                              CHANGED
+                            </span>
+                          </div>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                          <span class="font-extrabold text-[12px] font-sans px-2.5 py-0.5 rounded-md inline-block" 
+                                :style="'color: ' + getRankColor(j.current_rank) + '; background-color: color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 10%, transparent)'" 
+                                x-text="j.current_rank"></span>
+                        </td>
+                        <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-center" 
+                            :title="j.last_updated" 
+                            x-text="toRelativeTime(j.last_updated)"></td>
+                      </tr>
+                    </template>
+
+                    <!-- Empty state search -->
+                    <tr x-show="journals.length > 0 && filteredCount === 0">
+                      <td colspan="4" class="py-12 text-center text-textMuted font-mono text-[12px]">
+                        No monitored records matched the query.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <!-- Custom Reactive Pagination Footer -->
-            <div class="px-5 py-4 bg-appBg/20 border-t border-cardBorder flex flex-col sm:flex-row items-center justify-between gap-4 font-sans transition-all duration-300">
+            <div class="px-4 sm:px-5 py-4 bg-cardBg border border-cardBorder rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 font-sans transition-all duration-300">
               <span class="font-mono text-[11px] text-textMuted">
-                Showing <span class="font-bold text-textMain" x-text="((currentPage - 1) * pageSize) + 1"></span> 
+                Showing <span class="font-bold text-textMain" x-text="filteredCount === 0 ? 0 : ((currentPage - 1) * pageSize) + 1"></span> 
                 to <span class="font-bold text-textMain" x-text="Math.min(currentPage * pageSize, filteredCount)"></span> 
                 of <span class="font-bold text-textMain" x-text="filteredCount"></span> journals
               </span>
 
-              <div class="flex items-center gap-1.5" x-show="totalPages > 1">
+              <div class="flex items-center gap-1.5 w-full sm:w-auto justify-center" x-show="totalPages > 1">
                 <button @click="currentPage = 1" :disabled="currentPage === 1"
                         id="pageFirstBtn"
-                        class="px-2.5 py-1.5 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-mono text-textMuted hover:text-textMain hover:bg-appBg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                        class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
                   &lt;&lt;
                 </button>
                 <button @click="currentPage--" :disabled="currentPage === 1"
                         id="pagePrevBtn"
-                        class="px-3 py-1.5 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:bg-appBg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                        class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
                   &larr; Prev
                 </button>
                 
                 <span class="px-3 py-1.5 text-[11px] font-mono text-textMuted">
-                  Page <span class="font-extrabold text-textMain" x-text="currentPage"></span> of <span class="font-bold text-textMain" x-text="totalPages"></span>
+                  <span class="font-extrabold text-textMain" x-text="currentPage"></span> / <span x-text="totalPages"></span>
                 </span>
 
                 <button @click="currentPage++" :disabled="currentPage === totalPages"
                         id="pageNextBtn"
-                        class="px-3 py-1.5 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:bg-appBg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                        class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
                   Next &rarr;
                 </button>
                 <button @click="currentPage = totalPages" :disabled="currentPage === totalPages"
                         id="pageLastBtn"
-                        class="px-2.5 py-1.5 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-mono text-textMuted hover:text-textMain hover:bg-appBg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                        class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
                   &gt;&gt;
                 </button>
               </div>
             </div>
+
           </div>
         </div>
-
+        
         <!-- SIDEBAR PANEL (30% - Columns 8 to 10) -->
         <div class="lg:col-span-3 space-y-6">
           
-          <!-- Visual Distribution Analytics Card -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300">
-            <h3 class="text-xs font-bold font-sans tracking-widest text-textMuted uppercase">Audit Index Breakdown</h3>
+          <!-- Visual Distribution Analytics Card (Distinct diffuse shadow) -->
+          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-5 transition-all duration-300">
+            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Accreditation Profile</h3>
             
-            <div class="space-y-3 font-sans">
-              <!-- S1 to S6 Bar chart visuals -->
+            <div class="space-y-3.5 font-sans">
+              <!-- S1 to S6 bar chart visualizer -->
               <template x-for="rank in ['S1','S2','S3','S4','S5','S6']">
-                <div class="space-y-1">
+                <div class="space-y-1.5">
                   <div class="flex items-center justify-between text-[11px]">
                     <span class="font-bold uppercase tracking-wider" :style="'color: ' + getRankColor(rank)" x-text="rank"></span>
-                    <span class="font-mono text-textMuted" x-text="stats[rank.toLowerCase()] + ' journals'"></span>
+                    <span class="font-mono text-textMuted" x-text="stats[rank.toLowerCase()] + ' publications'"></span>
                   </div>
-                  <!-- Mini custom bar graph -->
-                  <div class="w-full bg-appBg rounded-full h-1.5 overflow-hidden">
+                  <!-- Mini custom bar graph with color-mix border and fill -->
+                  <div class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/50">
                     <div class="h-full rounded-full transition-all duration-500" 
                          :style="'width: ' + (stats.total > 0 ? (stats[rank.toLowerCase()] / stats.total * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
                   </div>
@@ -416,39 +481,42 @@
             </div>
           </div>
 
-          <!-- Daemon Health Monitoring Card -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm space-y-4 transition-all duration-300">
-            <h3 class="text-xs font-bold font-sans tracking-widest text-textMuted uppercase">System Telemetry</h3>
+          <!-- Daemon Telemetry and Status Card -->
+          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
+            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Database Telemetry</h3>
             
             <div class="space-y-3 text-[12px] font-sans">
-              <div class="flex items-center justify-between py-1.5 border-b border-cardBorder">
+              <div class="flex items-center justify-between py-2 border-b border-cardBorder/70">
                 <span class="text-textMuted">Tracker Engine</span>
-                <span class="font-mono font-bold text-emerald-500 dark:text-emerald-400">ONLINE</span>
+                <span class="font-mono font-bold text-emerald-500 dark:text-emerald-400 text-[11px] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  ONLINE
+                </span>
               </div>
-              <div class="flex items-center justify-between py-1.5 border-b border-cardBorder">
-                <span class="text-textMuted">DB Connection</span>
+              <div class="flex items-center justify-between py-2 border-b border-cardBorder/70">
+                <span class="text-textMuted">Database Connection</span>
                 <span class="font-mono font-bold text-textMain text-[11px]">sinta_tracker.db</span>
               </div>
-              <div class="flex items-center justify-between py-1.5 border-b border-cardBorder">
-                <span class="text-textMuted">DB Schema</span>
-                <span class="font-mono font-bold text-textMain text-[11px]">SQLite3 URI Mode=RO</span>
+              <div class="flex items-center justify-between py-2 border-b border-cardBorder/70">
+                <span class="text-textMuted">DB Driver Access</span>
+                <span class="font-mono font-bold text-textMain text-[11px]">SQLite3 Read-Only</span>
               </div>
-              <div class="flex items-center justify-between py-1.5">
-                <span class="text-textMuted">Crawl Target</span>
-                <span class="font-bold text-brandGold hover:underline text-[11px]">Science & Tech</span>
+              <div class="flex items-center justify-between py-2">
+                <span class="text-textMuted">Target Category</span>
+                <span class="font-bold text-brandGold text-[11px] tracking-wide">IT & ENGINEERING</span>
               </div>
             </div>
           </div>
 
-          <!-- Quick Actions & System Operations -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-sm space-y-3.5 transition-all duration-300">
-            <h3 class="text-xs font-bold font-sans tracking-widest text-textMuted uppercase">Quick Actions</h3>
+          <!-- Webhook Alert Integration CTA -->
+          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
+            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Real-Time Routing</h3>
             <p class="text-[12px] text-textMuted leading-relaxed">
-              Webhook configurations must be loaded and tested in settings view.
+              Dispatch immediate notifications to Discord channels and Telegram groups whenever an accreditation grade shift is parsed.
             </p>
             <button @click="navigate('config')" 
                     id="actionConfigBtn"
-                    class="w-full py-2 bg-brandGold text-white font-semibold text-[12px] uppercase tracking-wider rounded-lg shadow-sm hover:bg-brandGoldHover transition focus:outline-none">
+                    class="w-full py-2.5 bg-brandGold text-white font-bold text-[11px] uppercase tracking-wider rounded-lg shadow-sm hover:bg-brandGoldHover transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-[0.98]">
               Configure Webhooks
             </button>
           </div>
@@ -463,24 +531,25 @@
       
       <div class="max-w-3xl mx-auto space-y-6">
         
-        <div class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-sm space-y-2 transition-all duration-300">
-          <h2 class="text-2xl font-serif font-bold text-textMain tracking-tight">Audit Alert Integration</h2>
-          <p class="text-[14px] text-textMuted leading-relaxed">
-            Register webhook channels for immediate telemetry routing when accreditation fluctuations occur.
+        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 space-y-2">
+          <h2 class="text-2xl font-serif font-bold text-textMain tracking-tight">Audit Alert Channels</h2>
+          <p class="text-[13px] sm:text-[14px] text-textMuted leading-relaxed">
+            Register webhook channels for immediate telemetry routing when accreditation fluctuations occur. Secrets are masked on-screen to preserve environmental integrity.
           </p>
         </div>
 
         <div class="grid grid-cols-1 gap-6">
-          <!-- Discord Config Card -->
-          <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-sm transition-all duration-300 space-y-4">
-            <div class="flex items-center justify-between border-b border-cardBorder pb-3">
+          
+          <!-- Discord Config Panel -->
+          <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cardBorder/60 pb-3.5">
               <div class="flex items-center gap-3">
-                <span class="text-[13px] font-extrabold uppercase tracking-wider font-sans text-textMain">Discord Channel Webhook</span>
+                <span class="text-[12px] font-extrabold uppercase tracking-widest font-sans text-textMain">Discord Webhook Alert</span>
                 <!-- Status Badge -->
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-sans border"
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
                       :class="config.webhook && config.webhook.discord_url ? 'bg-[#EAF3DE] border-[#27500A]/20 text-[#27500A] dark:bg-[#27500A]/20 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-900/30'">
                   <span class="w-1.5 h-1.5 rounded-full" :class="config.webhook && config.webhook.discord_url ? 'bg-[#27500A] dark:bg-emerald-400' : 'bg-red-600'"></span>
-                  <span x-text="config.webhook && config.webhook.discord_url ? 'Configured' : 'Empty'"></span>
+                  <span x-text="config.webhook && config.webhook.discord_url ? 'Configured' : 'Inactive'"></span>
                 </span>
               </div>
               
@@ -488,45 +557,45 @@
               <div class="flex items-center gap-2" x-show="config.webhook && config.webhook.discord_url">
                 <button @click="testWebhook('discord')" 
                         id="testDiscordBtn"
-                        class="px-3 py-1 text-[11px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold rounded-lg transition duration-200">
-                  Test Alert
+                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
+                  Test Endpoint
                 </button>
                 <button @click="editDiscord = !editDiscord; discordUrlInput = ''" 
                         id="editDiscordBtn"
-                        class="px-3 py-1 text-[11px] font-sans font-bold uppercase tracking-wider text-textMuted border border-cardBorder hover:border-textMuted rounded-lg transition duration-200"
-                        x-text="editDiscord ? 'Cancel' : 'Edit'"></button>
+                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-textMuted border border-cardBorder hover:border-textMuted hover:bg-appBg rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+                        x-text="editDiscord ? 'Cancel' : 'Modify'"></button>
               </div>
             </div>
             
             <div class="space-y-2">
-              <label class="block text-[10px] font-bold font-sans text-textMuted uppercase tracking-wider">Discord Webhook Endpoint URL</label>
+              <label class="block text-[9px] font-bold font-sans text-textMuted uppercase tracking-widest">Discord Endpoint URL</label>
               
               <!-- Display Masked URL -->
               <div x-show="config.webhook && config.webhook.discord_url && !editDiscord"
                    id="discordUrlMasked"
-                   class="font-mono text-[13px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl break-all" 
+                   class="font-mono text-[12px] text-textMain bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all" 
                    x-text="config.webhook.discord_url"></div>
                    
-              <!-- Input field for new URL -->
+              <!-- Input field for URL -->
               <div x-show="!config.webhook || !config.webhook.discord_url || editDiscord">
                 <input type="url" x-model="discordUrlInput" 
                        id="discordUrlInput"
-                       placeholder="Paste your Discord Webhook URL (https://discord.com/api/webhooks/...)" 
-                       class="w-full font-mono text-[13px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold transition">
+                       placeholder="https://discord.com/api/webhooks/..." 
+                       class="w-full font-mono text-[12px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition">
               </div>
             </div>
           </div>
 
-          <!-- Telegram Config Card -->
-          <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-sm transition-all duration-300 space-y-4">
-            <div class="flex items-center justify-between border-b border-cardBorder pb-3">
+          <!-- Telegram Config Panel -->
+          <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cardBorder/60 pb-3.5">
               <div class="flex items-center gap-3">
-                <span class="text-[13px] font-extrabold uppercase tracking-wider font-sans text-textMain">Telegram Channel Alerts</span>
+                <span class="text-[12px] font-extrabold uppercase tracking-widest font-sans text-textMain">Telegram Alerts Channel</span>
                 <!-- Status Badge -->
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-sans border"
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
                       :class="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'bg-[#EAF3DE] border-[#27500A]/20 text-[#27500A] dark:bg-[#27500A]/20 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-900/30'">
                   <span class="w-1.5 h-1.5 rounded-full" :class="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'bg-[#27500A] dark:bg-emerald-400' : 'bg-red-600'"></span>
-                  <span x-text="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'Configured' : 'Empty'"></span>
+                  <span x-text="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'Configured' : 'Inactive'"></span>
                 </span>
               </div>
               
@@ -534,96 +603,98 @@
               <div class="flex items-center gap-2" x-show="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id">
                 <button @click="testWebhook('telegram')" 
                         id="testTelegramBtn"
-                        class="px-3 py-1 text-[11px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold rounded-lg transition duration-200">
-                  Test Alert
+                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
+                  Test Endpoint
                 </button>
                 <button @click="editTelegram = !editTelegram; telegramBotInput = ''; telegramChatInput = ''" 
                         id="editTelegramBtn"
-                        class="px-3 py-1 text-[11px] font-sans font-bold uppercase tracking-wider text-textMuted border border-cardBorder hover:border-textMuted rounded-lg transition duration-200"
-                        x-text="editTelegram ? 'Cancel' : 'Edit'"></button>
+                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-textMuted border border-cardBorder hover:border-textMuted hover:bg-appBg rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+                        x-text="editTelegram ? 'Cancel' : 'Modify'"></button>
               </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <!-- Bot Token field -->
               <div class="space-y-2">
-                <label class="block text-[10px] font-bold font-sans text-textMuted uppercase tracking-wider">Bot Token API</label>
+                <label class="block text-[9px] font-bold font-sans text-textMuted uppercase tracking-widest">Telegram Bot API Token</label>
                 
                 <!-- Display Masked Token -->
                 <div x-show="config.webhook && config.webhook.telegram_bot_token && !editTelegram"
                      id="telegramBotMasked"
-                     class="font-mono text-[13px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl break-all" 
+                     class="font-mono text-[12px] text-textMain bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all" 
                      x-text="config.webhook.telegram_bot_token"></div>
                      
                 <!-- Input field for Token -->
                 <div x-show="!config.webhook || !config.webhook.telegram_bot_token || editTelegram">
                   <input type="text" x-model="telegramBotInput" 
                          id="telegramBotInput"
-                         placeholder="Enter Telegram Bot Token..." 
-                         class="w-full font-mono text-[13px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold transition">
+                         placeholder="Enter Bot Token..." 
+                         class="w-full font-mono text-[12px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition">
                 </div>
               </div>
               
               <!-- Chat ID field -->
               <div class="space-y-2">
-                <label class="block text-[10px] font-bold font-sans text-textMuted uppercase tracking-wider">Target Chat / Channel ID</label>
+                <label class="block text-[9px] font-bold font-sans text-textMuted uppercase tracking-widest">Chat / Channel Identifier ID</label>
                 
                 <!-- Display Masked Chat ID -->
                 <div x-show="config.webhook && config.webhook.telegram_chat_id && !editTelegram"
                      id="telegramChatMasked"
-                     class="font-mono text-[13px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl" 
+                     class="font-mono text-[12px] text-textMain bg-appBg/60 p-3.5 border border-cardBorder rounded-xl" 
                      x-text="config.webhook.telegram_chat_id"></div>
                      
                 <!-- Input field for Chat ID -->
                 <div x-show="!config.webhook || !config.webhook.telegram_chat_id || editTelegram">
                   <input type="text" x-model="telegramChatInput" 
                          id="telegramChatInput"
-                         placeholder="Enter Target Chat or Group ID..." 
-                         class="w-full font-mono text-[13px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-1 focus:ring-brandGold focus:border-brandGold transition">
+                         placeholder="Enter Chat/Channel ID..." 
+                         class="w-full font-mono text-[12px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition">
                 </div>
               </div>
             </div>
           </div>
           
           <!-- Unsaved changes bar (Visible when editing) -->
-          <div class="flex items-center justify-between p-4 border border-brandGold/30 rounded-2xl bg-cardBg transition-all duration-300"
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border border-brandGold/30 rounded-2xl bg-cardBg transition-all duration-300 shadow-sm"
                id="unsavedBanner"
                x-show="(!config.webhook || !config.webhook.discord_url || editDiscord) || (!config.webhook || !config.webhook.telegram_bot_token || !config.webhook.telegram_chat_id || editTelegram)">
-            <div class="text-[13px] font-sans font-semibold text-textMuted">You have modified notification channels.</div>
-            <div class="flex items-center gap-3">
+            <div class="text-[13px] font-sans font-semibold text-textMuted text-center sm:text-left">You have modified notification channels. Ready to apply?</div>
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
               <button @click="resetForm()" 
                       id="saveCancelBtn"
-                      class="px-4 py-2 text-[12px] font-sans font-bold uppercase tracking-wider text-textMuted hover:text-textMain transition-colors duration-200">
-                Cancel
+                      class="px-4 py-2 text-[12px] font-sans font-bold uppercase tracking-wider text-textMuted hover:text-textMain transition-colors duration-200 focus:outline-none active:scale-95">
+                Discard
               </button>
               <button @click="saveWebhookConfig()" :disabled="isSaving"
                       id="saveConfirmBtn"
-                      class="px-4 py-2 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-lg transition-all duration-200 flex items-center gap-2">
-                <span x-text="isSaving ? 'Processing...' : 'Commit Changes'"></span>
+                      class="px-5 py-2.5 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span x-text="isSaving ? 'Saving Changes...' : 'Commit Settings'"></span>
               </button>
             </div>
           </div>
           
-          <!-- Telemetry status notification popups -->
+          <!-- Telemetry status notification toast -->
           <div x-show="saveMessage" 
                id="settingsStatusToast"
                x-transition
                class="p-4 rounded-xl border flex items-center gap-3 transition-all duration-300"
                :class="saveSuccess ? 'bg-[#EAF3DE] border-[#27500A]/30 text-[#27500A] dark:bg-[#27500A]/20 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-800 dark:text-red-400'">
-            <span class="text-[13px] font-sans font-bold" x-text="saveMessage"></span>
+            <span class="text-[12px] sm:text-[13px] font-sans font-bold" x-text="saveMessage"></span>
           </div>
 
-          <!-- Help Info Panel -->
+          <!-- Documentation block (asymmetric layout details) -->
           <div class="border border-cardBorder p-5 rounded-2xl bg-cardBg/50 flex items-start gap-4 transition-all duration-300">
             <span class="text-brandGold mt-0.5">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </span>
-            <div class="text-[13px] text-textMuted leading-relaxed">
-              <span class="font-bold text-textMain">Configuration Persistence:</span> Save commits write changes directly into the server database's <code class="font-mono bg-appBg px-1.5 py-0.5 border border-cardBorder rounded text-[11px] text-textMain font-semibold">config.json</code> config layer. Secrets are kept fully masked inside the user dashboard viewport to preserve environment integrity.
+            <div class="text-[13px] text-textMuted leading-relaxed space-y-1">
+              <span class="font-bold text-textMain block">Configuration Layer</span>
+              <p>Saving commits configuration variables directly into the server database's <code class="font-mono bg-appBg px-1.5 py-0.5 border border-cardBorder rounded text-[11px] text-textMain font-semibold">config.json</code> layer. Secure keys are filtered server-side during rendering to protect credentials.</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -636,13 +707,14 @@
        class="fixed inset-0 z-50 overflow-hidden" 
        aria-labelledby="slide-over-title" 
        role="dialog" 
-       aria-modal="true">
+       aria-modal="true"
+       @keydown.window.escape="isDrawerOpen = false">
     <div class="absolute inset-0 overflow-hidden">
-      <!-- Background backdrop with blur -->
-      <div class="absolute inset-0 bg-black/35 backdrop-blur-sm transition-opacity duration-300" 
+      <!-- Background backdrop with premium glass blur -->
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" 
            @click="isDrawerOpen = false" 
            x-show="isDrawerOpen"
-           x-transition:enter="ease-out duration-300"
+           x-transition:enter="ease-out duration-350"
            x-transition:enter-start="opacity-0"
            x-transition:enter-end="opacity-100"
            x-transition:leave="ease-in duration-200"
@@ -653,21 +725,21 @@
         <!-- Panel Slide view -->
         <div class="pointer-events-auto w-screen max-w-md bg-cardBg border-l border-cardBorder shadow-2xl transition-all duration-300"
              x-show="isDrawerOpen"
-             x-transition:enter="transform transition ease-in-out duration-300"
+             x-transition:enter="transform transition ease-in-out duration-350"
              x-transition:enter-start="translate-x-full"
              x-transition:enter-end="translate-x-0"
              x-transition:leave="transform transition ease-in-out duration-300"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="translate-x-full">
           
-          <div class="flex h-full flex-col overflow-y-auto py-6 px-6 font-sans">
-            <!-- Header of drawer -->
-            <div class="flex items-start justify-between border-b border-cardBorder pb-4.5">
-              <h2 class="text-lg font-bold text-textMain font-sans" id="slide-over-title">Journal Inspection</h2>
+          <div class="flex h-full flex-col overflow-y-auto py-6 px-6 sm:px-8 font-sans">
+            <!-- Drawer Header -->
+            <div class="flex items-start justify-between border-b border-cardBorder pb-4">
+              <h2 class="text-md sm:text-lg font-bold text-textMain font-sans" id="slide-over-title">Journal Details</h2>
               <div class="ml-3 flex h-7 items-center">
                 <button type="button" @click="isDrawerOpen = false"
                         id="drawerCloseBtn"
-                        class="rounded-lg text-textMuted hover:text-textMain focus:outline-none border border-cardBorder p-1 hover:bg-appBg transition">
+                        class="rounded-lg text-textMuted hover:text-textMain border border-cardBorder p-1.5 hover:bg-appBg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
                   <span class="sr-only">Close panel</span>
                   <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -677,57 +749,58 @@
             </div>
 
             <!-- Content Area inside drawer -->
-            <div class="relative flex-1 mt-6 space-y-6" x-data="{ currentVal: selectedJournal }">
+            <div class="relative flex-1 mt-6 space-y-6">
               <div class="space-y-1">
-                <span class="text-[9px] font-mono tracking-widest text-textMuted uppercase block" x-text="'DATABASE ID: #' + selectedJournal.id"></span>
-                <h3 class="text-xl font-bold font-serif text-textMain tracking-tight" x-text="selectedJournal.journal_name"></h3>
+                <span class="text-[9px] font-mono tracking-widest text-textMuted uppercase block" x-text="'ID: #' + selectedJournal.id"></span>
+                <h3 class="text-xl font-bold font-serif text-textMain tracking-tight leading-snug" x-text="selectedJournal.journal_name"></h3>
               </div>
 
-              <!-- Accreditation Status badge display -->
-              <div class="bg-appBg/50 p-4 border border-cardBorder rounded-2xl flex items-center justify-between gap-4">
+              <!-- Accreditation Status Card (Color-coded glowing accent container) -->
+              <div class="p-4 border rounded-2xl flex items-center justify-between gap-4"
+                   :style="'border-color: color-mix(in oklch, ' + getRankColor(selectedJournal.current_rank) + ' 35%, transparent); background-color: color-mix(in oklch, ' + getRankColor(selectedJournal.current_rank) + ' 5%, transparent); box-shadow: 0 4px 20px -6px color-mix(in oklch, ' + getRankColor(selectedJournal.current_rank) + ' 15%, transparent)'">
                 <div>
-                  <span class="text-[10px] font-bold text-textMuted uppercase tracking-wider block">Accreditation Rank</span>
+                  <span class="text-[9px] font-bold text-textMuted uppercase tracking-widest block">Accreditation Rank</span>
                   <span class="text-2xl font-extrabold font-sans mt-1 block" 
                         :style="'color: ' + getRankColor(selectedJournal.current_rank)" 
                         x-text="selectedJournal.current_rank || 'N/A'"></span>
                 </div>
-                <!-- Status icon badge -->
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-md shadow-sm"
+                <!-- Mini status badge -->
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-[16px] shadow-sm select-none"
                      :style="'background-color: ' + getRankColor(selectedJournal.current_rank)">
-                  <span class="font-serif font-bold text-[18px]" x-text="selectedJournal.current_rank"></span>
+                  <span class="font-sans font-bold" x-text="selectedJournal.current_rank"></span>
                 </div>
               </div>
 
-              <!-- Information Grid list -->
-              <div class="space-y-4 font-sans">
-                <div class="space-y-1 border-b border-cardBorder pb-3">
-                  <span class="text-[10px] font-bold tracking-widest text-textMuted uppercase">Last System Check</span>
+              <!-- Information Details Grid -->
+              <div class="space-y-5 font-sans">
+                <div class="space-y-1.5 border-b border-cardBorder/60 pb-4">
+                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Last Audited</span>
                   <span class="text-[13px] font-semibold text-textMain font-mono block" x-text="selectedJournal.last_updated"></span>
-                  <span class="text-[11px] text-textMuted italic block" x-text="'Checked relative: ' + toRelativeTime(selectedJournal.last_updated)"></span>
+                  <span class="text-[11px] text-textMuted italic block" x-text="'Relative: ' + toRelativeTime(selectedJournal.last_updated)"></span>
                 </div>
 
-                <div class="space-y-2 border-b border-cardBorder pb-3">
-                  <span class="text-[10px] font-bold tracking-widest text-textMuted uppercase block">SINTA Profile Portal</span>
-                  <div class="flex items-center justify-between gap-3">
+                <div class="space-y-2 border-b border-cardBorder/60 pb-4">
+                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">SINTA Profile Link</span>
+                  <div class="flex items-center justify-between gap-3 bg-appBg/60 p-2.5 rounded-xl border border-cardBorder">
                     <span class="font-mono text-[11px] text-textMuted truncate flex-1" x-text="selectedJournal.sinta_url"></span>
                     <a :href="selectedJournal.sinta_url" target="_blank"
                        id="drawerSintaLink"
-                       class="px-3 py-1.5 bg-[#185FA5] text-white font-bold text-[11px] tracking-wider uppercase rounded-lg shadow hover:bg-[#185FA5]/95 transition flex-shrink-0">
-                      Visit ↗
+                       class="px-3.5 py-2 bg-brandGold text-white font-bold text-[11px] tracking-wider uppercase rounded-lg shadow-sm hover:bg-brandGoldHover hover:shadow transition flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
+                      Visit Profile ↗
                     </a>
                   </div>
                 </div>
 
-                <div class="space-y-2">
-                  <span class="text-[10px] font-bold tracking-widest text-textMuted uppercase block">Change History Registry</span>
-                  <div class="p-4 bg-appBg/40 border border-cardBorder rounded-2xl space-y-3">
+                <div class="space-y-2.5">
+                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Activity Records Timeline</span>
+                  <div class="p-4 bg-appBg/40 border border-cardBorder rounded-2xl space-y-3 font-sans text-[12px]">
                     <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      <span class="text-[12px] text-textMain font-medium">Initial sync successful.</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span class="text-textMain font-medium">Initial daemon sync successful.</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-brandGold"></span>
-                      <span class="text-[12px] text-textMuted font-medium">Monitoring status is stable.</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-brandGold"></span>
+                      <span class="text-textMuted font-medium">Telemetry monitoring stable.</span>
                     </div>
                   </div>
                 </div>
@@ -735,10 +808,10 @@
             </div>
 
             <!-- Footer of drawer -->
-            <div class="border-t border-cardBorder pt-4.5 mt-auto">
+            <div class="border-t border-cardBorder pt-4 mt-auto">
               <button @click="isDrawerOpen = false" 
                       id="drawerActionCloseBtn"
-                      class="w-full py-2.5 bg-appBg text-textMain hover:bg-cardBorder font-bold text-[12px] uppercase tracking-wider rounded-lg transition border border-cardBorder">
+                      class="w-full py-2.5 bg-appBg text-textMain hover:bg-cardBorder hover:border-textMain font-bold text-[11px] uppercase tracking-wider rounded-lg transition border border-cardBorder focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
                 Close Inspection
               </button>
             </div>
@@ -748,22 +821,22 @@
     </div>
   </div>
 
-  <!-- 6. Editorial Footer Bar -->
-  <footer class="bg-cardBg border-t border-cardBorder py-6 px-6 mt-12 transition-all duration-300">
+  <!-- 6. Premium Editorial Footer -->
+  <footer class="bg-cardBg border-t border-cardBorder py-6 px-4 sm:px-6 mt-12 transition-all duration-300">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="text-[12px] text-textMuted font-sans">
-        &copy; 2026 SINTA Accreditation Tracker. Built with oklch design tokens & Alpine.js.
+      <div class="text-[12px] text-textMuted font-sans text-center md:text-left">
+        &copy; 2026 SINTA Accreditation Tracker. Optimized with OKLCH dynamic tokens & Alpine.js responsive framework.
       </div>
-      <div class="flex items-center gap-4 text-[11px] font-bold uppercase tracking-wider text-textMuted">
-        <a href="https://sinta.kemdiktisaintek.go.id" target="_blank" class="hover:text-textMain transition">SINTA Portal</a>
+      <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-textMuted">
+        <a href="https://sinta.kemdiktisaintek.go.id" target="_blank" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold">SINTA Portal</a>
         <span>&middot;</span>
-        <a href="/config" class="hover:text-textMain transition">Webhook Routing</a>
+        <a href="/config" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold">Webhook Settings</a>
       </div>
     </div>
   </footer>
 
   <script>
-    // System utility functions
+    // System date utilities
     function toRelativeTime(dateStr) {
       if (!dateStr) return '-';
       const lastUpdated = new Date(dateStr.replace(' ', 'T'));
@@ -835,9 +908,7 @@
         searchVal: '',
 
         init() {
-          // Sync Alpine darkMode state with theme applied synchronously in <head>
           this.darkMode = document.documentElement.classList.contains('dark');
-
           this.activeTab = window.ACTIVE_TAB || 'dashboard';
           if (this.activeTab === 'dashboard') {
             this.fetchJournals();
@@ -912,12 +983,12 @@
         // Color mapping for premium ranks using OKLCH curves
         getRankColor(rank) {
           const map = {
-            'S1': 'oklch(55% 0.18 290)', // Dazzling Amethyst
-            'S2': 'oklch(52% 0.14 175)', // Deep Emerald Teal
-            'S3': 'oklch(50% 0.16 240)', // Ocean Indigo Blue
-            'S4': 'oklch(62% 0.15 70)',  // Warm Amber Bronze
-            'S5': 'oklch(58% 0.16 25)',  // Crimson Editorial Red
-            'S6': 'oklch(60% 0.15 340)', // Muted Editorial Magenta
+            'S1': 'oklch(58% 0.16 290)', // Vibrant Royal Indigo
+            'S2': 'oklch(55% 0.14 175)', // Elegant Emerald Teal
+            'S3': 'oklch(53% 0.15 240)', // Ocean Sapphire Blue
+            'S4': 'oklch(65% 0.14 75)',  // Rich Antique Bronze
+            'S5': 'oklch(60% 0.16 35)',  // Warm Ochre-Rust Orange
+            'S6': 'oklch(56% 0.17 15)',  // Deep Academic Crimson
           };
           return map[rank] || 'oklch(60% 0.02 85)';
         },
@@ -928,9 +999,7 @@
         },
 
         get filteredAndSortedJournals() {
-          // Step 1: Search and rank category filters
           let result = this.journals.filter(j => {
-            // Apply rank category filter
             if (this.activeFilter !== 'All') {
               if (this.activeFilter === 'Changed') {
                 if (!isUpdatedWithin7Days(j.last_updated)) return false;
@@ -939,7 +1008,6 @@
               }
             }
             
-            // Apply search term filter
             if (this.searchVal.trim()) {
               const search = this.searchVal.toLowerCase();
               return j.journal_name.toLowerCase().includes(search) || 
@@ -949,7 +1017,6 @@
             return true;
           });
 
-          // Step 2: Sorting list array
           result.sort((a, b) => {
             let valA = a[this.sortCol];
             let valB = b[this.sortCol];
@@ -991,7 +1058,6 @@
           this.currentPage = 1;
         },
 
-        // Slide-over Drawer hooks
         openDrawer(journal) {
           this.selectedJournal = journal;
           this.isDrawerOpen = true;
@@ -1080,6 +1146,4 @@
     }
   </script>
 </body>
-</html>
-
-</html>
+</html>tml>
