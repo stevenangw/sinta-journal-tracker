@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the default Hugging Face Spaces port
+ENV PORT=7860
 EXPOSE 7860
 
 # Run the Flask dashboard
