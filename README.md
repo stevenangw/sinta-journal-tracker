@@ -1,3 +1,12 @@
+---
+title: Sinta Journal Tracker
+emoji: 📈
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
 # SINTA Journal Accreditation Rank Tracker
 
 A Python-based automated monitoring system to track and alert on accreditation rank changes in SINTA (Science and Technology Index) journals. Specifically filtered for IT, Computer Science, and Engineering topics, this system keeps records in a local SQLite database and serves them through a lightweight web dashboard.
