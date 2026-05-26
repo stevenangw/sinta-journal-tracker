@@ -54,23 +54,23 @@
   <!-- Premium Design Styling -->
   <style>
     :root {
-      --color-app-bg: oklch(98.2% 0.003 85);       /* Subtle warm paper cream background */
-      --color-card-bg: oklch(100% 0 0);           /* Pure alabaster white */
-      --color-card-border: oklch(91.5% 0.006 85);   /* Fine hairline border */
-      --color-text-main: oklch(18% 0.012 85);      /* Deep carbon charcoal */
-      --color-text-muted: oklch(52% 0.015 85);     /* Soft editorial graphite */
-      --color-brand-gold: oklch(62% 0.11 85);      /* Muted premium gold-bronze */
-      --color-brand-gold-hover: oklch(56% 0.11 85);
+      --color-app-bg: #FBFBFA;                       /* Low-chroma warm off-white (60%) */
+      --color-card-bg: #FFFFFF;                      /* Clean card background */
+      --color-card-border: #E8E8E6;                  /* Soft neutral border */
+      --color-text-main: #1E2229;                    /* Deep, organic dark graphite (30%) */
+      --color-text-muted: #5C6470;                   /* Muted slate graphite */
+      --color-brand-gold: #4A6070;                   /* Desaturated Slate Blue accent (10%) */
+      --color-brand-gold-hover: #3B4D5A;             /* Desaturated Slate Blue hover */
     }
 
     .dark {
-      --color-app-bg: oklch(13.5% 0.014 260);     /* Ink-obsidian night sky */
-      --color-card-bg: oklch(17.5% 0.017 260);    /* Premium slate graphite panel */
-      --color-card-border: oklch(25% 0.018 260);   /* Muted obsidian separator */
-      --color-text-main: oklch(95% 0.004 85);      /* Luminous cream-white */
-      --color-text-muted: oklch(66% 0.012 260);    /* Velvet slate blue-grey */
-      --color-brand-gold: oklch(76% 0.11 85);      /* Warm antique bronze gold */
-      --color-brand-gold-hover: oklch(81% 0.11 85);
+      --color-app-bg: #15181E;                       /* Deep ink-obsidian */
+      --color-card-bg: #1E2229;                      /* Organic dark graphite background */
+      --color-card-border: #2D333F;                  /* Muted obsidian separator */
+      --color-text-main: #F3F4F6;                    /* Luminous cream-white */
+      --color-text-muted: #9CA3AF;                   /* Velvet slate blue-grey */
+      --color-brand-gold: #60788A;                   /* Muted Slate Blue accent for dark mode */
+      --color-brand-gold-hover: #4F6372;
     }
 
     body {
@@ -92,11 +92,11 @@
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background: oklch(75% 0.01 85 / 0.25);
+      background: rgba(92, 100, 112, 0.2);
       border-radius: 10px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: oklch(75% 0.01 85 / 0.5);
+      background: rgba(92, 100, 112, 0.4);
     }
 
     /* Soft transition curves */
@@ -105,7 +105,7 @@
     }
   </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brandGold/20" x-data="appState()">
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brandGold/20 pb-20 md:pb-0" x-data="appState()">
 
   <!-- Inject config and route metadata from Flask securely -->
   <script>
@@ -136,8 +136,8 @@
         <div class="hidden sm:flex items-center gap-2.5">
           <!-- Pulse status light -->
           <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#607361] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#607361]"></span>
           </span>
           <!-- Monospace Timestamp -->
           <span class="font-mono text-[11px] text-textMuted">
@@ -148,7 +148,7 @@
         <!-- Theme preference toggle button -->
         <button @click="toggleTheme()" 
                 id="themeToggleBtn"
-                class="p-2 rounded-lg border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+                class="min-w-[48px] min-h-[48px] p-2 rounded-lg border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center"
                 aria-label="Toggle visual theme">
           <!-- Light icon -->
           <svg x-show="!darkMode" class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -163,22 +163,22 @@
     </div>
   </header>
 
-  <!-- 2. Minimalist Navigation Bar -->
-  <nav class="bg-cardBg border-b border-cardBorder w-full transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-1.5">
+  <!-- 2. Minimalist Sticky Bottom Navigation Bar (Mobile-first Thumb-Zone Optimized) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 md:sticky md:top-0 md:bottom-auto bg-cardBg/90 dark:bg-cardBg/80 border-t md:border-t-0 md:border-b border-cardBorder w-full transition-all duration-300 backdrop-blur-md shadow-lg md:shadow-none">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-around md:justify-start gap-3">
       <button @click="navigate('dashboard')" 
               id="navDashboardBtn"
-              class="relative px-3.5 sm:px-4 py-2.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+              class="relative flex-1 md:flex-initial min-w-[48px] min-h-[48px] px-4 py-3 text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center gap-2"
               :class="activeTab === 'dashboard' ? 'bg-appBg text-textMain' : 'text-textMuted hover:text-textMain hover:bg-appBg/40'">
-        Dashboard
-        <span x-show="activeTab === 'dashboard'" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-brandGold rounded-full"></span>
+        <span>Dashboard</span>
+        <span x-show="activeTab === 'dashboard'" class="absolute bottom-1 w-4 h-0.5 bg-brandGold rounded-full"></span>
       </button>
       <button @click="navigate('config')" 
               id="navConfigBtn"
-              class="relative px-3.5 sm:px-4 py-2.5 text-[11px] sm:text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+              class="relative flex-1 md:flex-initial min-w-[48px] min-h-[48px] px-4 py-3 text-[12px] font-bold uppercase tracking-wider rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center gap-2"
               :class="activeTab === 'config' ? 'bg-appBg text-textMain' : 'text-textMuted hover:text-textMain hover:bg-appBg/40'">
-        Webhook Settings
-        <span x-show="activeTab === 'config'" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-brandGold rounded-full"></span>
+        <span>Webhook Settings</span>
+        <span x-show="activeTab === 'config'" class="absolute bottom-1 w-4 h-0.5 bg-brandGold rounded-full"></span>
       </button>
     </div>
   </nav>
@@ -259,7 +259,7 @@
               </span>
               <input type="text" id="searchInput" x-model="searchVal" @input="currentPage = 1"
                      placeholder="Search journal name or rank..." 
-                     class="w-full pl-10 pr-8 py-2 text-[13px] font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-lg placeholder-textMuted/60 premium-transition">
+                     class="w-full pl-10 pr-8 py-3 text-base font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-lg placeholder-textMuted/60 min-h-[48px] premium-transition">
               <!-- Clear Button -->
               <button x-show="searchVal.length > 0" @click="searchVal = ''; currentPage = 1"
                       id="searchClearBtn"
@@ -581,7 +581,7 @@
                 <input type="url" x-model="discordUrlInput" 
                        id="discordUrlInput"
                        placeholder="https://discord.com/api/webhooks/..." 
-                       class="w-full font-mono text-[12px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition">
+                       class="w-full font-mono text-base text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[48px]">
               </div>
             </div>
           </div>
@@ -629,7 +629,7 @@
                   <input type="text" x-model="telegramBotInput" 
                          id="telegramBotInput"
                          placeholder="Enter Bot Token..." 
-                         class="w-full font-mono text-[12px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition">
+                         class="w-full font-mono text-base text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[48px]">
                 </div>
               </div>
               
@@ -648,7 +648,7 @@
                   <input type="text" x-model="telegramChatInput" 
                          id="telegramChatInput"
                          placeholder="Enter Chat/Channel ID..." 
-                         class="w-full font-mono text-[12px] text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition">
+                         class="w-full font-mono text-base text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[48px]">
                 </div>
               </div>
             </div>
@@ -980,17 +980,17 @@
           }
         },
 
-        // Color mapping for premium ranks using OKLCH curves
+        // Color mapping for premium ranks using curated desaturated tones
         getRankColor(rank) {
           const map = {
-            'S1': 'oklch(58% 0.16 290)', // Vibrant Royal Indigo
-            'S2': 'oklch(55% 0.14 175)', // Elegant Emerald Teal
-            'S3': 'oklch(53% 0.15 240)', // Ocean Sapphire Blue
-            'S4': 'oklch(65% 0.14 75)',  // Rich Antique Bronze
-            'S5': 'oklch(60% 0.16 35)',  // Warm Ochre-Rust Orange
-            'S6': 'oklch(56% 0.17 15)',  // Deep Academic Crimson
+            'S1': '#5C6D82', // Slate Indigo
+            'S2': '#6B8272', // Muted Sage
+            'S3': '#A68B82', // Dusty Terracotta
+            'S4': '#6F7A85', // Slate Gray
+            'S5': '#8C8470', // Muted Antique Brass
+            'S6': '#A37878', // Dusty Rose
           };
-          return map[rank] || 'oklch(60% 0.02 85)';
+          return map[rank] || '#5C6470';
         },
 
         // Reactive sorting, searching and filtering engine
