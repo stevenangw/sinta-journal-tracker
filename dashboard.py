@@ -11,6 +11,24 @@ DB_PATH = "sinta_tracker.db"
 CONFIG_PATH = os.environ.get("SINTA_CONFIG_PATH", "./config.json")
 
 
+def run_migrations():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        try:
+            cursor.execute("ALTER TABLE journals ADD COLUMN previous_rank TEXT")
+            conn.commit()
+            app.logger.info("Migration successful: added previous_rank column.")
+        except sqlite3.OperationalError:
+            # Column already exists
+            pass
+        conn.close()
+    except Exception as e:
+        app.logger.error(f"Migration error: {e}")
+
+run_migrations()
+
+
 def get_db_connection():
     # Connect in read-only mode using SQLite URI
     conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
@@ -195,7 +213,7 @@ def api_journals():
         limit_sql = "LIMIT ? OFFSET ?"
         query_params = params + [limit, offset]
         
-        cursor.execute(f"SELECT id, journal_name, sinta_url, current_rank, last_updated FROM journals {where_sql} {order_sql} {limit_sql}", query_params)
+        cursor.execute(f"SELECT id, journal_name, sinta_url, current_rank, previous_rank, last_updated FROM journals {where_sql} {order_sql} {limit_sql}", query_params)
         rows = cursor.fetchall()
         conn.close()
         
@@ -206,6 +224,7 @@ def api_journals():
                 "journal_name": row["journal_name"],
                 "sinta_url": row["sinta_url"],
                 "current_rank": row["current_rank"],
+                "previous_rank": row["previous_rank"],
                 "last_updated": row["last_updated"]
             })
             
@@ -222,6 +241,36 @@ def api_journals():
             }
         })
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/changes")
+def api_changes():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Query 10 journals where previous_rank is not NULL, and differs from current_rank
+        cursor.execute(
+            "SELECT id, journal_name, current_rank, previous_rank, last_updated "
+            "FROM journals "
+            "WHERE previous_rank IS NOT NULL AND previous_rank != '' AND previous_rank != 'None' AND previous_rank != current_rank "
+            "ORDER BY last_updated DESC LIMIT 10"
+        )
+        rows = cursor.fetchall()
+        conn.close()
+        
+        changes = []
+        for r in rows:
+            changes.append({
+                "id": r["id"],
+                "journal_name": r["journal_name"],
+                "current_rank": r["current_rank"],
+                "previous_rank": r["previous_rank"],
+                "last_updated": r["last_updated"]
+            })
+        return jsonify({"changes": changes})
+    except Exception as e:
+        app.logger.error(f"Error fetching changes: {e}")
         return jsonify({"error": str(e)}), 500
 
 

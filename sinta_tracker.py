@@ -117,10 +117,15 @@ def init_db(db_path: str = DB_NAME) -> None:
                 journal_name TEXT NOT NULL,
                 sinta_url TEXT UNIQUE NOT NULL,
                 current_rank TEXT NOT NULL,
+                previous_rank TEXT,
                 last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             """
         )
+        try:
+            cursor.execute("ALTER TABLE journals ADD COLUMN previous_rank TEXT")
+        except sqlite3.OperationalError:
+            pass
         conn.commit()
         conn.close()
         logging.info("Database and table 'journals' initialized successfully.")
@@ -150,10 +155,11 @@ def save_journal_to_db(
         now = datetime.now().isoformat()
         cursor.execute(
             """
-            INSERT INTO journals (id, journal_name, sinta_url, current_rank, last_updated)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO journals (id, journal_name, sinta_url, current_rank, previous_rank, last_updated)
+            VALUES (?, ?, ?, ?, NULL, ?)
             ON CONFLICT(sinta_url) DO UPDATE SET
                 journal_name=excluded.journal_name,
+                previous_rank=CASE WHEN current_rank != excluded.current_rank THEN current_rank ELSE previous_rank END,
                 current_rank=excluded.current_rank,
                 last_updated=excluded.last_updated
             """,
@@ -172,7 +178,7 @@ def get_all_journals_from_db(db_path: str = DB_NAME) -> List[Dict]:
     try:
         conn = get_db_connection(db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT id, journal_name, sinta_url, current_rank, last_updated FROM journals")
+        cursor.execute("SELECT id, journal_name, sinta_url, current_rank, previous_rank, last_updated FROM journals")
         rows = cursor.fetchall()
         conn.close()
         return [dict(row) for row in rows]
@@ -192,7 +198,7 @@ def update_journal_rank_in_db(
         cursor = conn.cursor()
         now = datetime.now().isoformat()
         cursor.execute(
-            "UPDATE journals SET current_rank = ?, last_updated = ? WHERE id = ?",
+            "UPDATE journals SET previous_rank = current_rank, current_rank = ?, last_updated = ? WHERE id = ?",
             (new_rank, now, journal_id)
         )
         conn.commit()
