@@ -883,13 +883,13 @@
 
               <!-- Dynamic Premium Diff Viewer Component -->
               <div class="space-y-2.5 border border-cardBorder/60 p-4 rounded-2xl bg-appBg/40">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-cardBorder/40 pb-2">
+                <div class="flex flex-col gap-1.5 border-b border-cardBorder/40 pb-2">
                   <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Accreditation Diff Log</span>
                   <span class="text-[9px] font-mono text-textMuted italic block select-none leading-none">*Simulated history based on 7-day change status</span>
                 </div>
                 
-                <!-- Diff View Box (desktop: side-by-side, mobile: vertical stack) -->
-                <div class="flex flex-col sm:flex-row gap-3 w-full font-mono text-[13px] sm:text-[14px]">
+                <!-- Diff View Box (always vertical inside narrow drawer) -->
+                <div class="flex flex-col gap-3 w-full font-mono text-[13px] sm:text-[14px]">
                   
                   <!-- Before Box (Removed / Red) -->
                   <div class="flex-1 p-3 border rounded-xl" style="background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)">
