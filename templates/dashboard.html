@@ -353,7 +353,7 @@
             <div class="w-full sm:w-auto flex justify-end shrink-0">
               <select @change="updateSort($el.value)"
                       id="sortSelect"
-                      class="w-full sm:w-auto px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider bg-surface-alt border border-cardBorder text-textMain rounded-lg focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[38px]">
+                      class="w-full sm:w-auto px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider bg-[var(--surface-alt)] border border-cardBorder text-textMain rounded-lg focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[38px]">
                 <option value="name_asc" :selected="sortCol === 'name' && sortDir === 'asc'">Nama A–Z</option>
                 <option value="name_desc" :selected="sortCol === 'name' && sortDir === 'desc'">Nama Z–A</option>
                 <option value="rank_asc" :selected="sortCol === 'rank' && sortDir === 'asc'">Rank Terbaik</option>
