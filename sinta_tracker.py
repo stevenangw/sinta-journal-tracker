@@ -38,7 +38,10 @@ USER_AGENT = (
 # 4. Map the category name to its integer value here.
 SINTA_CATEGORY_IDS = {
     "science": 5,
-    "engineering": 10
+    "engineering": 10,
+    "mathematics": 15,
+    "agriculture": 20,
+    "arts_humanities": 25
 }
 
 # Setup logging
@@ -78,7 +81,9 @@ def load_config(config_path: str = CONFIG_NAME) -> Dict:
                 "timeout_seconds": 10,
                 "delay_between_requests": 2.0,
                 "max_retries": 3,
-                "loop_interval_seconds": 86400
+                "loop_interval_seconds": 86400,
+                "enable_keyword_filter": False,
+                "keyword_filter_terms": []
             },
             "journals": []
         }
@@ -383,21 +388,35 @@ def crawl_sinta_category_bulk(
     categories: List[int],
     delay: float = 2.0,
     timeout: int = 10,
-    max_retries: int = 3
+    max_retries: int = 3,
+    config: Dict = None
 ) -> List[Dict]:
     """
     Crawls SINTA journal listing page using category filters.
     Applies filters via POST, paginates via GET with session checks,
-    filters by IT keywords client-side, and deduplicates the results.
+    filters by IT keywords client-side (if enabled), and deduplicates the results.
     """
-    # IT keywords (case-insensitive regex)
-    it_pattern = re.compile(
-        r'(komputer|computer|comput|informatika|informatik|informatic|sistem informasi|information system|'
-        r'teknologi informasi|information technology|software|jaringan|network|multimedia|telecommunication|'
-        r'telekomunikasi|elektronik|electro|electron|computing|digital|web|embedded|data science|sains data|'
-        r'artificial intelligence|kecerdasan buatan|intelligence|intelligent|robot|game|telematika|telematics|siber|cyber|'
-        r'kripto|crypto|database|basis data)', re.IGNORECASE
-    )
+    if config is None:
+        config = load_config()
+
+    enable_keyword_filter = config.get("scraping", {}).get("enable_keyword_filter", False)
+    keyword_terms = config.get("scraping", {}).get("keyword_filter_terms", [])
+    
+    it_pattern = None
+    if enable_keyword_filter:
+        if keyword_terms:
+            escaped_terms = [re.escape(t) for t in keyword_terms if t.strip()]
+            if escaped_terms:
+                it_pattern = re.compile(r'(' + '|'.join(escaped_terms) + r')', re.IGNORECASE)
+        
+        if not it_pattern:
+            it_pattern = re.compile(
+                r'(komputer|computer|comput|informatika|informatik|informatic|sistem informasi|information system|'
+                r'teknologi informasi|information technology|software|jaringan|network|multimedia|telecommunication|'
+                r'telekomunikasi|elektronik|electro|electron|computing|digital|web|embedded|data science|sains data|'
+                r'artificial intelligence|kecerdasan buatan|intelligence|intelligent|robot|game|telematika|telematics|siber|cyber|'
+                r'kripto|crypto|database|basis data)', re.IGNORECASE
+            )
 
     headers = {"User-Agent": USER_AGENT}
     discovered_journals = {}
@@ -449,24 +468,22 @@ def crawl_sinta_category_bulk(
                         time.sleep(2.0)
                         continue
                     
-                    # Verify filter context: check if the checkbox is checked in the HTML
                     soup = BeautifulSoup(r.text, "html.parser")
-                    checked_el = soup.find("input", attrs={"name": f"filter_area[{cat_id}]", "checked": True})
+                    name_divs = soup.find_all(class_="affil-name mb-3")
                     
-                    if checked_el:
-                        # Success: Context verified
+                    if name_divs:
                         html = r.text
                         break
-                    else:
-                        # Context lost or unexpected page layout! Trigger session refresh
+                    elif page == 1:
+                        # Page 1 is empty: trigger session refresh
                         logging.warning(
-                            f"[SESSION REFRESH] Filter context lost on page {page} for Category {cat_id} "
-                            f"(checkbox 'filter_area[{cat_id}]' not checked). Re-applying filter POST."
+                            f"[SESSION REFRESH] No journals found on Page 1 for Category {cat_id}. Re-applying filter POST."
                         )
-                        # Re-apply POST filter
                         apply_filter(cat_id)
-                        # Wait a bit before retrying the GET request
                         time.sleep(1.0)
+                    else:
+                        html = r.text
+                        break
                 except requests.RequestException as e:
                     logging.warning(f"Request exception on GET page {page} of Category {cat_id}: {e}")
                     time.sleep(2.0)
@@ -484,6 +501,7 @@ def crawl_sinta_category_bulk(
 
             page_discovered_count = 0
             page_matched_count = 0
+            page_skipped_count = 0
 
             for div in name_divs:
                 link = div.find('a')
@@ -512,8 +530,19 @@ def crawl_sinta_category_bulk(
                 sinta_url = f"https://sinta.kemdiktisaintek.go.id/journals/profile/{sinta_id}"
                 page_discovered_count += 1
                 
-                # Client-side IT keyword filtering
-                if it_pattern.search(name):
+                # Keyword Filtering Logic
+                if enable_keyword_filter and it_pattern:
+                    if it_pattern.search(name):
+                        page_matched_count += 1
+                        discovered_journals[sinta_id] = {
+                            "id": sinta_id,
+                            "journal_name": name,
+                            "sinta_url": sinta_url,
+                            "current_rank": rank
+                        }
+                    else:
+                        page_skipped_count += 1
+                else:
                     page_matched_count += 1
                     discovered_journals[sinta_id] = {
                         "id": sinta_id,
@@ -523,13 +552,143 @@ def crawl_sinta_category_bulk(
                     }
             
             logging.info(
-                f"Category {cat_id} Page {page}: Checked {page_discovered_count} journals, "
-                f"matched {page_matched_count} IT-relevant journals. Total unique matches: {len(discovered_journals)}."
+                f"Category {cat_id} Page {page}: Found {page_discovered_count} journals "
+                f"(total: {len(discovered_journals)}, skipped: {page_skipped_count})"
             )
             
             # Move to next page
             page += 1
             time.sleep(delay)
+
+    return list(discovered_journals.values())
+
+
+def crawl_sinta_all(
+    delay: float = 2.0,
+    timeout: int = 10,
+    max_retries: int = 3,
+    config: Dict = None
+) -> List[Dict]:
+    """
+    Crawls SINTA journal listing page without category filters.
+    Applies filters via GET only, filters by IT keywords client-side (if enabled),
+    and deduplicates the results.
+    """
+    if config is None:
+        config = load_config()
+
+    enable_keyword_filter = config.get("scraping", {}).get("enable_keyword_filter", False)
+    keyword_terms = config.get("scraping", {}).get("keyword_filter_terms", [])
+    
+    it_pattern = None
+    if enable_keyword_filter:
+        if keyword_terms:
+            escaped_terms = [re.escape(t) for t in keyword_terms if t.strip()]
+            if escaped_terms:
+                it_pattern = re.compile(r'(' + '|'.join(escaped_terms) + r')', re.IGNORECASE)
+        
+        if not it_pattern:
+            it_pattern = re.compile(
+                r'(komputer|computer|comput|informatika|informatik|informatic|sistem informasi|information system|'
+                r'teknologi informasi|information technology|software|jaringan|network|multimedia|telecommunication|'
+                r'telekomunikasi|elektronik|electro|electron|computing|digital|web|embedded|data science|sains data|'
+                r'artificial intelligence|kecerdasan buatan|intelligence|intelligent|robot|game|telematika|telematics|siber|cyber|'
+                r'kripto|crypto|database|basis data)', re.IGNORECASE
+            )
+
+    headers = {"User-Agent": USER_AGENT}
+    discovered_journals = {}
+
+    session = requests.Session()
+    session.headers.update(headers)
+
+    base_url = "https://sinta.kemdiktisaintek.go.id/journals"
+
+    page = 1
+    while True:
+        url = f"{base_url}?page={page}"
+        
+        html = None
+        for attempt in range(1, max_retries + 1):
+            try:
+                r = session.get(url, timeout=timeout)
+                if r.status_code != 200:
+                    logging.warning(f"HTTP {r.status_code} on GET page {page}")
+                    time.sleep(2.0)
+                    continue
+                
+                html = r.text
+                break
+            except requests.RequestException as e:
+                logging.warning(f"Request exception on GET page {page}: {e}")
+                time.sleep(2.0)
+
+        if not html:
+            logging.error(f"Failed to fetch page {page} after {max_retries} attempts. Aborting crawl.")
+            break
+
+        soup = BeautifulSoup(html, "html.parser")
+        name_divs = soup.find_all(class_="affil-name mb-3")
+        if not name_divs:
+            logging.info(f"No journals found on page {page}. Reached end.")
+            break
+
+        page_discovered_count = 0
+        page_matched_count = 0
+        page_skipped_count = 0
+
+        for div in name_divs:
+            link = div.find('a')
+            if not link:
+                continue
+            
+            href = link.get('href', '')
+            name = link.get_text(strip=True)
+            
+            match_id = re.search(r'/profile/(\d+)', href)
+            if not match_id:
+                continue
+            sinta_id = int(match_id.group(1))
+            
+            rank = "Unknown"
+            card = div.parent
+            accredited_el = card.find(class_=re.compile(r'accredited', re.IGNORECASE))
+            if accredited_el:
+                txt = accredited_el.get_text()
+                match_rank = re.search(r'S([1-6])', txt, re.IGNORECASE)
+                if match_rank:
+                    rank = f"S{match_rank.group(1)}"
+                    
+            sinta_url = f"https://sinta.kemdiktisaintek.go.id/journals/profile/{sinta_id}"
+            page_discovered_count += 1
+            
+            if enable_keyword_filter and it_pattern:
+                if it_pattern.search(name):
+                    page_matched_count += 1
+                    discovered_journals[sinta_id] = {
+                        "id": sinta_id,
+                        "journal_name": name,
+                        "sinta_url": sinta_url,
+                        "current_rank": rank
+                    }
+                else:
+                    page_skipped_count += 1
+            else:
+                page_matched_count += 1
+                discovered_journals[sinta_id] = {
+                    "id": sinta_id,
+                    "journal_name": name,
+                    "sinta_url": sinta_url,
+                    "current_rank": rank
+                }
+        
+        logging.info(
+            f"Page {page}: Found {page_discovered_count} journals "
+            f"(total: {len(discovered_journals)}, skipped: {page_skipped_count})"
+        )
+        
+        page += 1
+        time.sleep(delay)
 
     return list(discovered_journals.values())
 
@@ -622,6 +781,11 @@ def main() -> None:
         help="Crawl SINTA search listings in bulk to import/sync all IT journals to database and config."
     )
     parser.add_argument(
+        "--crawl-all",
+        action="store_true",
+        help="Crawl all SINTA journals without any category or keyword filters to fully populate the database."
+    )
+    parser.add_argument(
         "--scrape",
         action="store_true",
         help="Perform a single live scraping verification cycle over all monitored journals."
@@ -658,9 +822,9 @@ def main() -> None:
         logging.info("Auto-crawling SINTA by category filters for IT-related journals to populate database...")
         categories = list(SINTA_CATEGORY_IDS.values())
         # Enforce minimum 2-second delay between requests during bulk crawl
-        journals = crawl_sinta_category_bulk(categories, delay=2.0)
+        journals = crawl_sinta_category_bulk(categories, delay=2.0, config=config)
         
-        logging.info(f"Bulk category crawl complete. Found {len(journals)} unique IT journals.")
+        logging.info(f"Bulk category crawl complete. Found {len(journals)} unique journals.")
         
         imported_count = 0
         config_journals = []
@@ -690,7 +854,32 @@ def main() -> None:
         logging.info("Running mass category import from SINTA...")
         categories = list(SINTA_CATEGORY_IDS.values())
         # Enforce minimum 2-second delay between requests during bulk crawl
-        journals = crawl_sinta_category_bulk(categories, delay=2.0)
+        journals = crawl_sinta_category_bulk(categories, delay=2.0, config=config)
+        
+        imported_count = 0
+        config_journals = []
+        for journal in journals:
+            success = save_journal_to_db(
+                journal_id=journal["id"],
+                name=journal["journal_name"],
+                url=journal["sinta_url"],
+                rank=journal["current_rank"]
+            )
+            if success:
+                imported_count += 1
+                config_journals.append({
+                    "journal_name": journal["journal_name"],
+                    "sinta_url": journal["sinta_url"]
+                })
+                
+        config["journals"] = config_journals
+        save_config(config)
+        logging.info(f"Sync complete. Monitored list contains {imported_count} unique journals.")
+
+    elif args.crawl_all:
+        init_db()
+        logging.info("Running complete crawl over all SINTA journals without any category or keyword filters...")
+        journals = crawl_sinta_all(delay=2.0, config=config)
         
         imported_count = 0
         config_journals = []

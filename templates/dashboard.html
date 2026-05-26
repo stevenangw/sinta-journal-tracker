@@ -7,18 +7,18 @@
 
   <!-- Prevent FOUC (Flash of Unstyled Content) by setting dark theme instantly -->
   <script>
-    if (localStorage.getItem('theme') === 'dark' || 
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('jurnal-theme') === 'dark' || 
+        (!('jurnal-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
   </script>
 
-  <!-- Google Fonts: Editorial Serif and Technical pairings -->
+  <!-- Google Fonts: IBM Plex Sans and IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Spectral:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,18 +33,17 @@
       theme: {
         extend: {
           colors: {
-            appBg: 'var(--color-app-bg)',
-            cardBg: 'var(--color-card-bg)',
-            cardBorder: 'var(--color-card-border)',
-            textMain: 'var(--color-text-main)',
-            textMuted: 'var(--color-text-muted)',
-            brandGold: 'var(--color-brand-gold)',
-            brandGoldHover: 'var(--color-brand-gold-hover)',
+            appBg: 'var(--bg)',
+            cardBg: 'var(--surface)',
+            cardBorder: 'var(--border)',
+            textMain: 'var(--text-primary)',
+            textMuted: 'var(--text-secondary)',
+            brandGold: 'var(--accent)',
+            brandGoldHover: 'var(--accent-hover, var(--accent))',
           },
           fontFamily: {
-            serif: ['"Spectral"', 'Georgia', 'serif'],
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
           }
         }
       }
@@ -53,30 +52,90 @@
 
   <!-- Premium Design Styling -->
   <style>
+    *, ::before, ::after {
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+
     :root {
-      --color-app-bg: #FBFBFA;                       /* Low-chroma warm off-white (60%) */
-      --color-card-bg: #FFFFFF;                      /* Clean card background */
-      --color-card-border: #E8E8E6;                  /* Soft neutral border */
-      --color-text-main: #1E2229;                    /* Deep, organic dark graphite (30%) */
-      --color-text-muted: #5C6470;                   /* Muted slate graphite */
-      --color-brand-gold: #4A6070;                   /* Desaturated Slate Blue accent (10%) */
-      --color-brand-gold-hover: #3B4D5A;             /* Desaturated Slate Blue hover */
+      --bg:              #FAFAF8;
+      --surface:         #FFFFFF;
+      --surface-alt:     #F3F2EF;
+      --text-primary:    #1A1A1A;
+      --text-secondary:  #5A5A5A;
+      --accent:          #2C5282;
+      --accent-hover:    #1A365D;
+      --border:          #DDDBD7;
+      --muted:           #9E9A94;
+
+      /* Diff colors light */
+      --diff-added-bg:      #D4EDDA;
+      --diff-added-text:    #155724;
+      --diff-added-border:  #B8DACC;
+      --diff-removed-bg:    #F8D7DA;
+      --diff-removed-text:  #721C24;
+      --diff-removed-border:#F1B8BC;
+      --diff-modified-bg:   #FFF3CD;
+      --diff-modified-text: #856404;
+      --diff-modified-border:#FFE69C;
+
+      /* Sinta ranks color tokens */
+      --color-s1: #5C6D82;
+      --color-s2: #6B8272;
+      --color-s3: #A68B82;
+      --color-s4: #6F7A85;
+      --color-s5: #8C8470;
+      --color-s6: #A37878;
+      --color-s-default: #5C6470;
+      --status-active: #2E7D32;
     }
 
     .dark {
-      --color-app-bg: #15181E;                       /* Deep ink-obsidian */
-      --color-card-bg: #1E2229;                      /* Organic dark graphite background */
-      --color-card-border: #2D333F;                  /* Muted obsidian separator */
-      --color-text-main: #F3F4F6;                    /* Luminous cream-white */
-      --color-text-muted: #9CA3AF;                   /* Velvet slate blue-grey */
-      --color-brand-gold: #60788A;                   /* Muted Slate Blue accent for dark mode */
-      --color-brand-gold-hover: #4F6372;
+      --bg:              #141412;
+      --surface:         #1E1C1A;
+      --surface-alt:     #252320;
+      --text-primary:    #EDEDE9;
+      --text-secondary:  #9A958F;
+      --accent:          #6B9FD4;
+      --accent-hover:    #8BBBEC;
+      --border:          #2E2C28;
+      --muted:           #5A5550;
+
+      /* Diff colors dark */
+      --diff-added-bg:      #1A3326;
+      --diff-added-text:    #6AAE82;
+      --diff-added-border:  #2D5040;
+      --diff-removed-bg:    #3B1A1C;
+      --diff-removed-text:  #E07C7C;
+      --diff-removed-border:#5A2828;
+      --diff-modified-bg:   #332A10;
+      --diff-modified-text: #D4A843;
+      --diff-modified-border:#4A3C18;
+
+      /* Sinta ranks color tokens dark */
+      --color-s1: #6B82A1;
+      --color-s2: #7E9C88;
+      --color-s3: #C2A398;
+      --color-s4: #8794A3;
+      --color-s5: #A39B85;
+      --color-s6: #BD8E8E;
+      --color-s-default: #7E8794;
+      --status-active: #6AAE82;
     }
 
     body {
-      background-color: var(--color-app-bg);
-      color: var(--color-text-main);
-      transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      background-color: var(--bg);
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 16px; /* Body minimum 16px */
+    }
+
+    h1, .clamp-h1 {
+      font-size: clamp(1.75rem, 5vw, 3.5rem) !important;
+    }
+
+    h2, .clamp-h2 {
+      font-size: clamp(1.4rem, 4vw, 2.5rem) !important;
     }
 
     [x-cloak] {
@@ -122,9 +181,9 @@
           S
         </span>
         <div>
-          <h1 class="text-[14px] sm:text-[15px] font-extrabold uppercase tracking-widest font-sans leading-none text-textMain">
-            SINTA Tracker
-          </h1>
+          <span class="text-[14px] sm:text-[15px] font-extrabold uppercase tracking-widest font-sans leading-none text-textMain">
+            SINTA JOURNAL TRACKER
+          </span>
           <span class="text-[9px] font-mono tracking-widest uppercase text-textMuted leading-none block mt-0.5">
             Accreditation Audit
           </span>
@@ -136,8 +195,8 @@
         <div class="hidden sm:flex items-center gap-2.5">
           <!-- Pulse status light -->
           <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#607361] opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#607361]"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background-color: var(--status-active)"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2" style="background-color: var(--status-active)"></span>
           </span>
           <!-- Monospace Timestamp -->
           <span class="font-mono text-[11px] text-textMuted">
@@ -222,63 +281,86 @@
         <!-- MAIN PANEL (70% - Columns 1 to 7) -->
         <div class="lg:col-span-7 space-y-6">
           
-          <!-- Interactive Visual Stats Grid (Mobile-friendly: Wrap dynamically, custom shadows) -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
-            <!-- ALL button -->
-            <button @click="setFilter('All')"
-                    id="statAllBtn"
-                    class="p-3.5 transition-all duration-300 rounded-xl bg-cardBg border flex flex-col justify-between items-start text-left shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:shadow-lg active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40"
-                    :class="activeFilter === 'All' ? 'ring-2 ring-brandGold border-transparent' : 'border-cardBorder hover:border-brandGold/40'">
-              <span class="text-[9px] font-bold uppercase tracking-widest text-textMuted leading-none">ALL</span>
-              <span class="text-[20px] font-extrabold text-textMain leading-none mt-3.5 font-sans group-hover:translate-x-0.5 premium-transition" x-text="stats.total">0</span>
+          <!-- Component 1: Stats Bar (Premium Horizontal Scrollable Chips) -->
+          <div class="w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 mb-4 flex items-center gap-2">
+            <!-- Total Chip -->
+            <button @click="toggleRankFilter('All')"
+                    id="statsBarTotalBtn"
+                    class="px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2"
+                    :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
+              <span>Total</span>
+              <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold font-mono" :style="selectedRanks.length === 0 ? 'background-color: rgba(255,255,255,0.2); color: #ffffff' : 'background-color: var(--border); color: var(--text-primary)'" x-text="meta.stats ? Object.values(meta.stats).reduce((a,b)=>a+b, 0) : 0">0</span>
             </button>
-            <!-- S1 to S6 buttons with dynamically calculated oklch shadow glows and borders -->
-            <template x-for="rank in ['S1','S2','S3','S4','S5','S6']">
-              <button @click="setFilter(rank)"
-                      :id="'stat' + rank + 'Btn'"
-                      class="p-3.5 transition-all duration-300 rounded-xl bg-cardBg border flex flex-col justify-between items-start text-left shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:shadow-lg active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40"
-                      :style="activeFilter === rank ? 'border-color: ' + getRankColor(rank) + '; box-shadow: 0 8px 24px -6px color-mix(in oklch, ' + getRankColor(rank) + ' 25%, transparent); border-width: 2px' : 'border-color: var(--color-card-border);'"
-                      :class="activeFilter === rank ? '' : 'hover:border-brandGold/30'">
-                <span class="text-[9px] font-extrabold uppercase tracking-widest leading-none" :style="'color: ' + getRankColor(rank)" x-text="rank"></span>
-                <div class="flex items-baseline justify-between w-full mt-3.5">
-                  <span class="text-[20px] font-extrabold leading-none font-sans group-hover:translate-x-0.5 premium-transition" :style="'color: ' + getRankColor(rank)" x-text="stats[rank.toLowerCase()]">0</span>
-                  <span class="text-[9px] font-mono text-textMuted" x-text="(stats.total > 0 ? Math.round(stats[rank.toLowerCase()] / stats.total * 100) : 0) + '%'"></span>
-                </div>
+            <!-- Rank Chips -->
+            <template x-for="rank in ['S1','S2','S3','S4','S5','S6','Unknown']">
+              <button @click="toggleRankFilter(rank)"
+                      :id="'statsBar' + rank + 'Btn'"
+                      class="px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2"
+                      :style="selectedRanks.includes(rank) ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
+                <span :style="selectedRanks.includes(rank) ? 'color: #ffffff' : 'color: ' + getRankColor(rank)" x-text="rank"></span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold font-mono" :style="selectedRanks.includes(rank) ? 'background-color: rgba(255,255,255,0.2); color: #ffffff' : 'background-color: var(--border); color: var(--text-primary)'" x-text="meta.stats ? meta.stats[rank] : 0">0</span>
               </button>
             </template>
           </div>
 
-          <!-- Toolbar Row -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
-            <!-- Search bar with icon and clear button -->
-            <div class="relative flex-1 max-w-md w-full">
+          <!-- Component 2: Search Bar -->
+          <div class="space-y-2">
+            <div class="relative w-full">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </span>
-              <input type="text" id="searchInput" x-model="searchVal" @input="currentPage = 1"
+              <input type="text" id="searchInput" x-model="searchVal" @input="triggerSearchDebounce()"
                      placeholder="Search journal name or rank..." 
-                     class="w-full pl-10 pr-8 py-3 text-base font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-lg placeholder-textMuted/60 min-h-[48px] premium-transition">
+                     class="w-full pl-10 pr-8 py-3 text-base font-sans border border-cardBorder bg-cardBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-lg placeholder-textMuted/60 min-h-[48px] premium-transition">
               <!-- Clear Button -->
-              <button x-show="searchVal.length > 0" @click="searchVal = ''; currentPage = 1"
+              <button x-show="searchVal.length > 0" @click="clearSearch()"
                       id="searchClearBtn"
                       class="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-lg font-bold focus:outline-none focus-visible:text-brandGold">
                 &times;
               </button>
             </div>
-            
-            <!-- Quick Changed Toggle Pill -->
-            <div class="flex items-center gap-2">
-              <button @click="toggleChangedFilter()"
-                      id="filterChangedBtn"
-                      class="px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center gap-2 border rounded-lg shadow-[0_1px_4px_rgba(0,0,0,0.01)]"
-                      :class="activeFilter === 'Changed' ? 'bg-[#27500A] dark:bg-emerald-800 text-white border-transparent' : 'bg-cardBg text-textMain border-cardBorder hover:border-textMuted hover:bg-appBg/30'">
-                <span>Rank Changed</span>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold font-mono"
-                      :class="activeFilter === 'Changed' ? 'bg-white/20 text-white' : 'bg-appBg text-textMuted'"
-                      x-text="journals.filter(j => isUpdatedWithin7Days(j.last_updated)).length"></span>
+            <!-- Search status label -->
+            <div x-show="searchVal.trim().length > 0" class="text-[12px] font-mono text-textMuted pl-1">
+              Menampilkan <span class="font-bold text-textMain" x-text="meta.total || 0"></span> hasil untuk "<span class="italic text-textMain" x-text="searchVal.trim()"></span>"
+            </div>
+          </div>
+
+          <!-- Component 3: Filter & Sort Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+            <!-- Multi-select Filter rank chips (with horizontal scroll on mobile) -->
+            <div class="w-full sm:w-auto overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex items-center gap-1.5 py-1">
+              <!-- Semua Chip -->
+              <button @click="toggleRankFilter('All')"
+                      id="filterAllBtn"
+                      class="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg border transition-all duration-200 active:scale-95 focus:outline-none"
+                      :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
+                Semua
               </button>
+              <!-- Rank Chips -->
+              <template x-for="rank in ['S1','S2','S3','S4','S5','S6','Unknown']">
+                <button @click="toggleRankFilter(rank)"
+                        :id="'filter' + rank + 'Btn'"
+                        class="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg border transition-all duration-200 active:scale-95 focus:outline-none"
+                        :style="selectedRanks.includes(rank) ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
+                  <span x-text="rank"></span>
+                </button>
+              </template>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="w-full sm:w-auto flex justify-end shrink-0">
+              <select @change="updateSort($el.value)"
+                      id="sortSelect"
+                      class="w-full sm:w-auto px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider bg-surface-alt border border-cardBorder text-textMain rounded-lg focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[38px]">
+                <option value="name_asc" :selected="sortCol === 'name' && sortDir === 'asc'">Nama A–Z</option>
+                <option value="name_desc" :selected="sortCol === 'name' && sortDir === 'desc'">Nama Z–A</option>
+                <option value="rank_asc" :selected="sortCol === 'rank' && sortDir === 'asc'">Rank Terbaik</option>
+                <option value="rank_desc" :selected="sortCol === 'rank' && sortDir === 'desc'">Rank Terburuk</option>
+                <option value="last_updated_desc" :selected="sortCol === 'last_updated' && sortDir === 'desc'">Terbaru Diupdate</option>
+                <option value="last_updated_asc" :selected="sortCol === 'last_updated' && sortDir === 'asc'">Terlama Diupdate</option>
+              </select>
             </div>
           </div>
 
@@ -288,16 +370,14 @@
             <!-- MOBILE CARD VIEW (Block on <768px, Hidden on >=768px) -->
             <div class="block md:hidden space-y-3">
               <!-- Empty state loader / skeleton -->
-              <div x-show="journals.length === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted font-mono text-[12px] space-y-3">
-                <span class="relative flex h-3 w-3 mx-auto">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brandGold opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-brandGold"></span>
-                </span>
-                <p>Initializing database and loading records...</p>
+              <div x-show="isLoading" class="space-y-3 w-full">
+                <template x-for="i in [1,2,3,4,5]">
+                  <div class="h-20 w-full rounded-xl animate-pulse" style="background-color: var(--surface-alt)"></div>
+                </template>
               </div>
 
               <!-- Main Loop Cards -->
-              <template x-for="j in pagedJournals" :key="j.id">
+              <template x-for="j in journals" :key="j.id">
                 <div @click="openDrawer(j)" 
                      class="bg-cardBg border border-cardBorder rounded-xl p-4.5 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-brandGold/60 premium-transition cursor-pointer active:scale-[0.99] group">
                   <div class="flex items-start justify-between gap-3">
@@ -315,7 +395,8 @@
                     <span class="font-medium" x-text="'ID: #' + j.id"></span>
                     <span class="flex items-center gap-1.5">
                       <span x-show="isUpdatedWithin7Days(j.last_updated)" 
-                            class="text-[9px] font-extrabold tracking-widest text-[#27500A] bg-[#EAF3DE] dark:bg-[#27500A]/20 dark:text-emerald-400 px-1.5 py-0.5 rounded-[4px] font-sans uppercase inline-block shrink-0">
+                            style="background-color: var(--diff-modified-bg); border-color: var(--diff-modified-border); color: var(--diff-modified-text)"
+                            class="text-[9px] font-extrabold tracking-widest px-1.5 py-0.5 border rounded-[4px] font-sans uppercase inline-block shrink-0">
                         CHANGED
                       </span>
                       <span x-text="toRelativeTime(j.last_updated)"></span>
@@ -325,7 +406,7 @@
               </template>
 
               <!-- No records match -->
-              <div x-show="journals.length > 0 && filteredCount === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted text-[13px]">
+              <div x-show="!isLoading && journals.length === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted text-[13px]">
                 No matching journal logs found in database.
               </div>
             </div>
@@ -337,45 +418,43 @@
                   <thead>
                     <tr class="border-b border-cardBorder bg-appBg/30 text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
                       <th class="py-4 px-5 text-center w-[8%]">ID</th>
-                      <th class="py-4 px-4 cursor-pointer hover:text-textMain premium-transition w-[58%]" @click="toggleSort('journal_name')">
+                      <th class="py-4 px-4 cursor-pointer hover:text-textMain premium-transition w-[58%]" @click="updateSort(sortCol === 'name' && sortDir === 'asc' ? 'name_desc' : 'name_asc')">
                         <div class="flex items-center gap-1.5">
                           <span>Journal Title</span>
-                          <svg x-show="sortCol === 'journal_name' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                          <svg x-show="sortCol === 'journal_name' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                          <svg x-show="sortCol === 'name' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                          <svg x-show="sortCol === 'name' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                         </div>
                       </th>
-                      <th class="py-4 px-4 text-center cursor-pointer hover:text-textMain premium-transition w-[14%]" @click="toggleSort('current_rank')">
+                      <th class="py-4 px-4 text-center cursor-pointer hover:text-textMain premium-transition w-[14%]" @click="updateSort(sortCol === 'rank' && sortDir === 'asc' ? 'rank_desc' : 'rank_asc')">
                         <div class="flex items-center justify-center gap-1.5">
                           <span>Accreditation</span>
-                          <svg x-show="sortCol === 'current_rank' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                          <svg x-show="sortCol === 'current_rank' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                          <svg x-show="sortCol === 'rank' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                          <svg x-show="sortCol === 'rank' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                         </div>
                       </th>
-                      <th class="py-4 px-5 text-center cursor-pointer hover:text-textMain premium-transition w-[20%]" @click="toggleSort('last_updated')">
+                      <th class="py-4 px-5 text-center cursor-pointer hover:text-textMain premium-transition w-[20%]" @click="updateSort(sortCol === 'last_updated' && sortDir === 'desc' ? 'last_updated_asc' : 'last_updated_desc')">
                         <div class="flex items-center justify-center gap-1.5">
                           <span>Last Audited</span>
-                          <svg x-show="sortCol === 'last_updated' && !sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                          <svg x-show="sortCol === 'last_updated' && sortDesc" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                          <svg x-show="sortCol === 'last_updated' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+                          <svg x-show="sortCol === 'last_updated' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                         </div>
                       </th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-cardBorder/60 font-sans">
                     <!-- Empty Skeleton Loader -->
-                    <tr x-show="journals.length === 0">
-                      <td colspan="4" class="py-16 text-center text-textMuted font-mono text-[12px]">
-                        <div class="flex flex-col items-center justify-center gap-3">
-                          <span class="relative flex h-3.5 w-3.5">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brandGold opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-brandGold"></span>
-                          </span>
-                          <span>Hydrating system database records from SINTA core...</span>
+                    <tr x-show="isLoading">
+                      <td colspan="4" class="py-6">
+                        <div class="space-y-3.5 w-full">
+                          <template x-for="i in [1,2,3,4,5]">
+                            <div class="h-12 w-full rounded-xl animate-pulse" style="background-color: var(--surface-alt)"></div>
+                          </template>
                         </div>
                       </td>
                     </tr>
 
                     <!-- Reactive Table Rows -->
-                    <template x-for="j in pagedJournals" :key="j.id">
+                    <template x-for="j in journals" :key="j.id">
                       <tr @click="openDrawer(j)" 
                           :id="'journalRow' + j.id"
                           class="hover:bg-appBg/40 cursor-pointer transition-colors duration-150 group">
@@ -389,7 +468,8 @@
                             
                             <!-- "Changed" notification tag -->
                             <span x-show="isUpdatedWithin7Days(j.last_updated)" 
-                                  class="text-[9px] font-extrabold tracking-widest text-[#27500A] bg-[#EAF3DE] dark:bg-[#27500A]/20 dark:text-emerald-400 px-1.5 py-0.5 rounded-[4px] font-sans uppercase">
+                                  style="background-color: var(--diff-modified-bg); border-color: var(--diff-modified-border); color: var(--diff-modified-text)"
+                                  class="text-[9px] font-extrabold tracking-widest px-1.5 py-0.5 border rounded-[4px] font-sans uppercase">
                               CHANGED
                             </span>
                           </div>
@@ -406,7 +486,7 @@
                     </template>
 
                     <!-- Empty state search -->
-                    <tr x-show="journals.length > 0 && filteredCount === 0">
+                    <tr x-show="!isLoading && journals.length === 0">
                       <td colspan="4" class="py-12 text-center text-textMuted font-mono text-[12px]">
                         No monitored records matched the query.
                       </td>
@@ -416,40 +496,70 @@
               </div>
             </div>
 
-            <!-- Custom Reactive Pagination Footer -->
+            <!-- Component 4: Adaptive Pagination Footer -->
             <div class="px-4 sm:px-5 py-4 bg-cardBg border border-cardBorder rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 font-sans transition-all duration-300">
+              <!-- Showing text -->
               <span class="font-mono text-[11px] text-textMuted">
-                Showing <span class="font-bold text-textMain" x-text="filteredCount === 0 ? 0 : ((currentPage - 1) * pageSize) + 1"></span> 
-                to <span class="font-bold text-textMain" x-text="Math.min(currentPage * pageSize, filteredCount)"></span> 
-                of <span class="font-bold text-textMain" x-text="filteredCount"></span> journals
+                Showing <span class="font-bold text-textMain" x-text="meta.total === 0 ? 0 : ((currentPage - 1) * pageSize) + 1"></span> 
+                to <span class="font-bold text-textMain" x-text="Math.min(currentPage * pageSize, meta.total || 0)"></span> 
+                of <span class="font-bold text-textMain" x-text="meta.total || 0"></span> journals
               </span>
 
-              <div class="flex items-center gap-1.5 w-full sm:w-auto justify-center" x-show="totalPages > 1">
-                <button @click="currentPage = 1" :disabled="currentPage === 1"
-                        id="pageFirstBtn"
-                        class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                  &lt;&lt;
-                </button>
-                <button @click="currentPage--" :disabled="currentPage === 1"
-                        id="pagePrevBtn"
-                        class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                  &larr; Prev
-                </button>
+              <!-- Pagination Triggers -->
+              <div class="flex items-center gap-1.5 w-full sm:w-auto justify-center" x-show="meta.total_pages > 1">
                 
-                <span class="px-3 py-1.5 text-[11px] font-mono text-textMuted">
-                  <span class="font-extrabold text-textMain" x-text="currentPage"></span> / <span x-text="totalPages"></span>
-                </span>
+                <!-- Desktop Pagination -->
+                <div class="hidden sm:flex items-center gap-1.5">
+                  <button @click="setPage(1)" :disabled="currentPage === 1 || isLoading"
+                          id="pageFirstBtn"
+                          class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
+                    &lt;&lt;
+                  </button>
+                  <button @click="setPage(currentPage - 1)" :disabled="currentPage === 1 || isLoading"
+                          id="pagePrevBtn"
+                          class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
+                    &larr; Prev
+                  </button>
 
-                <button @click="currentPage++" :disabled="currentPage === totalPages"
-                        id="pageNextBtn"
-                        class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                  Next &rarr;
-                </button>
-                <button @click="currentPage = totalPages" :disabled="currentPage === totalPages"
-                        id="pageLastBtn"
-                        class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                  &gt;&gt;
-                </button>
+                  <template x-for="p in getVisiblePages()">
+                    <span class="flex items-center">
+                      <button x-show="p !== '...'" @click="setPage(p)" :disabled="isLoading"
+                              class="w-8 h-8 rounded-lg border text-[11px] font-bold transition flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
+                              :style="currentPage === p ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'"
+                              x-text="p"></button>
+                      <span x-show="p === '...'" class="px-2 text-[11px] font-mono text-textMuted" x-text="p"></span>
+                    </span>
+                  </template>
+
+                  <button @click="setPage(currentPage + 1)" :disabled="currentPage === meta.total_pages || isLoading"
+                          id="pageNextBtn"
+                          class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
+                    Next &rarr;
+                  </button>
+                  <button @click="setPage(meta.total_pages)" :disabled="currentPage === meta.total_pages || isLoading"
+                          id="pageLastBtn"
+                          class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
+                    &gt;&gt;
+                  </button>
+                </div>
+
+                <!-- Mobile Pagination -->
+                <div class="flex sm:hidden items-center justify-between gap-4 w-full">
+                  <button @click="setPage(currentPage - 1)" :disabled="currentPage === 1 || isLoading"
+                          id="pagePrevMobileBtn"
+                          class="px-4 py-2.5 rounded-lg border border-cardBorder bg-cardBg text-[12px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none min-h-[48px] flex items-center">
+                    &larr; Prev
+                  </button>
+                  <span class="text-[12px] font-mono text-textMuted">
+                    Hal. <span class="font-extrabold text-textMain" x-text="currentPage"></span> / <span x-text="meta.total_pages"></span>
+                  </span>
+                  <button @click="setPage(currentPage + 1)" :disabled="currentPage === meta.total_pages || isLoading"
+                          id="pageNextMobileBtn"
+                          class="px-4 py-2.5 rounded-lg border border-cardBorder bg-cardBg text-[12px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none min-h-[48px] flex items-center">
+                    Next &rarr;
+                  </button>
+                </div>
+
               </div>
             </div>
 
@@ -469,12 +579,12 @@
                 <div class="space-y-1.5">
                   <div class="flex items-center justify-between text-[11px]">
                     <span class="font-bold uppercase tracking-wider" :style="'color: ' + getRankColor(rank)" x-text="rank"></span>
-                    <span class="font-mono text-textMuted" x-text="stats[rank.toLowerCase()] + ' publications'"></span>
+                    <span class="font-mono text-textMuted" x-text="(meta.stats ? (meta.stats[rank] || 0) : 0) + ' publications'"></span>
                   </div>
                   <!-- Mini custom bar graph with color-mix border and fill -->
                   <div class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/50">
                     <div class="h-full rounded-full transition-all duration-500" 
-                         :style="'width: ' + (stats.total > 0 ? (stats[rank.toLowerCase()] / stats.total * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
+                         :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
                   </div>
                 </div>
               </template>
@@ -547,8 +657,8 @@
                 <span class="text-[12px] font-extrabold uppercase tracking-widest font-sans text-textMain">Discord Webhook Alert</span>
                 <!-- Status Badge -->
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                      :class="config.webhook && config.webhook.discord_url ? 'bg-[#EAF3DE] border-[#27500A]/20 text-[#27500A] dark:bg-[#27500A]/20 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-900/30'">
-                  <span class="w-1.5 h-1.5 rounded-full" :class="config.webhook && config.webhook.discord_url ? 'bg-[#27500A] dark:bg-emerald-400' : 'bg-red-600'"></span>
+                      :style="config.webhook && config.webhook.discord_url ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                  <span class="w-1.5 h-1.5 rounded-full" :style="config.webhook && config.webhook.discord_url ? 'background-color: var(--diff-added-text)' : 'background-color: var(--diff-removed-text)'"></span>
                   <span x-text="config.webhook && config.webhook.discord_url ? 'Configured' : 'Inactive'"></span>
                 </span>
               </div>
@@ -593,8 +703,8 @@
                 <span class="text-[12px] font-extrabold uppercase tracking-widest font-sans text-textMain">Telegram Alerts Channel</span>
                 <!-- Status Badge -->
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                      :class="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'bg-[#EAF3DE] border-[#27500A]/20 text-[#27500A] dark:bg-[#27500A]/20 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-900/30'">
-                  <span class="w-1.5 h-1.5 rounded-full" :class="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'bg-[#27500A] dark:bg-emerald-400' : 'bg-red-600'"></span>
+                      :style="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                  <span class="w-1.5 h-1.5 rounded-full" :style="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'background-color: var(--diff-added-text)' : 'background-color: var(--diff-removed-text)'"></span>
                   <span x-text="config.webhook && config.webhook.telegram_bot_token && config.webhook.telegram_chat_id ? 'Configured' : 'Inactive'"></span>
                 </span>
               </div>
@@ -659,15 +769,15 @@
                id="unsavedBanner"
                x-show="(!config.webhook || !config.webhook.discord_url || editDiscord) || (!config.webhook || !config.webhook.telegram_bot_token || !config.webhook.telegram_chat_id || editTelegram)">
             <div class="text-[13px] font-sans font-semibold text-textMuted text-center sm:text-left">You have modified notification channels. Ready to apply?</div>
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
               <button @click="resetForm()" 
                       id="saveCancelBtn"
-                      class="px-4 py-2 text-[12px] font-sans font-bold uppercase tracking-wider text-textMuted hover:text-textMain transition-colors duration-200 focus:outline-none active:scale-95">
+                      class="w-full sm:w-auto min-h-[48px] sm:min-h-0 px-4 py-2 text-[12px] font-sans font-bold uppercase tracking-wider text-textMuted hover:text-textMain transition-colors duration-200 focus:outline-none active:scale-95 flex items-center justify-center">
                 Discard
               </button>
               <button @click="saveWebhookConfig()" :disabled="isSaving"
                       id="saveConfirmBtn"
-                      class="px-5 py-2.5 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                      class="w-full sm:w-auto min-h-[48px] sm:min-h-0 px-5 py-2.5 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span x-text="isSaving ? 'Saving Changes...' : 'Commit Settings'"></span>
               </button>
             </div>
@@ -678,7 +788,7 @@
                id="settingsStatusToast"
                x-transition
                class="p-4 rounded-xl border flex items-center gap-3 transition-all duration-300"
-               :class="saveSuccess ? 'bg-[#EAF3DE] border-[#27500A]/30 text-[#27500A] dark:bg-[#27500A]/20 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-800 dark:text-red-400'">
+               :style="saveSuccess ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
             <span class="text-[12px] sm:text-[13px] font-sans font-bold" x-text="saveMessage"></span>
           </div>
 
@@ -768,6 +878,41 @@
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-[16px] shadow-sm select-none"
                      :style="'background-color: ' + getRankColor(selectedJournal.current_rank)">
                   <span class="font-sans font-bold" x-text="selectedJournal.current_rank"></span>
+                </div>
+              </div>
+
+              <!-- Dynamic Premium Diff Viewer Component -->
+              <div class="space-y-2.5 border border-cardBorder/60 p-4 rounded-2xl bg-appBg/40">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-cardBorder/40 pb-2">
+                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Accreditation Diff Log</span>
+                  <span class="text-[9px] font-mono text-textMuted italic block select-none leading-none">*Simulated history based on 7-day change status</span>
+                </div>
+                
+                <!-- Diff View Box (desktop: side-by-side, mobile: vertical stack) -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full font-mono text-[13px] sm:text-[14px]">
+                  
+                  <!-- Before Box (Removed / Red) -->
+                  <div class="flex-1 p-3 border rounded-xl" style="background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)">
+                    <div class="text-[9px] font-bold uppercase tracking-wider mb-2 opacity-80 select-none flex items-center justify-between">
+                      <span>Before</span>
+                      <span class="text-xs font-mono font-extrabold select-none">-</span>
+                    </div>
+                    <div class="overflow-x-auto whitespace-pre select-all py-1 scrollbar-thin">  1 <span class="opacity-55 select-none font-bold font-mono">-</span> Journal: <span x-text="selectedJournal.journal_name"></span>
+  2 <span class="opacity-55 select-none font-bold font-mono">-</span> Rank:    <span class="font-extrabold" x-text="isUpdatedWithin7Days(selectedJournal.last_updated) ? getPreviousRank(selectedJournal.current_rank) : (selectedJournal.current_rank || 'N/A')"></span>
+  3 <span class="opacity-55 select-none font-bold font-mono">-</span> Audited: <span x-text="isUpdatedWithin7Days(selectedJournal.last_updated) ? getSimulatedDate(selectedJournal.last_updated) : (selectedJournal.last_updated || 'N/A')"></span></div>
+                  </div>
+
+                  <!-- After Box (Added / Green) -->
+                  <div class="flex-1 p-3 border rounded-xl" style="background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)">
+                    <div class="text-[9px] font-bold uppercase tracking-wider mb-2 opacity-80 select-none flex items-center justify-between">
+                      <span>After</span>
+                      <span class="text-xs font-mono font-extrabold select-none">+</span>
+                    </div>
+                    <div class="overflow-x-auto whitespace-pre select-all py-1 scrollbar-thin">  1 <span class="opacity-55 select-none font-bold font-mono">+</span> Journal: <span x-text="selectedJournal.journal_name"></span>
+  2 <span class="opacity-55 select-none font-bold font-mono">+</span> Rank:    <span class="font-extrabold" x-text="selectedJournal.current_rank || 'N/A'"></span>
+  3 <span class="opacity-55 select-none font-bold font-mono">+</span> Audited: <span x-text="selectedJournal.last_updated || 'N/A'"></span></div>
+                  </div>
+
                 </div>
               </div>
 
@@ -868,26 +1013,29 @@
       return {
         activeTab: 'dashboard',
         journals: [],
-        stats: {
+        meta: {
           total: 0,
-          s1: 0,
-          s2: 0,
-          s3: 0,
-          s4: 0,
-          s5: 0,
-          s6: 0
+          page: 1,
+          limit: 50,
+          total_pages: 1,
+          stats: {
+            S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0
+          }
         },
-        activeFilter: 'All',
-        lastScrape: 'N/A',
         config: {},
+        lastScrape: 'N/A',
         
-        // Sorting states
-        sortCol: 'journal_name',
-        sortDesc: false,
+        // Custom search & filter states
+        searchVal: '',
+        selectedRanks: [],
+        sortCol: 'name',
+        sortDir: 'asc',
 
         // Pagination states
         currentPage: 1,
-        pageSize: 10,
+        pageSize: 50,
+        isLoading: false,
+        debounceTimeout: null,
         
         // Drawer inspection states
         isDrawerOpen: false,
@@ -905,12 +1053,19 @@
 
         // Theme preference state
         darkMode: false,
-        searchVal: '',
 
         init() {
           this.darkMode = document.documentElement.classList.contains('dark');
           this.activeTab = window.ACTIVE_TAB || 'dashboard';
           if (this.activeTab === 'dashboard') {
+            const params = new URLSearchParams(window.location.search);
+            this.currentPage = parseInt(params.get('page')) || 1;
+            this.searchVal = params.get('search') || '';
+            const rankParam = params.get('rank');
+            this.selectedRanks = rankParam ? rankParam.split(',') : [];
+            this.sortCol = params.get('sort') || 'name';
+            this.sortDir = params.get('dir') || 'asc';
+            
             this.fetchJournals();
           } else {
             this.config = window.CONFIG_DATA || {};
@@ -921,51 +1076,54 @@
           this.darkMode = !this.darkMode;
           if (this.darkMode) {
             document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
+            localStorage.setItem('jurnal-theme', 'dark');
           } else {
             document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
+            localStorage.setItem('jurnal-theme', 'light');
           }
-        },
-
-        toggleChangedFilter() {
-          if (this.activeFilter === 'Changed') {
-            this.activeFilter = 'All';
-          } else {
-            this.activeFilter = 'Changed';
-          }
-          this.currentPage = 1;
         },
 
         fetchJournals() {
-          fetch('/api/journals')
+          this.isLoading = true;
+          
+          const params = new URLSearchParams();
+          params.set('page', this.currentPage);
+          params.set('limit', this.pageSize);
+          if (this.searchVal.trim()) {
+            params.set('search', this.searchVal.trim());
+          }
+          if (this.selectedRanks.length > 0) {
+            params.set('rank', this.selectedRanks.join(','));
+          }
+          params.set('sort', this.sortCol);
+          params.set('dir', this.sortDir);
+          
+          const newUrl = `${window.location.pathname}?${params.toString()}`;
+          window.history.replaceState({}, '', newUrl);
+          
+          fetch(`/api/journals?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
-              this.journals = data;
+              this.journals = data.journals || [];
+              this.meta = data.meta || {
+                total: 0,
+                page: 1,
+                limit: 50,
+                total_pages: 1,
+                stats: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0 }
+              };
               this.calculateStats();
+              this.isLoading = false;
+            })
+            .catch(err => {
+              console.error("Fetch failed", err);
+              this.isLoading = false;
             });
         },
 
         calculateStats() {
-          this.stats.total = this.journals.length;
-          this.stats.s1 = 0;
-          this.stats.s2 = 0;
-          this.stats.s3 = 0;
-          this.stats.s4 = 0;
-          this.stats.s5 = 0;
-          this.stats.s6 = 0;
-          
           let latestTime = null;
-          
           this.journals.forEach(j => {
-            const r = j.current_rank;
-            if (r === 'S1') this.stats.s1++;
-            else if (r === 'S2') this.stats.s2++;
-            else if (r === 'S3') this.stats.s3++;
-            else if (r === 'S4') this.stats.s4++;
-            else if (r === 'S5') this.stats.s5++;
-            else if (r === 'S6') this.stats.s6++;
-            
             if (j.last_updated) {
               const t = new Date(j.last_updated.replace(' ', 'T'));
               if (!latestTime || t > latestTime) {
@@ -980,83 +1138,101 @@
           }
         },
 
+        triggerSearchDebounce() {
+          if (this.debounceTimeout) {
+            clearTimeout(this.debounceTimeout);
+          }
+          this.debounceTimeout = setTimeout(() => {
+            this.currentPage = 1;
+            this.fetchJournals();
+          }, 400);
+        },
+        
+        clearSearch() {
+          this.searchVal = '';
+          this.currentPage = 1;
+          this.fetchJournals();
+        },
+        
+        toggleRankFilter(rank) {
+          this.currentPage = 1;
+          if (rank === 'All') {
+            this.selectedRanks = [];
+          } else {
+            const idx = this.selectedRanks.indexOf(rank);
+            if (idx === -1) {
+              this.selectedRanks.push(rank);
+            } else {
+              this.selectedRanks.splice(idx, 1);
+            }
+          }
+          this.fetchJournals();
+        },
+        
+        updateSort(sortValue) {
+          const lastUnderscore = sortValue.lastIndexOf('_');
+          this.sortCol = sortValue.substring(0, lastUnderscore);
+          this.sortDir = sortValue.substring(lastUnderscore + 1);
+          this.currentPage = 1;
+          this.fetchJournals();
+        },
+        
+        setPage(page) {
+          if (page < 1 || page > this.meta.total_pages) return;
+          this.currentPage = page;
+          this.fetchJournals();
+        },
+        
+        getVisiblePages() {
+          const current = this.currentPage;
+          const total = this.meta.total_pages;
+          const pages = [];
+          
+          if (total <= 5) {
+            for (let i = 1; i <= total; i++) pages.push(i);
+          } else {
+            if (current <= 3) {
+              pages.push(1, 2, 3, 4, '...', total);
+            } else if (current >= total - 2) {
+              pages.push(1, '...', total - 3, total - 2, total - 1, total);
+            } else {
+              pages.push(1, '...', current - 1, current, current + 1, '...', total);
+            }
+          }
+          return pages;
+        },
+
         // Color mapping for premium ranks using curated desaturated tones
         getRankColor(rank) {
           const map = {
-            'S1': '#5C6D82', // Slate Indigo
-            'S2': '#6B8272', // Muted Sage
-            'S3': '#A68B82', // Dusty Terracotta
-            'S4': '#6F7A85', // Slate Gray
-            'S5': '#8C8470', // Muted Antique Brass
-            'S6': '#A37878', // Dusty Rose
+            'S1': 'var(--color-s1)',
+            'S2': 'var(--color-s2)',
+            'S3': 'var(--color-s3)',
+            'S4': 'var(--color-s4)',
+            'S5': 'var(--color-s5)',
+            'S6': 'var(--color-s6)',
           };
-          return map[rank] || '#5C6470';
+          return map[rank] || 'var(--color-s-default)';
         },
 
-        // Reactive sorting, searching and filtering engine
-        get filteredCount() {
-          return this.filteredAndSortedJournals.length;
+        getPreviousRank(rank) {
+          if (!rank) return 'N/A';
+          const order = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'];
+          const idx = order.indexOf(rank);
+          if (idx === -1) return 'N/A';
+          if (idx === order.length - 1) return rank;
+          return order[idx + 1];
         },
 
-        get filteredAndSortedJournals() {
-          let result = this.journals.filter(j => {
-            if (this.activeFilter !== 'All') {
-              if (this.activeFilter === 'Changed') {
-                if (!isUpdatedWithin7Days(j.last_updated)) return false;
-              } else if (j.current_rank !== this.activeFilter) {
-                return false;
-              }
-            }
-            
-            if (this.searchVal.trim()) {
-              const search = this.searchVal.toLowerCase();
-              return j.journal_name.toLowerCase().includes(search) || 
-                     (j.current_rank && j.current_rank.toLowerCase().includes(search)) || 
-                     String(j.id).includes(search);
-            }
-            return true;
-          });
-
-          result.sort((a, b) => {
-            let valA = a[this.sortCol];
-            let valB = b[this.sortCol];
-
-            if (typeof valA === 'string') {
-              valA = valA.toLowerCase();
-              valB = valB.toLowerCase();
-            }
-
-            if (valA < valB) return this.sortDesc ? 1 : -1;
-            if (valA > valB) return this.sortDesc ? -1 : 1;
-            return 0;
-          });
-
-          return result;
+        getSimulatedDate(dateStr) {
+          if (!dateStr) return 'N/A';
+          const d = new Date(dateStr.replace(' ', 'T'));
+          d.setDate(d.getDate() - 7);
+          const pad = (n) => String(n).padStart(2, '0');
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
         },
 
-        get pagedJournals() {
-          const start = (this.currentPage - 1) * this.pageSize;
-          return this.filteredAndSortedJournals.slice(start, start + this.pageSize);
-        },
 
-        get totalPages() {
-          return Math.ceil(this.filteredCount / this.pageSize) || 1;
-        },
-
-        toggleSort(column) {
-          if (this.sortCol === column) {
-            this.sortDesc = !this.sortDesc;
-          } else {
-            this.sortCol = column;
-            this.sortDesc = false;
-          }
-          this.currentPage = 1;
-        },
-
-        setFilter(filterName) {
-          this.activeFilter = filterName;
-          this.currentPage = 1;
-        },
 
         openDrawer(journal) {
           this.selectedJournal = journal;
@@ -1146,4 +1322,4 @@
     }
   </script>
 </body>
-</html>tml>
+</html>

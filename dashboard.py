@@ -131,12 +131,74 @@ def api_test_config():
 @app.route("/api/journals")
 def api_journals():
     try:
+        page = request.args.get("page", 1, type=int)
+        limit = request.args.get("limit", 50, type=int)
+        if limit > 100:
+            limit = 100
+        elif limit < 1:
+            limit = 50
+            
+        search = request.args.get("search", "").strip()
+        rank_str = request.args.get("rank", "").strip()
+        sort_col = request.args.get("sort", "name").strip()
+        sort_dir = request.args.get("dir", "asc").strip()
+        
+        if sort_dir.lower() not in ["asc", "desc"]:
+            sort_dir = "asc"
+            
+        where_clauses = []
+        params = []
+        
+        if search:
+            where_clauses.append("journal_name LIKE ?")
+            params.append(f"%{search}%")
+            
+        if rank_str:
+            ranks = [r.strip() for r in rank_str.split(",") if r.strip()]
+            if ranks:
+                placeholders = ",".join(["?"] * len(ranks))
+                where_clauses.append(f"current_rank IN ({placeholders})")
+                params.extend(ranks)
+                
+        where_sql = ""
+        if where_clauses:
+            where_sql = "WHERE " + " AND ".join(where_clauses)
+            
+        sort_field = "journal_name"
+        if sort_col == "rank":
+            sort_field = "CASE current_rank WHEN 'S1' THEN 1 WHEN 'S2' THEN 2 WHEN 'S3' THEN 3 WHEN 'S4' THEN 4 WHEN 'S5' THEN 5 WHEN 'S6' THEN 6 ELSE 7 END"
+        elif sort_col == "last_updated":
+            sort_field = "last_updated"
+            
+        order_sql = f"ORDER BY {sort_field} {sort_dir}"
+        
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, journal_name, sinta_url, current_rank, last_updated FROM journals")
+        
+        cursor.execute("SELECT current_rank, COUNT(*) as c FROM journals GROUP BY current_rank")
+        stats_rows = cursor.fetchall()
+        stats = {"S1": 0, "S2": 0, "S3": 0, "S4": 0, "S5": 0, "S6": 0, "Unknown": 0}
+        for r in stats_rows:
+            rank_key = r["current_rank"]
+            count_val = r["c"]
+            if rank_key in stats:
+                stats[rank_key] = count_val
+            elif not rank_key or rank_key == "Unknown":
+                stats["Unknown"] += count_val
+            else:
+                stats["Unknown"] += count_val
+                
+        cursor.execute(f"SELECT COUNT(*) FROM journals {where_sql}", params)
+        total_matching = cursor.fetchone()[0]
+        
+        offset = (page - 1) * limit
+        limit_sql = "LIMIT ? OFFSET ?"
+        query_params = params + [limit, offset]
+        
+        cursor.execute(f"SELECT id, journal_name, sinta_url, current_rank, last_updated FROM journals {where_sql} {order_sql} {limit_sql}", query_params)
         rows = cursor.fetchall()
         conn.close()
-
+        
         journals = []
         for row in rows:
             journals.append({
@@ -146,7 +208,19 @@ def api_journals():
                 "current_rank": row["current_rank"],
                 "last_updated": row["last_updated"]
             })
-        return jsonify(journals)
+            
+        total_pages = (total_matching + limit - 1) // limit if total_matching > 0 else 1
+        
+        return jsonify({
+            "journals": journals,
+            "meta": {
+                "total": total_matching,
+                "page": page,
+                "limit": limit,
+                "total_pages": total_pages,
+                "stats": stats
+            }
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
