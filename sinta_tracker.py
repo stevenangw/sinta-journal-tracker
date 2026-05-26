@@ -39,9 +39,6 @@ USER_AGENT = (
 SINTA_CATEGORY_IDS = {
     "science": 5,
     "engineering": 10,
-    "mathematics": 15,
-    "agriculture": 20,
-    "arts_humanities": 25
 }
 
 # Setup logging
