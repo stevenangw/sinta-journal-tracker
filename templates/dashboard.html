@@ -371,7 +371,9 @@
           <!-- Search status label -->
           <div x-show="searchVal.trim().length > 0" class="text-[12px] font-mono text-textMuted pl-1">
             Showing <span class="font-bold text-textMain" x-text="meta.total || 0"></span> results for "<span class="italic text-textMain" x-text="searchVal.trim()"></span>"
-          </div>          <!-- Adaptive Data List (Mobile: Cards, Desktop: Table) -->
+          </div>
+          
+          <!-- Adaptive Data List (Mobile: Cards, Desktop: Table) -->
           <div class="space-y-4">
             
             <!-- MOBILE CARD VIEW (Block on <768px, Hidden on >=768px) -->
@@ -603,11 +605,7 @@
                   </button>
                 </div>
 
-              </div>
-            </div>
-
           </div>
-        </div>
         
         <!-- SIDEBAR PANEL (30% - Columns 8 to 10) -->
         <div class="sidebar-right space-y-6">
