@@ -55,6 +55,10 @@
   <style>
     *, ::before, ::after {
       box-sizing: border-box;
+    }
+
+    /* Prevent horizontal overflow on block-level content only */
+    img, video, iframe, canvas {
       max-width: 100%;
     }
 
@@ -104,7 +108,7 @@
       --text-secondary:  #94A3B8;
       --accent:          #85A9C8; /* Fine light steel sky */
       --accent-hover:    #A5C8E8;
-      --border:          #2A333C;
+      --border:          #232B33; /* Subtler dark border — less contrast against surface */
       --muted:           #4A5560;
 
       /* Diff colors dark */
@@ -190,28 +194,56 @@
     /* Dashboard 2-column layout */
     .dashboard-layout {
       display: grid;
-      grid-template-columns: 1fr 21.25rem;
+      grid-template-columns: 1fr 20rem;
       gap: 1.5rem;
       align-items: start;
+      width: 100%;
+      min-width: 0;
     }
     
     .sidebar-right {
       position: sticky;
       top: 4.5rem;
+      min-width: 0;
+    }
+
+    .main-content {
+      min-width: 0; /* Prevent grid blowout */
     }
     
     .table-container {
       max-height: 43.75rem;
       overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Reduce border visibility in dark mode globally */
+    .dark .border-cardBorder {
+      border-color: rgba(35, 43, 51, 0.7) !important;
+    }
+    .dark .border-b.border-cardBorder {
+      border-bottom-color: rgba(35, 43, 51, 0.6) !important;
+    }
+    .dark .border-t.border-cardBorder {
+      border-top-color: rgba(35, 43, 51, 0.6) !important;
+    }
+    .dark .divide-cardBorder\/60 > :not([hidden]) ~ :not([hidden]) {
+      border-color: rgba(35, 43, 51, 0.4) !important;
     }
     
     @media (max-width: 1024px) {
       .dashboard-layout {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 1.25rem;
       }
       .sidebar-right {
         position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .dashboard-layout {
+        gap: 1rem;
       }
     }
   </style>
@@ -225,7 +257,7 @@
   </script>
 
   <!-- 1. Floating Glassmorphic Header -->
-  <header class="sticky top-0 z-40 w-full bg-cardBg/80 dark:bg-cardBg/70 border-b border-cardBorder backdrop-blur-md transition-all duration-300">
+  <header class="sticky top-0 z-40 w-full bg-cardBg/80 dark:bg-cardBg/70 border-b border-cardBorder/60 dark:border-cardBorder/40 backdrop-blur-md transition-all duration-300">
     <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-1.5 md:py-2.5 flex justify-between items-center min-h-[52px] md:min-h-[56px]">
       <div class="flex items-center gap-2 md:gap-3">
         <!-- Logo mark: Premium asymmetric geometric design -->
@@ -300,10 +332,10 @@
   </header>
 
   <!-- Main Workspace -->
-  <main class="flex-grow w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+  <main class="flex-grow w-full max-w-[1600px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
     
     <!-- Title Page Hierarchy -->
-    <div class="mb-4 border-b border-cardBorder/40 pb-3">
+    <div class="mb-3 border-b border-cardBorder/30 dark:border-cardBorder/20 pb-3">
       <h1 class="text-3xl sm:text-4xl font-serif font-bold text-textMain tracking-tight">Monitored Journals</h1>
       <p class="text-sm text-textMuted mt-1">Real-time accreditation status tracking for national scientific journals on SINTA.</p>
     </div>
@@ -347,7 +379,7 @@
           </div>
 
           <!-- Component 2: Unified Control Bar (Search & Sort) -->
-          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 py-3 px-4 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 py-3 px-3 sm:px-4 bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
             <!-- Search Input -->
             <div class="relative flex-grow">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
@@ -402,7 +434,7 @@
               <!-- Main Loop Cards -->
               <template x-for="(j, index) in journals" :key="j.id">
                 <div @click="openDrawer(j)" 
-                     class="bg-cardBg border border-cardBorder rounded-xl p-4 flex gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:border-brandGold/60 premium-transition cursor-pointer active:scale-[0.99] group items-center">
+                     class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-xl p-4 flex gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:border-brandGold/60 premium-transition cursor-pointer active:scale-[0.99] group items-center">
                   
                   <!-- Left visual anchor: prominent solid high-contrast rank block with distinct color shadow -->
                   <div class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-white font-extrabold text-sm shadow-md shrink-0 uppercase"
@@ -459,11 +491,11 @@
             </div>
 
             <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
-            <div class="hidden md:block bg-cardBg border border-cardBorder rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+            <div class="hidden md:block bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
               <div class="table-container">
                 <table id="journalTable" class="w-full text-left border-collapse table-fixed">
                   <thead class="sticky top-0 bg-cardBg/95 backdrop-blur-sm z-10 shadow-[0_1px_0_var(--border)]">
-                    <tr class="border-b border-cardBorder text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
+                    <tr class="border-b border-cardBorder/60 dark:border-cardBorder/30 text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
                       <th class="py-4 px-5 cursor-pointer hover:text-textMain premium-transition min-w-0" @click="updateSort(sortCol === 'name' && sortDir === 'asc' ? 'name_desc' : 'name_asc')">
                         <div class="flex items-center gap-1.5">
                           <span>Journal Name</span>
@@ -503,7 +535,7 @@
                     <template x-for="(j, index) in journals" :key="j.id">
                       <tr @click="openDrawer(j)" 
                           :id="'journalRow' + j.id"
-                          class="hover:bg-[var(--surface-alt)] cursor-pointer transition-colors duration-150 group border-b border-[var(--border)]">
+                          class="hover:bg-[var(--surface-alt)] cursor-pointer transition-colors duration-150 group border-b border-cardBorder/40 dark:border-cardBorder/25">
                         <td class="py-4 px-5 min-w-0">
                           <div class="flex items-center gap-3 w-full min-w-0">
                             <!-- Sequential serial number -->
@@ -556,7 +588,7 @@
             </div>
 
             <!-- Component 4: Adaptive Pagination Footer -->
-            <div class="px-4 sm:px-5 py-4 bg-cardBg border border-cardBorder rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 font-sans transition-all duration-300">
+            <div class="px-3 sm:px-5 py-4 bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 font-sans transition-all duration-300">
               <!-- Showing text -->
               <span class="font-mono text-[11px] text-textMuted">
                 Showing <span class="font-bold text-textMain" x-text="meta.total === 0 ? 0 : ((currentPage - 1) * pageSize) + 1"></span> 
@@ -626,7 +658,7 @@
         <div class="sidebar-right space-y-4">
           
           <!-- Visual Distribution Analytics Card (Distinct diffuse shadow) -->
-          <div x-show="meta.total > 0" class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
+          <div x-show="meta.total > 0" class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
             <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Accreditation Distribution</h3>
             
             <div class="space-y-3.5 font-sans">
@@ -638,7 +670,7 @@
                     <span class="font-mono text-textMuted" x-text="(meta.stats ? (meta.stats[rank] || 0) : 0) + ' ' + (meta.stats && meta.stats[rank] === 1 ? 'journal' : 'journals')"></span>
                   </div>
                   <!-- Mini custom bar graph with color-mix border and fill (hidden if value is 0) -->
-                  <div x-show="meta.stats && meta.stats[rank] > 0" class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/50">
+                  <div x-show="meta.stats && meta.stats[rank] > 0" class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/30 dark:border-cardBorder/20">
                     <div class="h-full rounded-full transition-all duration-500" 
                           :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
                   </div>
@@ -648,7 +680,7 @@
           </div>
 
           <!-- Empty State Distribution -->
-          <div x-show="meta.total === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] text-center space-y-4 transition-all duration-300">
+          <div x-show="meta.total === 0" class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] text-center space-y-4 transition-all duration-300">
             <div class="mx-auto w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
               <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -661,13 +693,13 @@
           </div>
 
           <!-- Perubahan Terbaru Card -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
+          <div class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
             <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Recent Changes</h3>
             
             <div class="space-y-3 font-sans max-h-[350px] overflow-y-auto pr-1">
               <!-- Loop over recently changed journals -->
               <template x-for="c in recentChanges" :key="c.id">
-                <div @click="openDrawer(c)" class="group cursor-pointer py-2 border-b border-cardBorder/50 last:border-b-0">
+                <div @click="openDrawer(c)" class="group cursor-pointer py-2 border-b border-cardBorder/30 dark:border-cardBorder/20 last:border-b-0">
                   <div class="text-[12px] font-bold text-textMain group-hover:text-brandGold transition-colors truncate" :title="c.journal_name" x-text="c.journal_name"></div>
                   <div class="flex items-center justify-between text-[10px] text-textMuted mt-1.5 font-mono">
                     
@@ -721,7 +753,7 @@
 
       <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
         <!-- Panel Slide view -->
-        <div class="pointer-events-auto w-screen max-w-md bg-cardBg border-l border-cardBorder shadow-2xl transition-all duration-300"
+        <div class="pointer-events-auto w-screen max-w-md bg-cardBg border-l border-cardBorder/60 dark:border-cardBorder/30 shadow-2xl transition-all duration-300"
              x-show="isDrawerOpen"
              x-transition:enter="transform transition ease-in-out duration-350"
              x-transition:enter-start="translate-x-full"
@@ -732,7 +764,7 @@
           
           <div class="flex h-full flex-col overflow-y-auto py-6 px-6 sm:px-8 font-sans">
             <!-- Drawer Header -->
-            <div class="flex items-start justify-between border-b border-cardBorder pb-4">
+            <div class="flex items-start justify-between border-b border-cardBorder/50 dark:border-cardBorder/25 pb-4">
               <h2 class="text-md sm:text-lg font-bold text-textMain font-sans" id="slide-over-title">Journal Details</h2>
               <div class="ml-3 flex h-7 items-center">
                 <button type="button" @click="isDrawerOpen = false"
@@ -841,7 +873,7 @@
             </div>
 
             <!-- Footer of drawer -->
-            <div class="border-t border-cardBorder pt-4 mt-auto">
+            <div class="border-t border-cardBorder/50 dark:border-cardBorder/25 pt-4 mt-auto">
               <button @click="isDrawerOpen = false" 
                       id="drawerActionCloseBtn"
                       class="w-full py-2.5 bg-appBg text-textMain hover:bg-cardBorder hover:border-textMain font-bold text-[11px] uppercase tracking-wider rounded-lg transition border border-cardBorder focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
@@ -857,7 +889,7 @@
   </main>
 
   <!-- 6. Premium Editorial Footer -->
-  <footer class="bg-cardBg border-t border-cardBorder py-6 px-4 sm:px-6 mt-12 transition-all duration-300">
+  <footer class="bg-cardBg border-t border-cardBorder/50 dark:border-cardBorder/30 py-6 px-4 sm:px-6 mt-12 transition-all duration-300">
     <div class="max-w-[1600px] w-full mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="text-[12px] text-textMuted font-sans text-center md:text-left">
         &copy; 2026 SINTA Journal Tracker. Data updated periodically.
