@@ -2,8 +2,8 @@
 
 # Initialize database if it doesn't exist
 if [ ! -f "sinta_tracker.db" ]; then
-    echo "Database not found. Initializing database..."
-    python sinta_tracker.py --init
+    echo "Database not found. Seeding database from config..."
+    python sinta_tracker.py --seed-from-config
 fi
 
 # Start the background scraping loop daemon
