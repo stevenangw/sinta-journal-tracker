@@ -8,7 +8,8 @@
         "timeout_seconds": 10,
         "delay_between_requests": 2.0,
         "max_retries": 3,
-        "loop_interval_seconds": 2592000
+        "loop_interval_seconds": 2592000,
+        "enable_keyword_filter": true
     },
     "journals": [
         {
