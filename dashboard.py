@@ -100,8 +100,8 @@ def make_response(success: bool, data=None, message: str = "", status_code: int 
 def handle_404(e):
     """Handles Resource Not Found states with custom layout matching UI or JSON formats."""
     if request.path.startswith("/api/"):
-        return make_response(False, None, "Endpoint API tidak ditemukan.", 404)
-    return render_template("dashboard.html", active_tab="error", error_message="Halaman yang Anda cari tidak dapat ditemukan."), 404
+        return make_response(False, None, "API endpoint not found.", 404)
+    return render_template("dashboard.html", active_tab="error", error_message="The page you are looking for could not be found."), 404
 
 
 @app.errorhandler(500)
@@ -109,8 +109,8 @@ def handle_500(e):
     """Global system error catcher."""
     app.logger.error(f"Internal System Error: {e}")
     if request.path.startswith("/api/"):
-        return make_response(False, None, "Terjadi kesalahan internal server.", 500)
-    return render_template("dashboard.html", active_tab="error", error_message="Terjadi kesalahan internal pada server kami."), 500
+        return make_response(False, None, "Internal server error occurred.", 500)
+    return render_template("dashboard.html", active_tab="error", error_message="An internal error occurred on our server."), 500
 
 
 @app.route("/")
@@ -169,10 +169,10 @@ def api_save_config():
             cache.clear()
             
         masked = get_masked_config()
-        return make_response(True, masked, "Konfigurasi berhasil diperbarui.")
+        return make_response(True, masked, "Configuration successfully updated.")
     except Exception as e:
         app.logger.error(f"Error saving config via API: {e}")
-        return make_response(False, None, f"Gagal memperbarui konfigurasi: {str(e)}", 500)
+        return make_response(False, None, f"Failed to update configuration: {str(e)}", 500)
 
 
 @app.route("/api/config/test", methods=["POST"])
@@ -188,25 +188,25 @@ def api_test_config():
         if platform == "discord":
             discord_url = webhook.get("discord_url", "")
             if not discord_url:
-                return make_response(False, None, "Webhook Discord belum dikonfigurasi.", 400)
+                return make_response(False, None, "Discord webhook not configured.", 400)
                 
             send_webhook_alert(config_data, "[TEST] Jurnal Sistem Informasi", "S4", "S3", "https://sinta.kemdiktisaintek.go.id")
-            return make_response(True, None, "Notifikasi uji coba Discord berhasil dikirim.")
+            return make_response(True, None, "Discord test notification successfully sent.")
             
         elif platform == "telegram":
             bot_token = webhook.get("telegram_bot_token", "")
             chat_id = webhook.get("telegram_chat_id", "")
             if not bot_token or not chat_id:
-                return make_response(False, None, "Token Bot atau Chat ID Telegram belum dikonfigurasi.", 400)
+                return make_response(False, None, "Telegram Bot Token or Chat ID not configured.", 400)
                 
             send_webhook_alert(config_data, "[TEST] Jurnal Sistem Informasi", "S4", "S3", "https://sinta.kemdiktisaintek.go.id")
-            return make_response(True, None, "Notifikasi uji coba Telegram berhasil dikirim.")
+            return make_response(True, None, "Telegram test notification successfully sent.")
             
         else:
-            return make_response(False, None, "Platform tidak didukung.", 400)
+            return make_response(False, None, "Platform not supported.", 400)
     except Exception as e:
         app.logger.error(f"Error testing config via API: {e}")
-        return make_response(False, None, f"Gagal melakukan uji coba integrasi: {str(e)}", 500)
+        return make_response(False, None, f"Failed to test integration: {str(e)}", 500)
 
 
 @app.route("/api/journals")
@@ -312,10 +312,10 @@ def api_journals():
                 "stats": stats
             }
         }
-        return make_response(True, result_data, "Data jurnal berhasil diambil.")
+        return make_response(True, result_data, "Journal data successfully retrieved.")
     except Exception as e:
         app.logger.error(f"Error fetching journals: {e}")
-        return make_response(False, None, f"Terjadi kesalahan saat memuat data jurnal: {str(e)}", 500)
+        return make_response(False, None, f"An error occurred while loading journal data: {str(e)}", 500)
 
 
 @app.route("/api/changes")
@@ -324,7 +324,7 @@ def api_changes():
     try:
         cached_changes = cache.get("api_changes")
         if cached_changes is not None:
-            return make_response(True, {"changes": cached_changes}, "Data riwayat perubahan berhasil diambil.")
+            return make_response(True, {"changes": cached_changes}, "Change history data successfully retrieved.")
             
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -347,10 +347,10 @@ def api_changes():
                 "last_updated": r["last_updated"]
             })
         cache.set("api_changes", changes, ttl=60)
-        return make_response(True, {"changes": changes}, "Data riwayat perubahan berhasil diambil.")
+        return make_response(True, {"changes": changes}, "Change history data successfully retrieved.")
     except Exception as e:
         app.logger.error(f"Error fetching changes: {e}")
-        return make_response(False, None, f"Terjadi kesalahan saat memuat data riwayat perubahan: {str(e)}", 500)
+        return make_response(False, None, f"An error occurred while loading change history data: {str(e)}", 500)
 
 
 if __name__ == "__main__":
