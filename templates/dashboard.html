@@ -137,6 +137,7 @@
     html, body {
       overflow-x: hidden;
       width: 100%;
+      scrollbar-gutter: stable;
     }
 
     body {
@@ -147,7 +148,7 @@
     }
 
     h1, .clamp-h1 {
-      font-size: clamp(1.75rem, 5vw, 3.5rem) !important;
+      font-size: clamp(1.5rem, 3vw, 2.25rem) !important;
     }
 
     h2, .clamp-h2 {
@@ -190,13 +191,13 @@
     .dashboard-layout {
       display: grid;
       grid-template-columns: 1fr 21.25rem;
-      gap: 2rem;
+      gap: 1.5rem;
       align-items: start;
     }
     
     .sidebar-right {
       position: sticky;
-      top: 6rem;
+      top: 4.5rem;
     }
     
     .table-container {
@@ -225,7 +226,7 @@
 
   <!-- 1. Floating Glassmorphic Header -->
   <header class="sticky top-0 z-40 w-full bg-cardBg/80 dark:bg-cardBg/70 border-b border-cardBorder backdrop-blur-md transition-all duration-300">
-    <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-1.5 md:py-4 flex justify-between items-center min-h-[52px] md:min-h-[72px]">
+    <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-1.5 md:py-2.5 flex justify-between items-center min-h-[52px] md:min-h-[56px]">
       <div class="flex items-center gap-2 md:gap-3">
         <!-- Logo mark: Premium asymmetric geometric design -->
         <span class="relative flex items-center justify-center w-7.5 h-7.5 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-brandGold text-white shadow-md shadow-brandGold/20 font-serif font-bold text-lg md:text-xl premium-transition transform active:scale-95 shrink-0">
@@ -245,7 +246,7 @@
       <!-- System status and Actions -->
       <div class="flex items-center gap-3 sm:gap-6">
         <div class="hidden sm:flex items-center gap-2.5">
-          <div class="flex items-center gap-2.5 bg-appBg/80 px-3.5 py-2 border border-cardBorder rounded-xl shadow-inner select-none transition-all duration-300">
+          <div class="flex items-center gap-2 bg-appBg/80 px-2.5 py-1.5 border border-cardBorder rounded-xl shadow-inner select-none transition-all duration-300">
             <!-- Pulse status light -->
             <span class="relative flex h-2.5 w-2.5">
               <span x-show="isLoading" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-blue-500"></span>
@@ -302,7 +303,7 @@
   <main class="flex-grow w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
     
     <!-- Title Page Hierarchy -->
-    <div class="mb-8 border-b border-cardBorder/60 pb-5">
+    <div class="mb-4 border-b border-cardBorder/40 pb-3">
       <h1 class="text-3xl sm:text-4xl font-serif font-bold text-textMain tracking-tight">Monitored Journals</h1>
       <p class="text-sm text-textMuted mt-1">Real-time accreditation status tracking for national scientific journals on SINTA.</p>
     </div>
@@ -314,14 +315,14 @@
       <div class="dashboard-layout">
         
         <!-- MAIN PANEL (70% - Columns 1 to 7) -->
-        <div class="main-content space-y-6">
+        <div class="main-content space-y-4">
           
           <!-- Component 1: Combined S1-S6 Interactive Filter Pills (Horizontal Scrollable) -->
-          <div class="w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2 mb-2 flex items-center gap-3">
+          <div class="w-full flex flex-wrap gap-2 py-1 mb-2 items-center">
             <!-- Total Chip -->
             <button @click="toggleRankFilter('All')"
                     id="statsBarTotalBtn"
-                    class="px-5 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-3 shadow-sm"
+                    class="px-3.5 py-2 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2 shadow-sm"
                     :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface); color: var(--text-secondary); border-color: var(--border)'">
               <span>All Journals</span>
               <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono transition-all duration-200" 
@@ -334,7 +335,7 @@
               <button x-show="rank !== 'Unknown' || (meta.stats && meta.stats.Unknown > 0)"
                       @click="toggleRankFilter(rank)"
                       :id="'statsBar' + rank + 'Btn'"
-                      class="px-5 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-3 shadow-sm"
+                      class="px-3.5 py-2 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2 shadow-sm"
                       :style="selectedRanks.includes(rank) ? 'background-color: ' + getRankColor(rank) + '; color: #ffffff; border-color: transparent; box-shadow: 0 4px 14px -4px ' + getRankColor(rank) : 'background-color: var(--surface); color: var(--text-secondary); border-color: var(--border)'">
                 <span :style="selectedRanks.includes(rank) ? 'color: #ffffff' : 'color: ' + getRankColor(rank)" 
                       x-text="rank === 'Unknown' ? 'Not Accredited' : rank"></span>
@@ -346,7 +347,7 @@
           </div>
 
           <!-- Component 2: Unified Control Bar (Search & Sort) -->
-          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 py-3 px-4 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
             <!-- Search Input -->
             <div class="relative flex-grow">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
@@ -455,30 +456,30 @@
               <div x-show="!isLoading && journals.length === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted text-[13px]">
                 No matching journal logs found in database.
               </div>
-            </div>    </div>
+            </div>
 
             <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
             <div class="hidden md:block bg-cardBg border border-cardBorder rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
               <div class="table-container">
-                <table id="journalTable" class="w-full text-left border-collapse">
+                <table id="journalTable" class="w-full text-left border-collapse table-fixed">
                   <thead class="sticky top-0 bg-cardBg/95 backdrop-blur-sm z-10 shadow-[0_1px_0_var(--border)]">
                     <tr class="border-b border-cardBorder text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
-                      <th class="py-4 px-5 cursor-pointer hover:text-textMain premium-transition w-[65%]" @click="updateSort(sortCol === 'name' && sortDir === 'asc' ? 'name_desc' : 'name_asc')">
+                      <th class="py-4 px-5 cursor-pointer hover:text-textMain premium-transition min-w-0" @click="updateSort(sortCol === 'name' && sortDir === 'asc' ? 'name_desc' : 'name_asc')">
                         <div class="flex items-center gap-1.5">
                           <span>Journal Name</span>
                           <svg x-show="sortCol === 'name' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
                           <svg x-show="sortCol === 'name' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                         </div>
                       </th>
-                      <th class="py-4 px-4 text-center cursor-pointer hover:text-textMain premium-transition w-[15%]" @click="updateSort(sortCol === 'rank' && sortDir === 'asc' ? 'rank_desc' : 'rank_asc')">
+                      <th class="py-4 px-4 text-center cursor-pointer hover:text-textMain premium-transition shrink-0 w-36" @click="updateSort(sortCol === 'rank' && sortDir === 'asc' ? 'rank_desc' : 'rank_asc')">
                         <div class="flex items-center justify-center gap-1.5">
                           <span>Accreditation</span>
                           <svg x-show="sortCol === 'rank' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
                           <svg x-show="sortCol === 'rank' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                         </div>
                       </th>
-                      <th class="py-4 px-5 text-center cursor-pointer hover:text-textMain premium-transition w-[20%]" @click="updateSort(sortCol === 'last_updated' && sortDir === 'desc' ? 'last_updated_asc' : 'last_updated_desc')">
-                        <div class="flex items-center justify-center gap-1.5">
+                      <th class="py-4 px-5 text-right cursor-pointer hover:text-textMain premium-transition shrink-0 w-24" @click="updateSort(sortCol === 'last_updated' && sortDir === 'desc' ? 'last_updated_asc' : 'last_updated_desc')">
+                        <div class="flex items-center justify-end gap-1.5">
                           <span>Updated</span>
                           <svg x-show="sortCol === 'last_updated' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
                           <svg x-show="sortCol === 'last_updated' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
@@ -502,15 +503,15 @@
                     <template x-for="(j, index) in journals" :key="j.id">
                       <tr @click="openDrawer(j)" 
                           :id="'journalRow' + j.id"
-                          class="hover:bg-appBg/40 cursor-pointer transition-colors duration-150 group">
-                        <td class="py-4 px-5">
-                          <div class="flex items-center gap-3">
+                          class="hover:bg-[var(--surface-alt)] cursor-pointer transition-colors duration-150 group border-b border-[var(--border)]">
+                        <td class="py-4 px-5 min-w-0">
+                          <div class="flex items-center gap-3 w-full min-w-0">
                             <!-- Sequential serial number -->
                             <span class="font-mono text-xs text-textMuted shrink-0 font-bold" x-text="'#' + (((currentPage - 1) * pageSize) + index + 1)"></span>
                             <!-- Accreditation rank colored accent indicator -->
                             <span class="inline-block w-1 h-3.5 rounded-full flex-shrink-0" 
                                   :style="'background-color: ' + getRankColor(j.current_rank)"></span>
-                            <span class="text-[13px] font-bold text-textMain group-hover:text-brandGold premium-transition" x-text="j.journal_name"></span>
+                            <span class="text-[13px] font-bold text-textMain group-hover:text-brandGold premium-transition truncate flex-1 min-w-0" :title="j.journal_name" x-text="j.journal_name"></span>
                             
                             <!-- Newly Added Badge -->
                             <template x-if="!j.previous_rank || j.previous_rank === '' || j.previous_rank === 'None'">
@@ -532,12 +533,12 @@
                             </template>
                           </div>
                         </td>
-                        <td class="py-4 px-4 text-center">
+                        <td class="py-4 px-4 text-center shrink-0 w-36">
                           <span class="font-extrabold text-[12px] font-sans px-2.5 py-0.5 rounded-md inline-block" 
                                 :style="'color: ' + getRankColor(j.current_rank) + '; background-color: color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 10%, transparent)'" 
                                 x-text="j.current_rank === 'Unknown' ? 'Not Accredited' : j.current_rank"></span>
                         </td>
-                        <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-center" 
+                        <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-right shrink-0 w-24" 
                             :title="formatIndonesianDateTime(j.last_updated)" 
                             x-text="toRelativeTime(j.last_updated)"></td>
                       </tr>
@@ -622,10 +623,10 @@
         </div>
         
         <!-- SIDEBAR PANEL (30% - Columns 8 to 10) -->
-        <div class="sidebar-right space-y-6">
+        <div class="sidebar-right space-y-4">
           
           <!-- Visual Distribution Analytics Card (Distinct diffuse shadow) -->
-          <div x-show="meta.total > 0" class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-5 transition-all duration-300">
+          <div x-show="meta.total > 0" class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
             <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Accreditation Distribution</h3>
             
             <div class="space-y-3.5 font-sans">
@@ -647,7 +648,7 @@
           </div>
 
           <!-- Empty State Distribution -->
-          <div x-show="meta.total === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-[0_6px_24px_rgba(0,0,0,0.015)] text-center space-y-4 transition-all duration-300">
+          <div x-show="meta.total === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] text-center space-y-4 transition-all duration-300">
             <div class="mx-auto w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
               <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -660,7 +661,7 @@
           </div>
 
           <!-- Perubahan Terbaru Card -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
+          <div class="bg-cardBg border border-cardBorder rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
             <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Recent Changes</h3>
             
             <div class="space-y-3 font-sans max-h-[350px] overflow-y-auto pr-1">
