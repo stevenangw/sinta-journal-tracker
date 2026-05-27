@@ -177,22 +177,22 @@
     /* Dashboard 2-column layout */
     .dashboard-layout {
       display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 1.5rem;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
       align-items: start;
     }
     
     .sidebar-right {
       position: sticky;
-      top: 1rem;
+      top: 6rem;
     }
     
     .table-container {
-      max-height: 600px;
+      max-height: 700px;
       overflow-y: auto;
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
       .dashboard-layout {
         grid-template-columns: 1fr;
       }
@@ -212,7 +212,7 @@
 
   <!-- 1. Floating Glassmorphic Header -->
   <header class="sticky top-0 z-40 w-full bg-cardBg/80 dark:bg-cardBg/70 border-b border-cardBorder backdrop-blur-md transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+    <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <!-- Logo mark: Premium asymmetric geometric design -->
         <span class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-brandGold text-white shadow-md shadow-brandGold/20 font-serif font-bold text-xl premium-transition transform active:scale-95">
@@ -231,24 +231,36 @@
       <!-- System status and Actions -->
       <div class="flex items-center gap-4 sm:gap-6">
         <div class="hidden sm:flex items-center gap-2.5">
-          <!-- Pulse status light -->
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background-color: var(--status-active)"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2" style="background-color: var(--status-active)"></span>
-          </span>
-          <!-- Monospace Timestamp -->
-          <span class="font-mono text-[11px] text-textMuted">
-            Diperbarui: <span class="font-semibold text-textMain" x-text="formatIndonesianDateTime(lastScrape)">Loading...</span>
-          </span>
+          <div class="flex items-center gap-2.5 bg-appBg/80 px-3.5 py-2 border border-cardBorder rounded-xl shadow-inner select-none transition-all duration-300">
+            <!-- Pulse status light -->
+            <span class="relative flex h-2.5 w-2.5">
+              <span x-show="isLoading" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-blue-500"></span>
+              <span x-show="!isLoading && meta.total > 0" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-40 bg-emerald-500"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 transition-all duration-300"
+                    :class="isLoading ? 'bg-blue-500' : (meta.total > 0 ? 'bg-emerald-500' : 'bg-amber-500')"></span>
+            </span>
+            <!-- Text -->
+            <span class="font-mono text-[11px] text-textMuted leading-none">
+              <template x-if="isLoading">
+                <span>Memperbarui...</span>
+              </template>
+              <template x-if="!isLoading && meta.total === 0">
+                <span>Belum ada jurnal</span>
+              </template>
+              <template x-if="!isLoading && meta.total > 0">
+                <span>Terakhir diperbarui: <span class="font-bold text-textMain" x-text="formatIndonesianDateTime(lastScrape)"></span></span>
+              </template>
+            </span>
+          </div>
         </div>
 
-        <!-- Webhook Settings Toggle Button -->
-        <button @click="navigate(activeTab === 'config' ? 'dashboard' : 'config')" 
+        <!-- Notification Settings Toggle Button (Gear icon) -->
+        <button @click="isSettingsOpen = true" 
                 id="headerSettingsBtn"
-                class="min-w-[48px] min-h-[48px] p-2 rounded-lg border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center"
-                :title="activeTab === 'config' ? 'Kembali ke Dashboard' : 'Pengaturan Webhook'"
-                aria-label="Webhook Settings">
-          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                class="min-w-[44px] min-h-[44px] p-2.5 rounded-xl border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center shadow-sm"
+                title="Pengaturan Notifikasi"
+                aria-label="Pengaturan Notifikasi">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
@@ -257,14 +269,14 @@
         <!-- Theme preference toggle button -->
         <button @click="toggleTheme()" 
                 id="themeToggleBtn"
-                class="min-w-[48px] min-h-[48px] p-2 rounded-lg border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center"
+                class="min-w-[44px] min-h-[44px] p-2.5 rounded-xl border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center shadow-sm"
                 aria-label="Toggle visual theme">
           <!-- Light icon -->
-          <svg x-show="!darkMode" class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L5.636 5.636M12 8a4 4 0 100 8 4 4 0 000-8z" />
           </svg>
           <!-- Dark icon -->
-          <svg x-show="darkMode" x-cloak class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg x-show="darkMode" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
           </svg>
         </button>
@@ -273,76 +285,56 @@
   </header>
 
   <!-- Main Workspace -->
-  <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+  <main class="flex-grow w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
     
-    <!-- Top Sub-Header Navigation Tabs -->
-    <div class="border-b border-cardBorder/60 pb-px mb-6">
-      <div class="flex items-center justify-between">
-        <nav class="flex space-x-8" aria-label="Tabs">
-          <!-- Dashboard Tab -->
-          <button @click="navigate('dashboard')"
-                  id="tabDashboardBtn"
-                  class="border-b-2 py-3 px-1 text-[13px] font-sans font-extrabold uppercase tracking-widest transition-all duration-200 focus:outline-none flex items-center gap-2"
-                  :class="activeTab === 'dashboard' ? 'border-brandGold text-brandGold' : 'border-transparent text-textMuted hover:text-textMain hover:border-cardBorder'">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-            Dashboard
-          </button>
-
-          <!-- Webhook Settings Tab -->
-          <button @click="navigate('config')"
-                  id="tabConfigBtn"
-                  class="border-b-2 py-3 px-1 text-[13px] font-sans font-extrabold uppercase tracking-widest transition-all duration-200 focus:outline-none flex items-center gap-2"
-                  :class="activeTab === 'config' ? 'border-brandGold text-brandGold' : 'border-transparent text-textMuted hover:text-textMain hover:border-cardBorder'">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Pengaturan Webhook
-          </button>
-        </nav>
-
-      </div>
+    <!-- Title Page Hierarchy -->
+    <div class="mb-8 border-b border-cardBorder/60 pb-5">
+      <h1 class="text-3xl sm:text-4xl font-serif font-bold text-textMain tracking-tight">Daftar Jurnal Terpantau</h1>
+      <p class="text-sm text-textMuted mt-1">Pemantauan real-time peringkat akreditasi jurnal ilmiah nasional SINTA.</p>
     </div>
 
     <!-- 3. Dashboard View -->
     <div x-show="activeTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
       
-
-
       <!-- Asymmetric Grid: 70/30 Layout -->
       <div class="dashboard-layout">
         
         <!-- MAIN PANEL (70% - Columns 1 to 7) -->
         <div class="main-content space-y-6">
           
-          <!-- Component 1: Stats Bar (Premium Horizontal Scrollable Chips) -->
-          <div class="w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 mb-4 flex items-center gap-2">
+          <!-- Component 1: Combined S1-S6 Interactive Filter Pills (Horizontal Scrollable) -->
+          <div class="w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-2 mb-2 flex items-center gap-3">
             <!-- Total Chip -->
             <button @click="toggleRankFilter('All')"
                     id="statsBarTotalBtn"
-                    class="px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2"
-                    :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
-              <span>Total</span>
-              <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold font-mono" :style="selectedRanks.length === 0 ? 'background-color: rgba(255,255,255,0.2); color: #ffffff' : 'background-color: var(--border); color: var(--text-primary)'" x-text="meta.stats ? Object.values(meta.stats).reduce((a,b)=>a+b, 0) : 0">0</span>
+                    class="px-5 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-3 shadow-sm"
+                    :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface); color: var(--text-secondary); border-color: var(--border)'">
+              <span>Semua Jurnal</span>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono transition-all duration-200" 
+                    :style="selectedRanks.length === 0 ? 'background-color: rgba(255,255,255,0.2); color: #ffffff' : 'background-color: var(--surface-alt); color: var(--text-primary)'" 
+                    x-text="meta.stats ? Object.values(meta.stats).reduce((a,b)=>a+b, 0) : 0">0</span>
             </button>
+            
             <!-- Rank Chips -->
             <template x-for="rank in ['S1','S2','S3','S4','S5','S6','Unknown']">
               <button x-show="rank !== 'Unknown' || (meta.stats && meta.stats.Unknown > 0)"
                       @click="toggleRankFilter(rank)"
                       :id="'statsBar' + rank + 'Btn'"
-                      class="px-4 py-2 border rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2"
-                      :style="selectedRanks.includes(rank) ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
-                <span :style="selectedRanks.includes(rank) ? 'color: #ffffff' : 'color: ' + getRankColor(rank)" x-text="rank === 'Unknown' ? 'Belum Terdata' : rank"></span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold font-mono" :style="selectedRanks.includes(rank) ? 'background-color: rgba(255,255,255,0.2); color: #ffffff' : 'background-color: var(--border); color: var(--text-primary)'" x-text="meta.stats ? meta.stats[rank] : 0">0</span>
+                      class="px-5 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-3 shadow-sm"
+                      :style="selectedRanks.includes(rank) ? 'background-color: ' + getRankColor(rank) + '; color: #ffffff; border-color: transparent; box-shadow: 0 4px 14px -4px ' + getRankColor(rank) : 'background-color: var(--surface); color: var(--text-secondary); border-color: var(--border)'">
+                <span :style="selectedRanks.includes(rank) ? 'color: #ffffff' : 'color: ' + getRankColor(rank)" 
+                      x-text="rank === 'Unknown' ? 'Belum Terakreditasi' : rank"></span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono transition-all duration-200" 
+                      :style="selectedRanks.includes(rank) ? 'background-color: rgba(255,255,255,0.25); color: #ffffff' : 'background-color: var(--surface-alt); color: var(--text-primary)'" 
+                      x-text="meta.stats ? meta.stats[rank] : 0">0</span>
               </button>
             </template>
           </div>
 
-          <!-- Component 2: Search Bar -->
-          <div class="space-y-2">
-            <div class="relative w-full">
+          <!-- Component 2: Unified Control Bar (Search & Sort) -->
+          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+            <!-- Search Input -->
+            <div class="relative flex-grow">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -350,48 +342,21 @@
               </span>
               <input type="text" id="searchInput" x-model="searchVal" @input="triggerSearchDebounce()"
                      placeholder="Cari nama jurnal..." 
-                     class="w-full pl-10 pr-8 py-3 text-base font-sans border border-cardBorder bg-cardBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-lg placeholder-textMuted/60 min-h-[48px] premium-transition">
+                     class="w-full pl-10 pr-8 py-3.5 text-sm font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-xl placeholder-textMuted/60 min-h-[44px] premium-transition">
               <!-- Clear Button -->
               <button x-show="searchVal.length > 0" @click="clearSearch()"
                       id="searchClearBtn"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-lg font-bold focus:outline-none focus-visible:text-brandGold">
+                      class="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-lg font-bold focus:outline-none focus-visible:text-brandGold">
                 &times;
               </button>
             </div>
-            <!-- Search status label -->
-            <div x-show="searchVal.trim().length > 0" class="text-[12px] font-mono text-textMuted pl-1">
-              Menampilkan <span class="font-bold text-textMain" x-text="meta.total || 0"></span> hasil untuk "<span class="italic text-textMain" x-text="searchVal.trim()"></span>"
-            </div>
-          </div>
-
-          <!-- Component 3: Filter & Sort Bar -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-cardBg border border-cardBorder rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
-            <!-- Multi-select Filter rank chips (with horizontal scroll on mobile) -->
-            <div class="w-full sm:w-auto overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex items-center gap-1.5 py-1">
-              <!-- Semua Chip -->
-              <button @click="toggleRankFilter('All')"
-                      id="filterAllBtn"
-                      class="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg border transition-all duration-200 active:scale-95 focus:outline-none"
-                      :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
-                Semua
-              </button>
-              <!-- Rank Chips -->
-              <template x-for="rank in ['S1','S2','S3','S4','S5','S6','Unknown']">
-                <button x-show="rank !== 'Unknown' || (meta.stats && meta.stats.Unknown > 0)"
-                        @click="toggleRankFilter(rank)"
-                        :id="'filter' + rank + 'Btn'"
-                        class="px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-lg border transition-all duration-200 active:scale-95 focus:outline-none"
-                        :style="selectedRanks.includes(rank) ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'">
-                  <span x-text="rank === 'Unknown' ? 'Belum Terdata' : rank"></span>
-                </button>
-              </template>
-            </div>
 
             <!-- Sort Dropdown -->
-            <div class="w-full sm:w-auto flex justify-end shrink-0">
+            <div class="shrink-0 flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-textMuted hidden sm:inline">Urutkan:</span>
               <select @change="updateSort($el.value)"
                       id="sortSelect"
-                      class="w-full sm:w-auto px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider bg-[var(--surface-alt)] border border-cardBorder text-textMain rounded-lg focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[38px]">
+                      class="w-full sm:w-auto px-4 py-3 text-xs font-bold uppercase tracking-wider bg-appBg border border-cardBorder text-textMain rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
                  <option value="last_updated_desc" :selected="sortCol === 'last_updated' && sortDir === 'desc'">Baru Diperbarui</option>
                  <option value="name_asc" :selected="sortCol === 'name' && sortDir === 'asc'">Nama A–Z</option>
                  <option value="name_desc" :selected="sortCol === 'name' && sortDir === 'desc'">Nama Z–A</option>
@@ -400,6 +365,11 @@
                  <option value="last_updated_asc" :selected="sortCol === 'last_updated' && sortDir === 'asc'">Terlama Diperbarui</option>
               </select>
             </div>
+          </div>
+          
+          <!-- Search status label -->
+          <div x-show="searchVal.trim().length > 0" class="text-[12px] font-mono text-textMuted pl-1">
+            Menampilkan <span class="font-bold text-textMain" x-text="meta.total || 0"></span> hasil untuk "<span class="italic text-textMain" x-text="searchVal.trim()"></span>"
           </div>
 
           <!-- Adaptive Data List (Mobile: Cards, Desktop: Table) -->
@@ -431,7 +401,7 @@
                     <!-- Rank Badge S1-S6 -->
                     <span class="font-extrabold text-[10px] font-sans px-2 py-0.5 rounded-md uppercase shrink-0" 
                           :style="'color: ' + getRankColor(j.current_rank) + '; background-color: color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 12%, transparent); border: 1px solid color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 30%, transparent)'"
-                          x-text="j.current_rank"></span>
+                          x-text="j.current_rank === 'Unknown' ? 'Belum Terakreditasi' : j.current_rank"></span>
 
                     <!-- Newly Added Badge -->
                     <template x-if="!j.previous_rank || j.previous_rank === '' || j.previous_rank === 'None'">
@@ -466,7 +436,9 @@
               <div x-show="!isLoading && journals.length === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted text-[13px]">
                 No matching journal logs found in database.
               </div>
-                        <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
+            </div>
+
+            <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
             <div class="hidden md:block bg-cardBg border border-cardBorder rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
               <div class="table-container">
                 <table id="journalTable" class="w-full text-left border-collapse">
@@ -534,7 +506,7 @@
                                             'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'"
                                     class="text-[9px] font-extrabold tracking-wide px-1.5 py-0.5 border rounded-[4px] font-sans inline-flex items-center gap-1 shrink-0 uppercase">
                                 <span x-text="isRankRise(j.previous_rank, j.current_rank) ? '▲' : '▼'"></span>
-                                <span x-text="j.previous_rank + ' → ' + j.current_rank"></span>
+                                <span x-text="(j.previous_rank === 'Unknown' ? 'Belum Terakreditasi' : j.previous_rank) + ' → ' + (j.current_rank === 'Unknown' ? 'Belum Terakreditasi' : j.current_rank)"></span>
                               </span>
                             </template>
                           </div>
@@ -542,7 +514,7 @@
                         <td class="py-4 px-4 text-center">
                           <span class="font-extrabold text-[12px] font-sans px-2.5 py-0.5 rounded-md inline-block" 
                                 :style="'color: ' + getRankColor(j.current_rank) + '; background-color: color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 10%, transparent)'" 
-                                x-text="j.current_rank"></span>
+                                x-text="j.current_rank === 'Unknown' ? 'Belum Terakreditasi' : j.current_rank"></span>
                         </td>
                         <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-center" 
                             :title="formatIndonesianDateTime(j.last_updated)" 
@@ -635,7 +607,7 @@
         <div class="sidebar-right space-y-6">
           
           <!-- Visual Distribution Analytics Card (Distinct diffuse shadow) -->
-          <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-5 transition-all duration-300">
+          <div x-show="meta.total > 0" class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-5 transition-all duration-300">
             <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Distribusi Akreditasi</h3>
             
             <div class="space-y-3.5 font-sans">
@@ -649,16 +621,29 @@
                   <!-- Mini custom bar graph with color-mix border and fill -->
                   <div class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/50">
                     <div class="h-full rounded-full transition-all duration-500" 
-                         :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
+                          :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
                   </div>
                 </div>
               </template>
             </div>
           </div>
 
-          <!-- Baru Berubah (Recently Changed) Card -->
+          <!-- Empty State Distribution -->
+          <div x-show="meta.total === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-6 shadow-[0_6px_24px_rgba(0,0,0,0.015)] text-center space-y-4 transition-all duration-300">
+            <div class="mx-auto w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
+              <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Distribusi Akreditasi</h3>
+            <p class="text-[13px] text-textMuted leading-relaxed font-sans">
+              Tambahkan jurnal pertama kamu untuk melihat distribusi akreditasi.
+            </p>
+          </div>
+
+          <!-- Perubahan Terbaru Card -->
           <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
-            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Baru Berubah</h3>
+            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Perubahan Terbaru</h3>
             
             <div class="space-y-3 font-sans max-h-[350px] overflow-y-auto pr-1">
               <!-- Loop over recently changed journals -->
@@ -693,138 +678,6 @@
       </div>
 
     </div>
-
-    <!-- 4. Webhook Settings View -->
-    <div x-show="activeTab === 'config'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
-      
-      <div class="max-w-3xl mx-auto space-y-6">
-        
-        <!-- Header Card -->
-        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 space-y-2">
-          <h2 class="text-2xl font-serif font-bold text-textMain tracking-tight">Notifikasi Perubahan Akreditasi</h2>
-          <p class="text-[13px] sm:text-[14px] text-textMuted leading-relaxed">
-            Sambungkan Discord atau Telegram untuk menerima notifikasi otomatis setiap ada jurnal yang berubah akreditasinya.
-          </p>
-        </div>
-
-        <!-- Empty State jika belum ada yang dikonfigurasi -->
-        <div x-show="!(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id))"
-             class="bg-cardBg border border-cardBorder rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-3 transition-all duration-300 shadow-sm">
-          <span class="text-brandGold p-4 bg-brandGold/10 rounded-full shrink-0">
-            <!-- Icon bell/notifikasi -->
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-            </svg>
-          </span>
-          <div class="space-y-1">
-            <span class="font-bold text-textMain text-md block">Belum ada notifikasi aktif</span>
-            <p class="text-[13px] text-textMuted leading-relaxed max-w-sm">
-              Isi URL webhook di atas untuk mulai menerima pemberitahuan.
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6">
-          
-          <!-- Discord Config Panel -->
-          <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4">
-            <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
-              <span class="text-sm font-bold text-textMain font-sans">Discord</span>
-              <!-- Status Badge -->
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                    :style="config?.webhook?.discord_url ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                <span x-text="config?.webhook?.discord_url ? 'Aktif' : 'Tidak Aktif'"></span>
-              </span>
-            </div>
-            
-            <div class="space-y-3">
-              <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">URL Webhook Discord</label>
-              
-              <!-- Display Masked URL -->
-              <div x-show="config?.webhook?.discord_url && !editDiscord"
-                   class="flex items-center justify-between gap-3 bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all">
-                <span class="font-mono text-xs text-textMain" x-text="config?.webhook?.discord_url"></span>
-                <button @click="editDiscord = true; discordUrlInput = ''" 
-                        class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition">
-                  Ubah
-                </button>
-              </div>
-                   
-              <!-- Input field for URL -->
-              <div x-show="!config?.webhook?.discord_url || editDiscord" class="flex flex-col sm:flex-row items-stretch gap-2">
-                <input type="text" x-model="discordUrlInput" 
-                       placeholder="https://discord.com/api/webhooks/..." 
-                       class="flex-grow font-mono text-sm text-textMain bg-appBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
-                <button @click="saveSingleWebhook('discord')"
-                        class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
-                  Simpan
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Telegram Config Panel -->
-          <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4">
-            <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
-              <span class="text-sm font-bold text-textMain font-sans">Telegram</span>
-              <!-- Status Badge -->
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                    :style="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                <span x-text="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'Aktif' : 'Tidak Aktif'"></span>
-              </span>
-            </div>
-            
-            <div class="space-y-3">
-              <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">URL Webhook Telegram</label>
-              
-              <!-- Display Masked URL -->
-              <div x-show="config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id && !editTelegram"
-                   class="flex items-center justify-between gap-3 bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all">
-                <span class="font-mono text-xs text-textMain" x-text="`https://api.telegram.org/bot${config?.webhook?.telegram_bot_token}/sendMessage?chat_id=${config?.webhook?.telegram_chat_id}`"></span>
-                <button @click="editTelegram = true; telegramUrlInput = ''" 
-                        class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition">
-                  Ubah
-                </button>
-              </div>
-                   
-              <!-- Input field for URL -->
-              <div x-show="!(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) || editTelegram" class="flex flex-col sm:flex-row items-stretch gap-2">
-                <input type="text" x-model="telegramUrlInput" 
-                       placeholder="https://api.telegram.org/bot.../sendMessage" 
-                       class="flex-grow font-mono text-sm text-textMain bg-appBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
-                <button @click="saveSingleWebhook('telegram')"
-                        class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
-                  Simpan
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Unified Uji Coba Notifikasi Button -->
-          <div class="flex justify-center pt-2">
-            <button @click="testAllWebhooks()"
-                    :disabled="!(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id))"
-                    class="w-full sm:w-auto px-6 py-3.5 text-xs font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-              </svg>
-              Uji Coba Notifikasi
-            </button>
-          </div>
-          
-          <!-- Telemetry status notification toast -->
-          <div x-show="saveMessage" 
-               id="settingsStatusToast"
-               x-transition
-               class="p-4 rounded-xl border flex items-center gap-3 transition-all duration-300"
-               :style="saveSuccess ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-            <span class="text-[12px] sm:text-[13px] font-sans font-bold" x-text="saveMessage"></span>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </main>
 
   <!-- 5. Interactive Slide-Over Detail Drawer -->
   <div x-show="isDrawerOpen" 
@@ -984,17 +837,168 @@
 
   <!-- 6. Premium Editorial Footer -->
   <footer class="bg-cardBg border-t border-cardBorder py-6 px-4 sm:px-6 mt-12 transition-all duration-300">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="max-w-[1600px] w-full mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="text-[12px] text-textMuted font-sans text-center md:text-left">
         &copy; 2026 SINTA Journal Tracker. Data diperbarui setiap 24 jam.
       </div>
       <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-textMuted">
-        <a href="https://sinta.kemdiktisaintek.go.id" target="_blank" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold">Portal SINTA</a>
+        <a href="https://sinta.kemdiktisaintek.go.id" target="_blank" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold text-[11px]">Portal SINTA</a>
         <span>&middot;</span>
-        <button @click="navigate('config')" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold uppercase">Webhook Settings</button>
+        <button @click="isSettingsOpen = true" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold uppercase text-[11px]">Pengaturan Notifikasi</button>
       </div>
     </div>
   </footer>
+
+  <!-- 7. Interactive Settings Modal (Notifikasi) -->
+  <div x-show="isSettingsOpen" 
+       id="settingsModal"
+       x-cloak
+       class="fixed inset-0 z-50 overflow-y-auto" 
+       aria-labelledby="modal-title" 
+       role="dialog" 
+       aria-modal="true"
+       @keydown.window.escape="isSettingsOpen = false">
+    <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+      
+      <!-- Backdrop with premium glass blur -->
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300" 
+           @click="isSettingsOpen = false" 
+           x-show="isSettingsOpen"
+           x-transition:enter="ease-out duration-300"
+           x-transition:enter-start="opacity-0"
+           x-transition:enter-end="opacity-100"
+           x-transition:leave="ease-in duration-200"
+           x-transition:leave-start="opacity-100"
+           x-transition:leave-end="opacity-0"></div>
+
+      <!-- Modal Panel -->
+      <div class="relative transform overflow-hidden rounded-2xl bg-cardBg border border-cardBorder text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl premium-transition"
+           x-show="isSettingsOpen"
+           x-transition:enter="ease-out duration-300"
+           x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+           x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+           x-transition:leave="ease-in duration-200"
+           x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+           x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+        
+        <div class="px-6 py-6 sm:p-8 font-sans space-y-6">
+          <!-- Modal Header -->
+          <div class="flex items-start justify-between border-b border-cardBorder pb-4">
+            <div>
+              <h2 class="text-xl font-serif font-bold text-textMain tracking-tight" id="modal-title">Pengaturan Notifikasi</h2>
+              <p class="text-xs text-textMuted mt-1">Konfigurasi saluran pemberitahuan otomatis untuk perubahan akreditasi jurnal.</p>
+            </div>
+            <button type="button" @click="isSettingsOpen = false"
+                    id="modalCloseBtn"
+                    class="rounded-lg text-textMuted hover:text-textMain border border-cardBorder p-1.5 hover:bg-appBg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
+              <span class="sr-only">Tutup</span>
+              <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Configuration Content -->
+          <div class="space-y-6">
+            <!-- Discord Config Panel -->
+            <div class="p-5 bg-appBg border border-cardBorder rounded-xl space-y-4">
+              <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
+                <span class="text-sm font-bold text-textMain">Notifikasi Discord</span>
+                <!-- Status Badge -->
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
+                      :style="config?.webhook?.discord_url ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                  <span x-text="config?.webhook?.discord_url ? 'Aktif' : 'Tidak Aktif'"></span>
+                </span>
+              </div>
+              
+              <div class="space-y-3">
+                <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">Alamat Integrasi Discord</label>
+                
+                <!-- Display Masked URL -->
+                <div x-show="config?.webhook?.discord_url && !editDiscord"
+                     class="flex items-center justify-between gap-3 bg-cardBg p-3 border border-cardBorder rounded-xl break-all">
+                  <span class="font-mono text-xs text-textMain" x-text="config?.webhook?.discord_url"></span>
+                  <button @click="editDiscord = true; discordUrlInput = ''" 
+                          class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition flex-shrink-0">
+                    Ubah
+                  </button>
+                </div>
+                     
+                <!-- Input field for URL -->
+                <div x-show="!config?.webhook?.discord_url || editDiscord" class="flex flex-col sm:flex-row items-stretch gap-2">
+                  <input type="text" x-model="discordUrlInput" 
+                         placeholder="https://discord.com/api/webhooks/..." 
+                         class="flex-grow font-mono text-sm text-textMain bg-cardBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
+                  <button @click="saveSingleWebhook('discord')"
+                          class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
+                    Simpan
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Telegram Config Panel -->
+            <div class="p-5 bg-appBg border border-cardBorder rounded-xl space-y-4">
+              <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
+                <span class="text-sm font-bold text-textMain">Notifikasi Telegram</span>
+                <!-- Status Badge -->
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
+                      :style="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                  <span x-text="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'Aktif' : 'Tidak Aktif'"></span>
+                </span>
+              </div>
+              
+              <div class="space-y-3">
+                <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">Alamat Integrasi Telegram</label>
+                
+                <!-- Display Masked URL -->
+                <div x-show="config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id && !editTelegram"
+                     class="flex items-center justify-between gap-3 bg-cardBg p-3 border border-cardBorder rounded-xl break-all">
+                  <span class="font-mono text-xs text-textMain" x-text="`https://api.telegram.org/bot${config?.webhook?.telegram_bot_token}/sendMessage?chat_id=${config?.webhook?.telegram_chat_id}`"></span>
+                  <button @click="editTelegram = true; telegramUrlInput = ''" 
+                          class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition flex-shrink-0">
+                    Ubah
+                  </button>
+                </div>
+                     
+                <!-- Input field for URL -->
+                <div x-show="!(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) || editTelegram" class="flex flex-col sm:flex-row items-stretch gap-2">
+                  <input type="text" x-model="telegramUrlInput" 
+                         placeholder="https://api.telegram.org/bot.../sendMessage" 
+                         class="flex-grow font-mono text-sm text-textMain bg-cardBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
+                  <button @click="saveSingleWebhook('telegram')"
+                          class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
+                    Simpan
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Action buttons and Toasts -->
+            <div class="flex flex-col gap-3">
+              <div class="flex justify-center pt-2">
+                <button @click="testAllWebhooks()"
+                        :disabled="!(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id))"
+                        class="w-full px-6 py-3.5 text-xs font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                  </svg>
+                  Kirim Notifikasi Percobaan
+                </button>
+              </div>
+              
+              <div x-show="saveMessage" 
+                   x-transition
+                   class="p-4 rounded-xl border flex items-center gap-3 transition-all duration-300 text-xs font-bold font-sans"
+                   :style="saveSuccess ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                <span x-text="saveMessage"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // System date utilities
@@ -1016,7 +1020,7 @@
     }
 
     function formatIndonesianDateTime(dateStr) {
-      if (!dateStr || dateStr === 'N/A') return 'Belum Terdata';
+      if (!dateStr || dateStr === 'N/A') return 'Belum terdata';
       try {
         const months = [
           'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -1084,6 +1088,9 @@
         isDrawerOpen: false,
         selectedJournal: {},
 
+        // Settings modal state
+        isSettingsOpen: false,
+
         // Webhook configuration states
         editDiscord: false,
         editTelegram: false,
@@ -1106,22 +1113,25 @@
         init() {
           this.darkMode = document.documentElement.classList.contains('dark');
           this.activeTab = window.ACTIVE_TAB || 'dashboard';
-          if (this.activeTab === 'dashboard') {
-            const params = new URLSearchParams(window.location.search);
-            this.currentPage = parseInt(params.get('page')) || 1;
-            this.searchVal = params.get('search') || '';
-            const rankParam = params.get('rank');
-            this.selectedRanks = rankParam ? rankParam.split(',') : [];
-            this.sortCol = params.get('sort') || 'last_updated';
-            this.sortDir = params.get('dir') || 'desc';
-            
-            this.fetchJournals();
-            this.fetchChanges();
-          } else {
-            this.config = window.CONFIG_DATA || { webhook: { discord_url: '', telegram_bot_token: '', telegram_chat_id: '' } };
-            if (!this.config.webhook) {
-              this.config.webhook = { discord_url: '', telegram_bot_token: '', telegram_chat_id: '' };
-            }
+          if (this.activeTab === 'config') {
+            this.isSettingsOpen = true;
+            this.activeTab = 'dashboard';
+          }
+          
+          const params = new URLSearchParams(window.location.search);
+          this.currentPage = parseInt(params.get('page')) || 1;
+          this.searchVal = params.get('search') || '';
+          const rankParam = params.get('rank');
+          this.selectedRanks = rankParam ? rankParam.split(',') : [];
+          this.sortCol = params.get('sort') || 'last_updated';
+          this.sortDir = params.get('dir') || 'desc';
+          
+          this.fetchJournals();
+          this.fetchChanges();
+          
+          this.config = window.CONFIG_DATA || { webhook: { discord_url: '', telegram_bot_token: '', telegram_chat_id: '' } };
+          if (!this.config || !this.config.webhook) {
+            this.config = { webhook: { discord_url: '', telegram_bot_token: '', telegram_chat_id: '' } };
           }
         },
 
@@ -1372,7 +1382,7 @@
             this.isSaving = false;
             if (resData.success && resData.data) {
               this.saveSuccess = true;
-              this.saveMessage = 'Saluran webhook berhasil diperbarui!';
+              this.saveMessage = 'Saluran notifikasi berhasil diperbarui!';
               this.config = resData.data;
               if (platform === 'discord') this.editDiscord = false;
               if (platform === 'telegram') this.editTelegram = false;
