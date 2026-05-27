@@ -566,6 +566,144 @@ def crawl_sinta_category_bulk(
     return list(discovered_journals.values())
 
 
+def crawl_sinta_search_bulk(
+    queries: List[str],
+    delay: float = 2.0,
+    timeout: int = 10,
+    max_retries: int = 3,
+    config: Dict = None
+) -> List[Dict]:
+    """
+    Crawls SINTA search listings in bulk using search queries.
+    Applies filters via GET query parameters, filters by IT keywords client-side (if enabled),
+    and deduplicates the results.
+    """
+    if config is None:
+        config = load_config()
+
+    enable_keyword_filter = config.get("scraping", {}).get("enable_keyword_filter", False)
+    keyword_terms = config.get("scraping", {}).get("keyword_filter_terms", [])
+    
+    it_pattern = None
+    if enable_keyword_filter:
+        if keyword_terms:
+            escaped_terms = [re.escape(t) for t in keyword_terms if t.strip()]
+            if escaped_terms:
+                it_pattern = re.compile(r'(' + '|'.join(escaped_terms) + r')', re.IGNORECASE)
+        
+        if not it_pattern:
+            it_pattern = re.compile(
+                r'(komputer|computer|comput|informatika|informatik|informatic|sistem informasi|information system|'
+                r'teknologi informasi|information technology|software|jaringan|network|multimedia|telecommunication|'
+                r'telekomunikasi|elektronik|electro|electron|computing|digital|web|embedded|data science|sains data|'
+                r'artificial intelligence|kecerdasan buatan|intelligence|intelligent|robot|game|telematika|telematics|siber|cyber|'
+                r'kripto|crypto|database|basis data)', re.IGNORECASE
+            )
+
+    headers = {"User-Agent": USER_AGENT}
+    discovered_journals = {}
+
+    session = requests.Session()
+    session.headers.update(headers)
+
+    base_url = "https://sinta.kemdiktisaintek.go.id/journals"
+
+    for query in queries:
+        logging.info(f"Starting crawl search for query: '{query}'...")
+        
+        page = 1
+        while True:
+            url = f"{base_url}?page={page}&q={query}"
+            
+            # Retrieve page html with retries
+            html = None
+            for attempt in range(1, max_retries + 1):
+                try:
+                    r = session.get(url, timeout=timeout)
+                    if r.status_code != 200:
+                        logging.warning(f"HTTP {r.status_code} on GET page {page} of query '{query}'")
+                        time.sleep(2.0)
+                        continue
+                    
+                    html = r.text
+                    break
+                except requests.RequestException as e:
+                    logging.warning(f"Request exception on GET page {page} of query '{query}': {e}")
+                    time.sleep(2.0)
+
+            if not html:
+                logging.error(f"Failed to fetch page {page} of query '{query}' after {max_retries} attempts. Aborting search crawl.")
+                break
+
+            # Parse journals
+            soup = BeautifulSoup(html, "html.parser")
+            name_divs = soup.find_all(class_="affil-name mb-3")
+            if not name_divs:
+                logging.info(f"No journals found on page {page} of query '{query}'. Reached end.")
+                break
+
+            page_discovered_count = 0
+            page_matched_count = 0
+            page_skipped_count = 0
+
+            for div in name_divs:
+                link = div.find('a')
+                if not link:
+                    continue
+                
+                href = link.get('href', '')
+                name = link.get_text(strip=True)
+                
+                # Extract SINTA ID
+                match_id = re.search(r'/profile/(\d+)', href)
+                if not match_id:
+                    continue
+                
+                j_id = int(match_id.group(1))
+                page_discovered_count += 1
+                
+                # Extract rank from detail card text
+                rank_span = div.find_next(class_="info-sinta")
+                current_rank = "Unknown"
+                if rank_span:
+                    txt = rank_span.get_text(strip=True)
+                    match_rank = re.search(r'S([1-6])', txt, re.IGNORECASE)
+                    if match_rank:
+                        current_rank = f"S{match_rank.group(1)}"
+                
+                # Keyword Filtering Logic
+                if enable_keyword_filter and it_pattern:
+                    if it_pattern.search(name):
+                        discovered_journals[j_id] = {
+                            "id": j_id,
+                            "journal_name": name,
+                            "sinta_url": f"{base_url}/profile/{j_id}",
+                            "current_rank": current_rank
+                        }
+                        page_matched_count += 1
+                    else:
+                        page_skipped_count += 1
+                else:
+                    discovered_journals[j_id] = {
+                        "id": j_id,
+                        "journal_name": name,
+                        "sinta_url": f"{base_url}/profile/{j_id}",
+                        "current_rank": current_rank
+                    }
+                    page_matched_count += 1
+            
+            logging.info(
+                f"Query '{query}' Page {page}: Found {page_discovered_count} journals "
+                f"(total: {len(discovered_journals)}, skipped: {page_skipped_count})"
+            )
+            
+            # Move to next page
+            page += 1
+            time.sleep(delay)
+
+    return list(discovered_journals.values())
+
+
 def crawl_sinta_all(
     delay: float = 2.0,
     timeout: int = 10,
@@ -898,15 +1036,15 @@ def main() -> None:
 
     if args.init:
         init_db()
-        logging.info("Auto-crawling SINTA by category filters for IT-related journals to populate database...")
-        categories = list(SINTA_CATEGORY_IDS.values())
+        logging.info("Auto-crawling SINTA search listings for IT-related journals to populate database...")
+        queries = ["computer", "komputer", "informatika", "information system", "sistem informasi", "teknologi informasi", "software", "computing", "network", "cyber"]
         # Enforce minimum 2-second delay between requests during bulk crawl
-        journals = crawl_sinta_category_bulk(categories, delay=2.0, config=config)
+        journals = crawl_sinta_search_bulk(queries, delay=2.0, config=config)
         
-        logging.info(f"Bulk category crawl complete. Found {len(journals)} unique journals.")
+        logging.info(f"Bulk search crawl complete. Found {len(journals)} unique journals.")
         
         if len(journals) == 0:
-            logging.error("SINTA category crawler returned 0 journals. This is likely because the SINTA server (sinta.kemdiktisaintek.go.id) is currently returning HTTP 503 or is offline. Please run with --seed-from-config to populate using config list, or try again when SINTA is online.")
+            logging.error("SINTA search crawler returned 0 journals. This is likely because the SINTA server (sinta.kemdiktisaintek.go.id) is currently returning HTTP 503 or is offline. Please try again when SINTA is online.")
         else:
             imported_count = 0
             config_journals = []
@@ -933,13 +1071,13 @@ def main() -> None:
 
     elif args.import_all:
         init_db()
-        logging.info("Running mass category import from SINTA...")
-        categories = list(SINTA_CATEGORY_IDS.values())
+        logging.info("Running mass search import from SINTA...")
+        queries = ["computer", "komputer", "informatika", "information system", "sistem informasi", "teknologi informasi", "software", "computing", "network", "cyber"]
         # Enforce minimum 2-second delay between requests during bulk crawl
-        journals = crawl_sinta_category_bulk(categories, delay=2.0, config=config)
+        journals = crawl_sinta_search_bulk(queries, delay=2.0, config=config)
         
         if len(journals) == 0:
-            logging.error("SINTA category crawler returned 0 journals. This is likely because the SINTA server (sinta.kemdiktisaintek.go.id) is currently returning HTTP 503 or is offline. Please run with --seed-from-config to populate using config list, or try again when SINTA is online.")
+            logging.error("SINTA search crawler returned 0 journals. This is likely because the SINTA server (sinta.kemdiktisaintek.go.id) is currently returning HTTP 503 or is offline. Please try again when SINTA is online.")
         else:
             imported_count = 0
             config_journals = []
