@@ -158,8 +158,8 @@ def api_journals():
             
         search = request.args.get("search", "").strip()
         rank_str = request.args.get("rank", "").strip()
-        sort_col = request.args.get("sort", "name").strip()
-        sort_dir = request.args.get("dir", "asc").strip()
+        sort_col = request.args.get("sort", "last_updated").strip()
+        sort_dir = request.args.get("dir", "desc").strip()
         
         if sort_dir.lower() not in ["asc", "desc"]:
             sort_dir = "asc"
