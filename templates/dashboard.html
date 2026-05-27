@@ -134,11 +134,16 @@
       --badge-new-text: #93C5FD;
     }
 
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
     body {
       background-color: var(--bg);
       color: var(--text-primary);
       transition: background-color 0.3s, color 0.3s;
-      font-size: 16px; /* Body minimum 16px */
+      font-size: 1rem; /* Body minimum 16px/1rem */
     }
 
     h1, .clamp-h1 {
@@ -153,17 +158,24 @@
       display: none !important;
     }
 
+    /* Fluid media elements */
+    img, svg, video, iframe {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
     /* Asymmetric, ultra-premium editorial scrollbars */
     ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 0.3125rem;
+      height: 0.3125rem;
     }
     ::-webkit-scrollbar-track {
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
       background: rgba(92, 100, 112, 0.2);
-      border-radius: 10px;
+      border-radius: 0.625rem;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(92, 100, 112, 0.4);
@@ -177,7 +189,7 @@
     /* Dashboard 2-column layout */
     .dashboard-layout {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr 21.25rem;
       gap: 2rem;
       align-items: start;
     }
@@ -188,13 +200,14 @@
     }
     
     .table-container {
-      max-height: 700px;
+      max-height: 43.75rem;
       overflow-y: auto;
     }
     
     @media (max-width: 1024px) {
       .dashboard-layout {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
       }
       .sidebar-right {
         position: static;
