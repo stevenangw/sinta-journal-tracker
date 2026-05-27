@@ -464,39 +464,14 @@ def crawl_sinta_category_bulk(
 
     base_url = "https://sinta.kemdiktisaintek.go.id/journals"
 
-    # Function to establish the session filter for a category
-    def apply_filter(cat_id: int) -> bool:
-        post_data = {
-            "filter_journals": "1",
-            f"filter_area[{cat_id}]": str(cat_id)
-        }
-        for attempt in range(1, max_retries + 1):
-            try:
-                r = session.post(base_url, data=post_data, timeout=timeout)
-                if r.status_code == 200:
-                    logging.info(f"Successfully applied SINTA filter for Category ID {cat_id} (Attempt {attempt})")
-                    return True
-                else:
-                    logging.warning(f"Failed to apply SINTA filter POST (status: {r.status_code})")
-            except requests.RequestException as e:
-                logging.warning(f"Connection error applying filter POST: {e}")
-            if attempt < max_retries:
-                time.sleep(2.0)
-        return False
-
     for cat_id in categories:
         logging.info(f"Starting crawl for Category ID: {cat_id}...")
         
-        # 1. Apply initial POST filter
-        if not apply_filter(cat_id):
-            logging.error(f"Could not apply filter for Category ID {cat_id}. Skipping category.")
-            continue
-
         page = 1
         while True:
-            url = f"{base_url}?page={page}"
+            url = f"{base_url}?page={page}&filter_journals=1&filter_area[{cat_id}]={cat_id}"
             
-            # Retrieve page html with retries and session refresh check
+            # Retrieve page html with retries
             html = None
             for attempt in range(1, max_retries + 1):
                 try:
@@ -506,22 +481,12 @@ def crawl_sinta_category_bulk(
                         time.sleep(2.0)
                         continue
                     
+                    # We can parse right away
                     soup = BeautifulSoup(r.text, "html.parser")
                     name_divs = soup.find_all(class_="affil-name mb-3")
                     
-                    if name_divs:
-                        html = r.text
-                        break
-                    elif page == 1:
-                        # Page 1 is empty: trigger session refresh
-                        logging.warning(
-                            f"[SESSION REFRESH] No journals found on Page 1 for Category {cat_id}. Re-applying filter POST."
-                        )
-                        apply_filter(cat_id)
-                        time.sleep(1.0)
-                    else:
-                        html = r.text
-                        break
+                    html = r.text
+                    break
                 except requests.RequestException as e:
                     logging.warning(f"Request exception on GET page {page} of Category {cat_id}: {e}")
                     time.sleep(2.0)
@@ -803,6 +768,71 @@ def execute_scrape_cycle(config: Dict, target_id: Optional[int] = None) -> None:
             send_unknown_threshold_alert(config, unknown_count, total_count)
 
 
+def seed_from_config(config_path: str = CONFIG_NAME, db_path: str = DB_NAME) -> int:
+    """
+    Directly seeds the database from journals configured in config.json.
+    Extracts the journal SINTA ID from sinta_url and sets current_rank to 'Unknown'.
+    Returns the number of successfully seeded journals.
+    """
+    config_data = {}
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+        except Exception as e:
+            logging.error(f"Failed to parse config file: {e}")
+            return 0
+    else:
+        logging.error(f"Config file '{config_path}' not found for seeding.")
+        return 0
+
+    journals = config_data.get("journals", [])
+    if not journals:
+        logging.warning("No journals found in config file to seed.")
+        return 0
+
+    init_db(db_path)
+    imported_count = 0
+    for journal in journals:
+        name = journal.get("journal_name")
+        url = journal.get("sinta_url")
+        if not name or not url:
+            continue
+        
+        # Extract SINTA ID
+        match_id = re.search(r'/profile/(\d+)', url)
+        if not match_id:
+            logging.warning(f"Skipping journal '{name}' because SINTA ID could not be extracted from URL: '{url}'")
+            continue
+        sinta_id = int(match_id.group(1))
+
+        # Check if already exists in DB to prevent unnecessary overwrites, or do an upsert with current_rank = 'Unknown' only if new
+        conn = get_db_connection(db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT current_rank FROM journals WHERE id = ?", (sinta_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            # Already exists in DB, keep its existing rank
+            logging.info(f"Journal ID {sinta_id} ('{name}') already exists in DB with rank '{row['current_rank']}'. Skipping duplicate seeding.")
+            imported_count += 1
+            continue
+
+        success = save_journal_to_db(
+            journal_id=sinta_id,
+            name=name,
+            url=url,
+            rank="Unknown",
+            db_path=db_path
+        )
+        if success:
+            imported_count += 1
+
+    logging.info(f"Seeded {imported_count} journals from config to DB.")
+    return imported_count
+
+
 def main() -> None:
     """CLI Entry Point."""
     parser = argparse.ArgumentParser(
@@ -844,6 +874,11 @@ def main() -> None:
         type=int,
         help="Optional. Target a single journal ID for scraping."
     )
+    parser.add_argument(
+        "--seed-from-config",
+        action="store_true",
+        help="Directly seed the database from journals configured in config.json without querying SINTA listings."
+    )
     
     args = parser.parse_args()
     
@@ -855,6 +890,12 @@ def main() -> None:
     # Initialize configuration
     config = load_config()
 
+    if args.seed_from_config:
+        logging.info("Directly seeding database from config.json...")
+        imported_count = seed_from_config()
+        logging.info(f"Database seeding complete. Seeded {imported_count} journals.")
+        sys.exit(0)
+
     if args.init:
         init_db()
         logging.info("Auto-crawling SINTA by category filters for IT-related journals to populate database...")
@@ -864,28 +905,34 @@ def main() -> None:
         
         logging.info(f"Bulk category crawl complete. Found {len(journals)} unique journals.")
         
-        imported_count = 0
-        config_journals = []
-        for journal in journals:
-            success = save_journal_to_db(
-                journal_id=journal["id"],
-                name=journal["journal_name"],
-                url=journal["sinta_url"],
-                rank=journal["current_rank"]
-            )
-            if success:
-                imported_count += 1
-                config_journals.append({
-                    "journal_name": journal["journal_name"],
-                    "sinta_url": journal["sinta_url"]
-                })
-                
-        logging.info(f"Successfully seeded {imported_count} journals to the SQLite database.")
-        
-        # Save to config.json as well so the user can easily view or edit target URLs
-        config["journals"] = config_journals
-        save_config(config)
-        logging.info("Database initialization and initial bulk seed complete.")
+        if len(journals) == 0:
+            logging.info("SINTA category crawler returned 0 journals (likely due to HTTP 503 or server offline). "
+                         "Automatically falling back to seeding target journals from config.json...")
+            imported_count = seed_from_config()
+            logging.info(f"Successfully seeded {imported_count} fallback journals from config.json to the database.")
+        else:
+            imported_count = 0
+            config_journals = []
+            for journal in journals:
+                success = save_journal_to_db(
+                    journal_id=journal["id"],
+                    name=journal["journal_name"],
+                    url=journal["sinta_url"],
+                    rank=journal["current_rank"]
+                )
+                if success:
+                    imported_count += 1
+                    config_journals.append({
+                        "journal_name": journal["journal_name"],
+                        "sinta_url": journal["sinta_url"]
+                    })
+                    
+            logging.info(f"Successfully seeded {imported_count} journals to the SQLite database.")
+            
+            # Save to config.json as well so the user can easily view or edit target URLs
+            config["journals"] = config_journals
+            save_config(config)
+            logging.info("Database initialization and initial bulk seed complete.")
 
     elif args.import_all:
         init_db()
@@ -894,25 +941,31 @@ def main() -> None:
         # Enforce minimum 2-second delay between requests during bulk crawl
         journals = crawl_sinta_category_bulk(categories, delay=2.0, config=config)
         
-        imported_count = 0
-        config_journals = []
-        for journal in journals:
-            success = save_journal_to_db(
-                journal_id=journal["id"],
-                name=journal["journal_name"],
-                url=journal["sinta_url"],
-                rank=journal["current_rank"]
-            )
-            if success:
-                imported_count += 1
-                config_journals.append({
-                    "journal_name": journal["journal_name"],
-                    "sinta_url": journal["sinta_url"]
-                })
-                
-        config["journals"] = config_journals
-        save_config(config)
-        logging.info(f"Sync complete. Monitored list contains {imported_count} unique journals.")
+        if len(journals) == 0:
+            logging.info("SINTA category crawler returned 0 journals (likely due to HTTP 503 or server offline). "
+                         "Automatically falling back to seeding target journals from config.json...")
+            imported_count = seed_from_config()
+            logging.info(f"Successfully seeded {imported_count} fallback journals from config.json to the database.")
+        else:
+            imported_count = 0
+            config_journals = []
+            for journal in journals:
+                success = save_journal_to_db(
+                    journal_id=journal["id"],
+                    name=journal["journal_name"],
+                    url=journal["sinta_url"],
+                    rank=journal["current_rank"]
+                )
+                if success:
+                    imported_count += 1
+                    config_journals.append({
+                        "journal_name": journal["journal_name"],
+                        "sinta_url": journal["sinta_url"]
+                    })
+                    
+            config["journals"] = config_journals
+            save_config(config)
+            logging.info(f"Sync complete. Monitored list contains {imported_count} unique journals.")
 
     elif args.crawl_all:
         init_db()
