@@ -19,10 +19,14 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+
+# Load env variables
+load_dotenv()
 
 # Define constants
 DB_NAME = "sinta_tracker.db"
-CONFIG_NAME = "config.json"
+CONFIG_NAME = os.environ.get("SINTA_CONFIG_PATH", "config.json")
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -62,37 +66,57 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=log_handlers
 )
+def get_db_path(db_path: Optional[str] = None) -> str:
+    if db_path is not None and db_path != DB_NAME:
+        return db_path
+    db_url = os.environ.get("DATABASE_URL")
+    if not db_url:
+        return DB_NAME
+    if db_url.startswith("sqlite:///"):
+        return db_url[len("sqlite:///"):]
+    return db_url
 
 
 def load_config(config_path: str = CONFIG_NAME) -> Dict:
-    """Loads application configuration from JSON."""
-    if not os.path.exists(config_path):
-        logging.warning(f"Config file '{config_path}' not found. Creating default config.")
-        default_config = {
-            "webhook": {
-                "discord_url": "",
-                "telegram_bot_token": "",
-                "telegram_chat_id": ""
-            },
-            "scraping": {
-                "timeout_seconds": 10,
-                "delay_between_requests": 2.0,
-                "max_retries": 3,
-                "loop_interval_seconds": 86400,
-                "enable_keyword_filter": False,
-                "keyword_filter_terms": []
-            },
-            "journals": []
-        }
-        save_config(default_config, config_path)
-        return default_config
+    """Loads application configuration, prioritizing environment variables."""
+    config_data = {}
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+        except Exception as e:
+            logging.error(f"Failed to parse config file: {e}")
+    else:
+        logging.warning(f"Config file '{config_path}' not found.")
 
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logging.error(f"Failed to parse config file: {e}")
-        sys.exit(1)
+    if "webhook" not in config_data:
+        config_data["webhook"] = {}
+    if "scraping" not in config_data:
+        config_data["scraping"] = {
+            "timeout_seconds": 10,
+            "delay_between_requests": 2.0,
+            "max_retries": 3,
+            "loop_interval_seconds": 86400,
+            "enable_keyword_filter": False,
+            "keyword_filter_terms": []
+        }
+    if "journals" not in config_data:
+        config_data["journals"] = []
+
+    # Override with env variables if present
+    discord_url = os.environ.get("DISCORD_WEBHOOK_URL")
+    if discord_url:
+        config_data["webhook"]["discord_url"] = discord_url
+
+    telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    if telegram_token:
+        config_data["webhook"]["telegram_bot_token"] = telegram_token
+
+    telegram_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+    if telegram_chat_id:
+        config_data["webhook"]["telegram_chat_id"] = telegram_chat_id
+
+    return config_data
 
 
 def save_config(config_data: Dict, config_path: str = CONFIG_NAME) -> None:
@@ -106,7 +130,8 @@ def save_config(config_data: Dict, config_path: str = CONFIG_NAME) -> None:
 
 
 def init_db(db_path: str = DB_NAME) -> None:
-    """Initializes the SQLite database and ensures the journals table exists with 5 columns."""
+    """Initializes the SQLite database, ensures table exists, and creates database indexes."""
+    db_path = get_db_path(db_path)
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -126,9 +151,15 @@ def init_db(db_path: str = DB_NAME) -> None:
             cursor.execute("ALTER TABLE journals ADD COLUMN previous_rank TEXT")
         except sqlite3.OperationalError:
             pass
+
+        # Create indexes
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_journals_current_rank ON journals (current_rank)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_journals_last_updated ON journals (last_updated)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_journals_journal_name ON journals (journal_name)")
+
         conn.commit()
         conn.close()
-        logging.info("Database and table 'journals' initialized successfully.")
+        logging.info("Database and table 'journals' initialized successfully with indexes.")
     except Exception as e:
         logging.critical(f"Database initialization failed: {e}")
         sys.exit(1)
@@ -136,6 +167,7 @@ def init_db(db_path: str = DB_NAME) -> None:
 
 def get_db_connection(db_path: str = DB_NAME) -> sqlite3.Connection:
     """Returns a connection to the SQLite database."""
+    db_path = get_db_path(db_path)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -149,6 +181,7 @@ def save_journal_to_db(
     db_path: str = DB_NAME
 ) -> bool:
     """Upserts a journal record into the database."""
+    db_path = get_db_path(db_path)
     try:
         conn = get_db_connection(db_path)
         cursor = conn.cursor()
@@ -175,6 +208,7 @@ def save_journal_to_db(
 
 def get_all_journals_from_db(db_path: str = DB_NAME) -> List[Dict]:
     """Retrieves all monitored journals from the database."""
+    db_path = get_db_path(db_path)
     try:
         conn = get_db_connection(db_path)
         cursor = conn.cursor()
@@ -193,6 +227,7 @@ def update_journal_rank_in_db(
     db_path: str = DB_NAME
 ) -> None:
     """Updates the rank and timestamp for a journal in the database."""
+    db_path = get_db_path(db_path)
     try:
         conn = get_db_connection(db_path)
         cursor = conn.cursor()

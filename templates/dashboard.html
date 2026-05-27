@@ -15,10 +15,10 @@
     }
   </script>
 
-  <!-- Google Fonts: IBM Plex Sans and IBM Plex Mono -->
+  <!-- Google Fonts: Lora and Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -42,8 +42,9 @@
             brandGoldHover: 'var(--accent-hover, var(--accent))',
           },
           fontFamily: {
-            sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
-            mono: ['"IBM Plex Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Lora"', 'Georgia', 'serif'],
+            mono: ['monospace'],
           }
         }
       }
@@ -58,74 +59,74 @@
     }
 
     :root {
-      --bg:              #FAFAF8;
+      --bg:              #F9F9F6; /* Ivory/Alabaster Warm clean bg */
       --surface:         #FFFFFF;
-      --surface-alt:     #F3F2EF;
-      --text-primary:    #1A1A1A;
-      --text-secondary:  #5A5A5A;
-      --accent:          #2C5282;
-      --accent-hover:    #1A365D;
-      --border:          #DDDBD7;
-      --muted:           #9E9A94;
+      --surface-alt:     #F0EFEA; /* Soft document warm-tint linen */
+      --text-primary:    #1E252B; /* Dark ink */
+      --text-secondary:  #55606A;
+      --accent:          #1F3A52; /* Prussian Blue academic accent */
+      --accent-hover:    #122435;
+      --border:          #E3E1DC; /* Document grid thin margin line */
+      --muted:           #8B8A85;
 
       /* Diff colors light */
-      --diff-added-bg:      #D4EDDA;
-      --diff-added-text:    #155724;
-      --diff-added-border:  #B8DACC;
-      --diff-removed-bg:    #F8D7DA;
-      --diff-removed-text:  #721C24;
-      --diff-removed-border:#F1B8BC;
-      --diff-modified-bg:   #FFF3CD;
-      --diff-modified-text: #856404;
-      --diff-modified-border:#FFE69C;
+      --diff-added-bg:      #E6F4EA;
+      --diff-added-text:    #137333;
+      --diff-added-border:  #CEEAD6;
+      --diff-removed-bg:    #FCE8E6;
+      --diff-removed-text:  #C5221F;
+      --diff-removed-border:#FAD2CF;
+      --diff-modified-bg:   #FEF7E0;
+      --diff-modified-text: #B06000;
+      --diff-modified-border:#FFE0B2;
 
-      /* Sinta ranks color tokens */
-      --color-s1: #D97706;
-      --color-s2: #16A34A;
-      --color-s3: #2563EB;
-      --color-s4: #7C3AED;
-      --color-s5: #4B5563;
-      --color-s6: #D84315;
-      --color-s-default: #6B7280;
-      --status-active: #16A34A;
+      /* Curated Sinta ranks color tokens with high legibility and prestige (light) */
+      --color-s1: #B7791F; /* Crimson Golden Aura */
+      --color-s2: #2F855A; /* Scholar Green */
+      --color-s3: #2B6CB0; /* Classic Deep Navy */
+      --color-s4: #6B46C1; /* Royal Amethyst Purple */
+      --color-s5: #4A5568; /* Charcoal Ink Slate */
+      --color-s6: #C05621; /* Ochre Amber Rust */
+      --color-s-default: #718096;
+      --status-active: #2F855A;
 
       /* Blue badge for newly added journals (light) */
-      --badge-new-bg: #EFF6FF;
-      --badge-new-border: #BFDBFE;
-      --badge-new-text: #1D4ED8;
+      --badge-new-bg: #EBF8FF;
+      --badge-new-border: #BEE3F8;
+      --badge-new-text: #2B6CB0;
     }
 
     .dark {
-      --bg:              #141412;
-      --surface:         #1E1C1A;
-      --surface-alt:     #252320;
-      --text-primary:    #EDEDE9;
-      --text-secondary:  #9A958F;
-      --accent:          #6B9FD4;
-      --accent-hover:    #8BBBEC;
-      --border:          #2E2C28;
-      --muted:           #5A5550;
+      --bg:              #0F1215; /* Deep Charcoal library dark bg */
+      --surface:         #171C21; /* Rich midnight leather vault */
+      --surface-alt:     #1E252C;
+      --text-primary:    #E2E8F0;
+      --text-secondary:  #94A3B8;
+      --accent:          #85A9C8; /* Fine light steel sky */
+      --accent-hover:    #A5C8E8;
+      --border:          #2A333C;
+      --muted:           #4A5560;
 
       /* Diff colors dark */
-      --diff-added-bg:      #1A3326;
-      --diff-added-text:    #6AAE82;
-      --diff-added-border:  #2D5040;
-      --diff-removed-bg:    #3B1A1C;
-      --diff-removed-text:  #E07C7C;
-      --diff-removed-border:#5A2828;
-      --diff-modified-bg:   #332A10;
-      --diff-modified-text: #D4A843;
-      --diff-modified-border:#4A3C18;
+      --diff-added-bg:      #132B1B;
+      --diff-added-text:    #81C784;
+      --diff-added-border:  #1B3D27;
+      --diff-removed-bg:    #371618;
+      --diff-removed-text:  #E57373;
+      --diff-removed-border:#4C1F22;
+      --diff-modified-bg:   #2C220E;
+      --diff-modified-text: #F0B429;
+      --diff-modified-border:#3E3014;
 
-      /* Sinta ranks color tokens dark */
-      --color-s1: #F59E0B;
-      --color-s2: #4ADE80;
-      --color-s3: #60A5FA;
-      --color-s4: #A78BFA;
-      --color-s5: #9CA3AF;
-      --color-s6: #F97316;
-      --color-s-default: #9CA3AF;
-      --status-active: #4ADE80;
+      /* Curated Sinta ranks color tokens dark */
+      --color-s1: #ECC94B; /* Radiant Antique Gold */
+      --color-s2: #48BB78; /* Meadow Jade */
+      --color-s3: #63B3ED; /* Celestial Light Blue */
+      --color-s4: #B794F4; /* Lavender Spark */
+      --color-s5: #A0AEC0; /* Light Slate Gray */
+      --color-s6: #ED8936; /* Warm Ochre Orange */
+      --color-s-default: #A0AEC0;
+      --status-active: #48BB78;
 
       /* Blue badge for newly added journals (dark) */
       --badge-new-bg: #1E3A8A;
@@ -1155,16 +1156,20 @@
           
           fetch(`/api/journals?${params.toString()}`)
             .then(res => res.json())
-            .then(data => {
-              this.journals = data.journals || [];
-              this.meta = data.meta || {
-                total: 0,
-                page: 1,
-                limit: 50,
-                total_pages: 1,
-                stats: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0 }
-              };
-              this.calculateStats();
+            .then(resData => {
+              if (resData.success && resData.data) {
+                this.journals = resData.data.journals || [];
+                this.meta = resData.data.meta || {
+                  total: 0,
+                  page: 1,
+                  limit: 50,
+                  total_pages: 1,
+                  stats: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0 }
+                };
+                this.calculateStats();
+              } else {
+                console.error("API response returned success=false or missing data payload", resData);
+              }
               this.isLoading = false;
             })
             .catch(err => {
@@ -1176,8 +1181,12 @@
         fetchChanges() {
           fetch('/api/changes')
             .then(res => res.json())
-            .then(data => {
-              this.recentChanges = data.changes || [];
+            .then(resData => {
+              if (resData.success && resData.data) {
+                this.recentChanges = resData.data.changes || [];
+              } else {
+                console.error("API response failed to load changes", resData);
+              }
             })
             .catch(err => {
               console.error("Failed to fetch changes", err);
@@ -1359,19 +1368,19 @@
             body: JSON.stringify(payload)
           })
           .then(res => res.json())
-          .then(data => {
+          .then(resData => {
             this.isSaving = false;
-            if (data.success) {
+            if (resData.success && resData.data) {
               this.saveSuccess = true;
               this.saveMessage = 'Saluran webhook berhasil diperbarui!';
-              this.config = data.config;
+              this.config = resData.data;
               if (platform === 'discord') this.editDiscord = false;
               if (platform === 'telegram') this.editTelegram = false;
               this.resetForm();
               setTimeout(() => { this.saveMessage = ''; }, 4000);
             } else {
               this.saveSuccess = false;
-              this.saveMessage = data.error || 'Gagal menyimpan perubahan konfigurasi.';
+              this.saveMessage = resData.message || 'Gagal menyimpan perubahan konfigurasi.';
             }
           })
           .catch(err => {
@@ -1389,13 +1398,13 @@
             body: JSON.stringify({ platform: platform })
           })
           .then(res => res.json())
-          .then(data => {
-            if (data.success) {
+          .then(resData => {
+            if (resData.success) {
               this.saveSuccess = true;
               this.saveMessage = `Notifikasi uji coba berhasil dikirim ke ${platform}!`;
             } else {
               this.saveSuccess = false;
-              this.saveMessage = data.error || `Gagal mengirim uji coba notifikasi ke ${platform}.`;
+              this.saveMessage = resData.message || `Gagal mengirim uji coba notifikasi ke ${platform}.`;
             }
           })
           .catch(err => {
