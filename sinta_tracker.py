@@ -906,10 +906,7 @@ def main() -> None:
         logging.info(f"Bulk category crawl complete. Found {len(journals)} unique journals.")
         
         if len(journals) == 0:
-            logging.info("SINTA category crawler returned 0 journals (likely due to HTTP 503 or server offline). "
-                         "Automatically falling back to seeding target journals from config.json...")
-            imported_count = seed_from_config()
-            logging.info(f"Successfully seeded {imported_count} fallback journals from config.json to the database.")
+            logging.error("SINTA category crawler returned 0 journals. This is likely because the SINTA server (sinta.kemdiktisaintek.go.id) is currently returning HTTP 503 or is offline. Please run with --seed-from-config to populate using config list, or try again when SINTA is online.")
         else:
             imported_count = 0
             config_journals = []
@@ -942,10 +939,7 @@ def main() -> None:
         journals = crawl_sinta_category_bulk(categories, delay=2.0, config=config)
         
         if len(journals) == 0:
-            logging.info("SINTA category crawler returned 0 journals (likely due to HTTP 503 or server offline). "
-                         "Automatically falling back to seeding target journals from config.json...")
-            imported_count = seed_from_config()
-            logging.info(f"Successfully seeded {imported_count} fallback journals from config.json to the database.")
+            logging.error("SINTA category crawler returned 0 journals. This is likely because the SINTA server (sinta.kemdiktisaintek.go.id) is currently returning HTTP 503 or is offline. Please run with --seed-from-config to populate using config list, or try again when SINTA is online.")
         else:
             imported_count = 0
             config_journals = []
