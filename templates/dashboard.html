@@ -172,6 +172,33 @@
     .premium-transition {
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    /* Dashboard 2-column layout */
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    
+    .sidebar-right {
+      position: sticky;
+      top: 1rem;
+    }
+    
+    .table-container {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar-right {
+        position: static;
+      }
+    }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brandGold/20 pb-20 md:pb-0" x-data="appState()">
@@ -275,10 +302,6 @@
           </button>
         </nav>
 
-        <!-- Breadcrumb on desktop -->
-        <div class="hidden sm:block text-[11px] font-sans font-bold text-textMuted tracking-widest uppercase">
-          Navigasi: <span class="text-brandGold" x-text="activeTab === 'dashboard' ? 'Dashboard' : 'Pengaturan Webhook'"></span>
-        </div>
       </div>
     </div>
 
@@ -288,10 +311,10 @@
 
 
       <!-- Asymmetric Grid: 70/30 Layout -->
-      <div class="grid grid-cols-1 md:grid-cols-10 gap-6">
+      <div class="dashboard-layout">
         
         <!-- MAIN PANEL (70% - Columns 1 to 7) -->
-        <div class="md:col-span-7 space-y-6">
+        <div class="main-content space-y-6">
           
           <!-- Component 1: Stats Bar (Premium Horizontal Scrollable Chips) -->
           <div class="w-full overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 mb-4 flex items-center gap-2">
@@ -444,7 +467,7 @@
               </div>
                         <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
             <div class="hidden md:block bg-cardBg border border-cardBorder rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
-              <div class="max-h-[620px] overflow-y-auto">
+              <div class="table-container">
                 <table id="journalTable" class="w-full text-left border-collapse">
                   <thead class="sticky top-0 bg-cardBg/95 backdrop-blur-sm z-10 shadow-[0_1px_0_var(--border)]">
                     <tr class="border-b border-cardBorder text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
@@ -608,7 +631,7 @@
         </div>
         
         <!-- SIDEBAR PANEL (30% - Columns 8 to 10) -->
-        <div class="md:col-span-3 md:sticky md:top-[125px] h-fit space-y-6">
+        <div class="sidebar-right space-y-6">
           
           <!-- Visual Distribution Analytics Card (Distinct diffuse shadow) -->
           <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-5 transition-all duration-300">
@@ -675,34 +698,27 @@
       
       <div class="max-w-3xl mx-auto space-y-6">
         
-        <!-- Header Card with Dynamic Status -->
-        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 space-y-3">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 class="text-2xl font-serif font-bold text-textMain tracking-tight">Pengaturan Webhook Notifikasi</h2>
-            <!-- Dynamic Connection Status in Header -->
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider font-sans border shrink-0"
-                  :style="(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id)) ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-              <span class="w-1.5 h-1.5 rounded-full" :style="(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id)) ? 'background-color: var(--diff-added-text)' : 'background-color: var(--diff-removed-text)'"></span>
-              <span x-text="(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id)) ? 'Webhook: Terkonfigurasi' : 'Webhook: Belum dikonfigurasi'"></span>
-            </span>
-          </div>
+        <!-- Header Card -->
+        <div class="bg-cardBg border border-cardBorder rounded-2xl p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 space-y-2">
+          <h2 class="text-2xl font-serif font-bold text-textMain tracking-tight">Notifikasi Perubahan Akreditasi</h2>
           <p class="text-[13px] sm:text-[14px] text-textMuted leading-relaxed">
-            Hubungkan saluran Discord atau grup Telegram untuk menerima notifikasi instan secara real-time saat terjadi perubahan status akreditasi pada jurnal SINTA yang dipantau.
+            Sambungkan Discord atau Telegram untuk menerima notifikasi otomatis setiap ada jurnal yang berubah akreditasinya.
           </p>
         </div>
 
-        <!-- Empty State Info Banner -->
+        <!-- Empty State jika belum ada yang dikonfigurasi -->
         <div x-show="!(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id))"
-             class="bg-gradient-to-r from-brandGold/5 to-transparent border border-brandGold/20 rounded-2xl p-5 flex items-start gap-4 transition-all duration-300">
-          <span class="text-brandGold p-2 bg-brandGold/10 rounded-xl shrink-0 mt-0.5">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+             class="bg-cardBg border border-cardBorder rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-3 transition-all duration-300 shadow-sm">
+          <span class="text-brandGold p-4 bg-brandGold/10 rounded-full shrink-0">
+            <!-- Icon bell/notifikasi -->
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>
           </span>
           <div class="space-y-1">
-            <span class="font-bold text-textMain text-sm block">Notifikasi Belum Aktif</span>
-            <p class="text-[13px] text-textMuted leading-relaxed">
-              Sistem tidak mendeteksi adanya konfigurasi saluran webhook yang aktif. Silakan isi URL Webhook Discord atau Token Bot Telegram di bawah ini agar Anda mendapatkan pemberitahuan instan saat status akreditasi jurnal berubah.
+            <span class="font-bold text-textMain text-md block">Belum ada notifikasi aktif</span>
+            <p class="text-[13px] text-textMuted leading-relaxed max-w-sm">
+              Isi URL webhook di atas untuk mulai menerima pemberitahuan.
             </p>
           </div>
         </div>
@@ -711,135 +727,88 @@
           
           <!-- Discord Config Panel -->
           <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cardBorder/60 pb-3.5">
-              <div class="flex items-center gap-3">
-                <span class="text-[12px] font-extrabold uppercase tracking-widest font-sans text-textMain">Notifikasi Discord Webhook</span>
-                <!-- Status Badge -->
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                      :style="config?.webhook?.discord_url ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                  <span class="w-1.5 h-1.5 rounded-full" :style="config?.webhook?.discord_url ? 'background-color: var(--diff-added-text)' : 'background-color: var(--diff-removed-text)'"></span>
-                  <span x-text="config?.webhook?.discord_url ? 'Terkonfigurasi' : 'Tidak Aktif'"></span>
-                </span>
-              </div>
-              
-              <!-- Action Buttons -->
-              <div class="flex items-center gap-2" x-show="config?.webhook?.discord_url">
-                <button @click="testWebhook('discord')" 
-                        id="testDiscordBtn"
-                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
-                  Uji Endpoint
-                </button>
-                <button @click="editDiscord = !editDiscord; discordUrlInput = ''" 
-                        id="editDiscordBtn"
-                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-textMuted border border-cardBorder hover:border-textMuted hover:bg-appBg rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
-                        x-text="editDiscord ? 'Batal' : 'Ubah'"></button>
-              </div>
+            <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
+              <span class="text-sm font-bold text-textMain font-sans">Discord</span>
+              <!-- Status Badge -->
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
+                    :style="config?.webhook?.discord_url ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                <span x-text="config?.webhook?.discord_url ? 'Aktif' : 'Tidak Aktif'"></span>
+              </span>
             </div>
             
-            <div class="space-y-2">
-              <label class="block text-[9px] font-bold font-sans text-textMuted uppercase tracking-widest">URL Webhook Discord</label>
+            <div class="space-y-3">
+              <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">URL Webhook Discord</label>
               
               <!-- Display Masked URL -->
               <div x-show="config?.webhook?.discord_url && !editDiscord"
-                   id="discordUrlMasked"
-                   class="font-mono text-[12px] text-textMain bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all" 
-                   x-text="config?.webhook?.discord_url"></div>
+                   class="flex items-center justify-between gap-3 bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all">
+                <span class="font-mono text-xs text-textMain" x-text="config?.webhook?.discord_url"></span>
+                <button @click="editDiscord = true; discordUrlInput = ''" 
+                        class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition">
+                  Ubah
+                </button>
+              </div>
                    
               <!-- Input field for URL -->
-              <div x-show="!config?.webhook?.discord_url || editDiscord">
-                <input type="url" x-model="discordUrlInput" 
-                       id="discordUrlInput"
-                       placeholder="Masukkan URL Webhook Discord (https://discord.com/api/webhooks/...)" 
-                       class="w-full font-mono text-base text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[48px]">
+              <div x-show="!config?.webhook?.discord_url || editDiscord" class="flex flex-col sm:flex-row items-stretch gap-2">
+                <input type="text" x-model="discordUrlInput" 
+                       placeholder="https://discord.com/api/webhooks/..." 
+                       class="flex-grow font-mono text-sm text-textMain bg-appBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
+                <button @click="saveSingleWebhook('discord')"
+                        class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
+                  Simpan
+                </button>
               </div>
             </div>
           </div>
 
           <!-- Telegram Config Panel -->
           <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-cardBorder/60 pb-3.5">
-              <div class="flex items-center gap-3">
-                <span class="text-[12px] font-extrabold uppercase tracking-widest font-sans text-textMain">Notifikasi Telegram</span>
-                <!-- Status Badge -->
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                      :style="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                  <span class="w-1.5 h-1.5 rounded-full" :style="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'background-color: var(--diff-added-text)' : 'background-color: var(--diff-removed-text)'"></span>
-                  <span x-text="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'Terkonfigurasi' : 'Tidak Aktif'"></span>
-                </span>
-              </div>
-              
-              <!-- Action Buttons -->
-              <div class="flex items-center gap-2" x-show="config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id">
-                <button @click="testWebhook('telegram')" 
-                        id="testTelegramBtn"
-                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
-                  Uji Endpoint
-                </button>
-                <button @click="editTelegram = !editTelegram; telegramBotInput = ''; telegramChatInput = ''" 
-                        id="editTelegramBtn"
-                        class="px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-textMuted border border-cardBorder hover:border-textMuted hover:bg-appBg rounded-lg premium-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
-                        x-text="editTelegram ? 'Batal' : 'Ubah'"></button>
-              </div>
+            <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
+              <span class="text-sm font-bold text-textMain font-sans">Telegram</span>
+              <!-- Status Badge -->
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
+                    :style="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
+                <span x-text="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'Aktif' : 'Tidak Aktif'"></span>
+              </span>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <!-- Bot Token field -->
-              <div class="space-y-2">
-                <label class="block text-[9px] font-bold font-sans text-textMuted uppercase tracking-widest">Token API Bot Telegram</label>
-                
-                <!-- Display Masked Token -->
-                <div x-show="config?.webhook?.telegram_bot_token && !editTelegram"
-                     id="telegramBotMasked"
-                     class="font-mono text-[12px] text-textMain bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all" 
-                     x-text="config?.webhook?.telegram_bot_token"></div>
-                     
-                <!-- Input field for Token -->
-                <div x-show="!config?.webhook?.telegram_bot_token || editTelegram">
-                  <input type="text" x-model="telegramBotInput" 
-                         id="telegramBotInput"
-                         placeholder="Masukkan Token Bot Telegram..." 
-                         class="w-full font-mono text-base text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[48px]">
-                </div>
-              </div>
+            <div class="space-y-3">
+              <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">URL Webhook Telegram</label>
               
-              <!-- Chat ID field -->
-              <div class="space-y-2">
-                <label class="block text-[9px] font-bold font-sans text-textMuted uppercase tracking-widest">ID Chat / Channel Telegram</label>
-                
-                <!-- Display Masked Chat ID -->
-                <div x-show="config?.webhook?.telegram_chat_id && !editTelegram"
-                     id="telegramChatMasked"
-                     class="font-mono text-[12px] text-textMain bg-appBg/60 p-3.5 border border-cardBorder rounded-xl" 
-                     x-text="config?.webhook?.telegram_chat_id"></div>
-                     
-                <!-- Input field for Chat ID -->
-                <div x-show="!config?.webhook?.telegram_chat_id || editTelegram">
-                  <input type="text" x-model="telegramChatInput" 
-                         id="telegramChatInput"
-                         placeholder="Masukkan ID Chat/Channel Telegram..." 
-                         class="w-full font-mono text-base text-textMain bg-appBg p-3.5 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[48px]">
-                </div>
+              <!-- Display Masked URL -->
+              <div x-show="config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id && !editTelegram"
+                   class="flex items-center justify-between gap-3 bg-appBg/60 p-3.5 border border-cardBorder rounded-xl break-all">
+                <span class="font-mono text-xs text-textMain" x-text="`https://api.telegram.org/bot${config?.webhook?.telegram_bot_token}/sendMessage?chat_id=${config?.webhook?.telegram_chat_id}`"></span>
+                <button @click="editTelegram = true; telegramUrlInput = ''" 
+                        class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition">
+                  Ubah
+                </button>
+              </div>
+                   
+              <!-- Input field for URL -->
+              <div x-show="!(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) || editTelegram" class="flex flex-col sm:flex-row items-stretch gap-2">
+                <input type="text" x-model="telegramUrlInput" 
+                       placeholder="https://api.telegram.org/bot.../sendMessage" 
+                       class="flex-grow font-mono text-sm text-textMain bg-appBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
+                <button @click="saveSingleWebhook('telegram')"
+                        class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
+                  Simpan
+                </button>
               </div>
             </div>
           </div>
           
-          <!-- Unsaved changes bar (Visible when editing) -->
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border border-brandGold/30 rounded-2xl bg-cardBg transition-all duration-300 shadow-sm"
-               id="unsavedBanner"
-               x-show="(!config?.webhook?.discord_url || editDiscord) || (!config?.webhook?.telegram_bot_token || !config?.webhook?.telegram_chat_id || editTelegram)">
-            <div class="text-[13px] font-sans font-semibold text-textMuted text-center sm:text-left">Anda telah mengubah konfigurasi saluran notifikasi. Siap menerapkan perubahan?</div>
-            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
-              <button @click="resetForm()" 
-                      id="saveCancelBtn"
-                      class="w-full sm:w-auto min-h-[48px] sm:min-h-0 px-4 py-2 text-[12px] font-sans font-bold uppercase tracking-wider text-textMuted hover:text-textMain transition-colors duration-200 focus:outline-none active:scale-95 flex items-center justify-center">
-                Buang
-              </button>
-              <button @click="saveWebhookConfig()" :disabled="isSaving"
-                      id="saveConfirmBtn"
-                      class="w-full sm:w-auto min-h-[48px] sm:min-h-0 px-5 py-2.5 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span x-text="isSaving ? 'Menyimpan Perubahan...' : 'Terapkan Pengaturan'"></span>
-              </button>
-            </div>
+          <!-- Unified Uji Coba Notifikasi Button -->
+          <div class="flex justify-center pt-2">
+            <button @click="testAllWebhooks()"
+                    :disabled="!(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id))"
+                    class="w-full sm:w-auto px-6 py-3.5 text-xs font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
+              Uji Coba Notifikasi
+            </button>
           </div>
           
           <!-- Telemetry status notification toast -->
@@ -849,19 +818,6 @@
                class="p-4 rounded-xl border flex items-center gap-3 transition-all duration-300"
                :style="saveSuccess ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
             <span class="text-[12px] sm:text-[13px] font-sans font-bold" x-text="saveMessage"></span>
-          </div>
-
-          <!-- Documentation block (asymmetric layout details) -->
-          <div class="border border-cardBorder p-5 rounded-2xl bg-cardBg/50 flex items-start gap-4 transition-all duration-300">
-            <span class="text-brandGold mt-0.5">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </span>
-            <div class="text-[13px] text-textMuted leading-relaxed space-y-1">
-              <span class="font-bold text-textMain block">Lapisan Konfigurasi</span>
-              <p>Menyimpan variabel konfigurasi secara langsung ke dalam berkas <code class="font-mono bg-appBg px-1.5 py-0.5 border border-cardBorder rounded text-[11px] text-textMain font-semibold">config.json</code> di server. Seluruh kunci keamanan disaring di sisi server selama proses rendering untuk melindungi informasi kredensial Anda.</p>
-            </div>
           </div>
 
         </div>
@@ -1133,6 +1089,7 @@
         discordUrlInput: '',
         telegramBotInput: '',
         telegramChatInput: '',
+        telegramUrlInput: '',
         isSaving: false,
         saveMessage: '',
         saveSuccess: true,
@@ -1354,16 +1311,46 @@
         },
 
         saveWebhookConfig() {
+          // Fallback forwarding to saveSingleWebhook
+        },
+
+        saveSingleWebhook(platform) {
           this.isSaving = true;
           this.saveMessage = '';
           
           const payload = {};
-          if (!this.config?.webhook?.discord_url || this.editDiscord) {
+          if (platform === 'discord') {
             payload.discord_url = this.discordUrlInput.trim();
-          }
-          if (!this.config?.webhook?.telegram_bot_token || !this.config?.webhook?.telegram_chat_id || this.editTelegram) {
-            payload.telegram_bot_token = this.telegramBotInput.trim();
-            payload.telegram_chat_id = this.telegramChatInput.trim();
+          } else if (platform === 'telegram') {
+            const urlStr = this.telegramUrlInput.trim();
+            let botToken = '';
+            let chatId = '';
+            try {
+              if (urlStr.startsWith('http')) {
+                const urlObj = new URL(urlStr);
+                const pathParts = urlObj.pathname.split('/');
+                for (let part of pathParts) {
+                  if (part.startsWith('bot')) {
+                    botToken = part.substring(3);
+                  }
+                }
+                chatId = urlObj.searchParams.get('chat_id') || '';
+              } else {
+                if (urlStr.includes(':')) {
+                  const parts = urlStr.split(':');
+                  if (parts.length >= 2) {
+                    botToken = parts[0] + ':' + parts[1];
+                    const remaining = urlStr.replace(botToken, '').trim();
+                    chatId = remaining.replace(/^[,\s:]+/, '');
+                  }
+                }
+              }
+            } catch (e) {
+              console.error(e);
+            }
+            
+            payload.telegram_bot_token = botToken;
+            payload.telegram_chat_id = chatId;
           }
           
           fetch('/api/config', {
@@ -1378,6 +1365,8 @@
               this.saveSuccess = true;
               this.saveMessage = 'Saluran webhook berhasil diperbarui!';
               this.config = data.config;
+              if (platform === 'discord') this.editDiscord = false;
+              if (platform === 'telegram') this.editTelegram = false;
               this.resetForm();
               setTimeout(() => { this.saveMessage = ''; }, 4000);
             } else {
@@ -1413,6 +1402,19 @@
             this.saveSuccess = false;
             this.saveMessage = 'Permintaan uji coba notifikasi habis waktu.';
           });
+        },
+
+        testAllWebhooks() {
+          if (this.config?.webhook?.discord_url) {
+            this.testWebhook('discord');
+          }
+          if (this.config?.webhook?.telegram_bot_token && this.config?.webhook?.telegram_chat_id) {
+            setTimeout(() => { this.testWebhook('telegram'); }, 1000);
+          }
+        },
+
+        getPreviousRank(rank) {
+          return this.selectedJournal?.previous_rank || rank || 'N/A';
         },
 
         navigate(tab) {
