@@ -1158,3 +1158,40 @@ button, input, select, textarea {
     flex: none;
   }
 }
+
+/* 16. MOBILE MOBILE-FIRST OVERFLOW & ACCESSIBILITY CORRECTIONS */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.main-wrapper {
+  max-width: 100%;
+}
+
+.stat-pills-container {
+  max-width: 100%;
+}
+
+.footer-wrapper p {
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+/* Hide status text on small mobile screens to prevent header overflow */
+@media (max-width: 640px) {
+  .status-indicator span:last-child {
+    display: none !important;
+  }
+  .status-indicator {
+    padding: 0 !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: var(--radius-full) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
