@@ -1162,7 +1162,6 @@ button, input, select, textarea {
 /* 16. MOBILE MOBILE-FIRST OVERFLOW & ACCESSIBILITY CORRECTIONS */
 html, body {
   max-width: 100%;
-  overflow-x: hidden;
 }
 
 .main-wrapper {
@@ -1179,19 +1178,32 @@ html, body {
   line-height: 1.6;
 }
 
-/* Hide status text on small mobile screens to prevent header overflow */
-@media (max-width: 640px) {
-  .status-indicator span:last-child {
-    display: none !important;
+/* Stacking header layout vertically on small mobile viewports to prevent overflow without hiding content */
+@media (max-width: 576px) {
+  .header-container {
+    flex-direction: column;
+    height: auto !important;
+    padding: var(--space-3) var(--space-4) !important;
+    gap: var(--space-3) !important;
+    align-items: center;
+    text-align: center;
   }
+  
+  .brand-section {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .control-section {
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-3) !important;
+  }
+  
   .status-indicator {
-    padding: 0 !important;
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: var(--radius-full) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    padding: var(--space-2) var(--space-4);
   }
 }
+
 
