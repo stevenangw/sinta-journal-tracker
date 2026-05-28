@@ -7,8 +7,8 @@
 
   <!-- Prevent FOUC (Flash of Unstyled Content) by setting dark theme instantly -->
   <script>
-    if (localStorage.getItem('jurnal-theme') === 'dark' || 
-        (!('jurnal-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    const savedTheme = localStorage.getItem('jurnal-theme');
+    if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
@@ -108,7 +108,7 @@
       --text-secondary:  #94A3B8;
       --accent:          #85A9C8; /* Fine light steel sky */
       --accent-hover:    #A5C8E8;
-      --border:          #232B33; /* Subtler dark border — less contrast against surface */
+      --border:          #2A333C; /* Dark border -- #2A333C */
       --muted:           #4A5560;
 
       /* Diff colors dark */
@@ -194,11 +194,12 @@
     /* Dashboard 2-column layout */
     .dashboard-layout {
       display: grid;
-      grid-template-columns: 1fr 20rem;
+      grid-template-columns: 1fr 340px;
       gap: 1.5rem;
       align-items: start;
       width: 100%;
       min-width: 0;
+      box-sizing: border-box;
     }
     
     .sidebar-right {
@@ -219,16 +220,110 @@
 
     /* Reduce border visibility in dark mode globally */
     .dark .border-cardBorder {
-      border-color: rgba(35, 43, 51, 0.7) !important;
+      border-color: rgba(255, 255, 255, 0.06) !important;
     }
     .dark .border-b.border-cardBorder {
-      border-bottom-color: rgba(35, 43, 51, 0.6) !important;
+      border-bottom-color: rgba(255, 255, 255, 0.06) !important;
     }
     .dark .border-t.border-cardBorder {
-      border-top-color: rgba(35, 43, 51, 0.6) !important;
+      border-top-color: rgba(255, 255, 255, 0.06) !important;
     }
     .dark .divide-cardBorder\/60 > :not([hidden]) ~ :not([hidden]) {
-      border-color: rgba(35, 43, 51, 0.4) !important;
+      border-color: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    /* 3A. HEADER */
+    .dark header {
+      border-bottom: 1px solid var(--border) !important;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 4px 16px rgba(0,0,0,0.3) !important;
+    }
+
+    /* 3B. CARD / SURFACE (dark mode) */
+    .dark .bg-cardBg, .dark .bg-surface {
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 4px 24px rgba(0,0,0,0.25) !important;
+    }
+
+    /* 3C. FILTER TABS inactive (dark mode) */
+    .dark button[id^="statsBar"]:not([style*="color: rgb(255, 255, 255)"]):not([style*="color: #ffffff"]):not([style*="color:#ffffff"]) {
+      background-color: rgba(255, 255, 255, 0.03) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      color: var(--text-secondary) !important;
+      box-shadow: none !important;
+    }
+    .dark button[id^="statsBar"]:not([style*="color: rgb(255, 255, 255)"]):not([style*="color: #ffffff"]):not([style*="color:#ffffff"]):hover {
+      background-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    /* 3D. TABEL HEADER ROW (dark mode) */
+    .dark #journalTable thead tr {
+      background-color: rgba(255,255,255,0.025) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+      letter-spacing: 0.08em;
+    }
+
+    /* 3E. TABEL ROW HOVER (dark and light mode custom transition) */
+    tr.group {
+      transition: background-color 0.15s ease;
+      border-bottom: 1px solid var(--border);
+    }
+    .dark tr.group {
+      border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+    }
+    tr.group:hover {
+      background-color: var(--surface-alt) !important;
+    }
+    .dark tr.group:hover {
+      background-color: rgba(255,255,255,0.03) !important;
+    }
+
+    /* 3F. SEARCH BAR (dark mode) */
+    .dark #searchInput {
+      background-color: rgba(255,255,255,0.03) !important;
+      border: 1px solid rgba(255,255,255,0.09) !important;
+    }
+    .dark #searchInput:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px rgba(133,169,200,0.12) !important;
+    }
+
+    /* 3G. SIDEBAR CARDS (dark mode) */
+    .dark .sidebar-right > div {
+      background-color: var(--surface) !important;
+      border: 1px solid rgba(255,255,255,0.06) !important;
+    }
+
+    /* 3H. PROGRESS BAR DISTRIBUTION (dark mode shadow fill using color-mix on currentColor) */
+    .dark .sidebar-right .h-full {
+      box-shadow: 0 0 6px color-mix(in srgb, currentColor 40%, transparent) !important;
+    }
+
+    /* 3I. HERO H1 (dark mode) */
+    .dark h1 {
+      background: linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+    }
+
+    /* 3K. LOGO "S" (dark mode shadow) */
+    .dark span.bg-brandGold {
+      box-shadow: 0 0 12px rgba(133,169,200,0.3) !important;
+    }
+
+    /* 3L. STATUS PILL "Last updated" (dark mode) */
+    .dark .status-pill-updated {
+      background: rgba(255,255,255,0.04) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
+
+    /* 3N. RECENT CHANGES ROW HOVER (dark mode) */
+    .dark .recent-change-item:hover {
+      background: rgba(255,255,255,0.03) !important;
+      padding: 0.5rem !important;
+      border-radius: 0.5rem !important;
+      margin: 0 -0.5rem !important;
     }
     
     @media (max-width: 1024px) {
@@ -278,7 +373,7 @@
       <!-- System status and Actions -->
       <div class="flex items-center gap-3 sm:gap-6">
         <div class="hidden sm:flex items-center gap-2.5">
-          <div class="flex items-center gap-2 bg-appBg/80 px-2.5 py-1.5 border border-cardBorder rounded-xl shadow-inner select-none transition-all duration-300">
+          <div class="status-pill-updated flex items-center gap-2 bg-appBg/80 px-2.5 py-1.5 border border-cardBorder rounded-xl shadow-inner select-none transition-all duration-300">
             <!-- Pulse status light -->
             <span class="relative flex h-2.5 w-2.5">
               <span x-show="isLoading" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-blue-500"></span>
@@ -332,16 +427,16 @@
   </header>
 
   <!-- Main Workspace -->
-  <main class="flex-grow w-full max-w-[1600px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
+  <main class="flex-grow w-full box-border max-w-[1600px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
     
     <!-- Title Page Hierarchy -->
-    <div class="mb-3 border-b border-cardBorder/30 dark:border-cardBorder/20 pb-3">
-      <h1 class="text-3xl sm:text-4xl font-serif font-bold text-textMain tracking-tight">Monitored Journals</h1>
+    <div class="mb-4 border-b border-[var(--border)] dark:border-[rgba(255,255,255,0.08)] pb-3">
+      <h1 class="font-serif font-bold text-textMain tracking-tight">Monitored Journals</h1>
       <p class="text-sm text-textMuted mt-1">Real-time accreditation status tracking for national scientific journals on SINTA.</p>
     </div>
 
     <!-- 3. Dashboard View -->
-    <div x-show="activeTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6">
+    <div x-show="activeTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
       
       <!-- Asymmetric Grid: 70/30 Layout -->
       <div class="dashboard-layout">
@@ -350,7 +445,7 @@
         <div class="main-content space-y-4">
           
           <!-- Component 1: Combined S1-S6 Interactive Filter Pills (Horizontal Scrollable) -->
-          <div class="w-full flex flex-wrap gap-2 py-1 mb-2 items-center">
+          <div class="w-full flex flex-wrap gap-2 py-1 mb-1 items-center">
             <!-- Total Chip -->
             <button @click="toggleRankFilter('All')"
                     id="statsBarTotalBtn"
@@ -377,9 +472,9 @@
               </button>
             </template>
           </div>
-
+          
           <!-- Component 2: Unified Control Bar (Search & Sort) -->
-          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 py-3 px-3 sm:px-4 bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
+          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 py-3 px-4 bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
             <!-- Search Input -->
             <div class="relative flex-grow">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
@@ -566,8 +661,8 @@
                           </div>
                         </td>
                         <td class="py-4 px-4 text-center shrink-0 w-36">
-                          <span class="font-extrabold text-[12px] font-sans px-2.5 py-0.5 rounded-md inline-block" 
-                                :style="'color: ' + getRankColor(j.current_rank) + '; background-color: color-mix(in oklch, ' + getRankColor(j.current_rank) + ' 10%, transparent)'" 
+                          <span class="font-extrabold text-[12px] font-sans px-2.5 py-0.5 rounded-md inline-block border" 
+                                :style="'color: ' + getRankColor(j.current_rank) + '; background: color-mix(in srgb, ' + getRankColor(j.current_rank) + ' 15%, transparent); border-color: color-mix(in srgb, ' + getRankColor(j.current_rank) + ' 30%, transparent)'" 
                                 x-text="j.current_rank === 'Unknown' ? 'Not Accredited' : j.current_rank"></span>
                         </td>
                         <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-right shrink-0 w-24" 
@@ -672,7 +767,7 @@
                   <!-- Mini custom bar graph with color-mix border and fill (hidden if value is 0) -->
                   <div x-show="meta.stats && meta.stats[rank] > 0" class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/30 dark:border-cardBorder/20">
                     <div class="h-full rounded-full transition-all duration-500" 
-                          :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank)"></div>
+                          :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank) + '; color: ' + getRankColor(rank)"></div>
                   </div>
                 </div>
               </template>
@@ -699,7 +794,7 @@
             <div class="space-y-3 font-sans max-h-[350px] overflow-y-auto pr-1">
               <!-- Loop over recently changed journals -->
               <template x-for="c in recentChanges" :key="c.id">
-                <div @click="openDrawer(c)" class="group cursor-pointer py-2 border-b border-cardBorder/30 dark:border-cardBorder/20 last:border-b-0">
+                <div @click="openDrawer(c)" class="recent-change-item group cursor-pointer py-2 border-b border-cardBorder/30 dark:border-cardBorder/20 last:border-b-0">
                   <div class="text-[12px] font-bold text-textMain group-hover:text-brandGold transition-colors truncate" :title="c.journal_name" x-text="c.journal_name"></div>
                   <div class="flex items-center justify-between text-[10px] text-textMuted mt-1.5 font-mono">
                     
@@ -1133,7 +1228,7 @@
 
         // Pagination states
         currentPage: 1,
-        pageSize: 50,
+        pageSize: 10,
         isLoading: false,
         debounceTimeout: null,
         
