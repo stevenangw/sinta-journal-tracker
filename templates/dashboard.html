@@ -7,13 +7,13 @@
     {% include 'error.html' %}
   {% else %}
     
-    <!-- DASHBOARD UTAMA -->
+    <!-- MAIN DASHBOARD -->
     <div x-data="dashboardApp()" class="layout-grid" style="animation: slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
       
-      <!-- KOLOM UTAMA (KIRI - 65%) -->
+      <!-- MAIN COLUMN (LEFT - 65%) -->
       <section style="display: flex; flex-direction: column;">
         
-        <!-- Bar Pencarian & Pengurutan -->
+        <!-- Search, Sort & Page Limit Controls -->
         <div class="controls-group">
           <!-- Live Search Bar -->
           <div class="search-wrapper">
@@ -25,22 +25,34 @@
                    @input="debounceFetch()" 
                    class="search-input" 
                    id="input-pencarian"
-                   placeholder="Cari nama jurnal ilmiah..." 
-                   aria-label="Cari nama jurnal">
+                   placeholder="Search scientific journals by name..." 
+                   aria-label="Search journals">
           </div>
           
-          <!-- Dropdown Pengurutan -->
+          <!-- Sort Dropdown -->
           <div style="position: relative;">
-            <select x-model="sortValue" @change="handleSortChange()" class="sort-select" id="select-pengurutan" aria-label="Urutkan daftar jurnal">
-              <option value="last_updated|desc">Pembaruan Terkini (Terbaru)</option>
-              <option value="last_updated|asc">Pembaruan Terlama</option>
-              <option value="rank|asc">Peringkat SINTA (S1 → S6)</option>
-              <option value="rank|desc">Peringkat SINTA (S6 → S1)</option>
+            <select x-model="sortValue" @change="handleSortChange()" class="sort-select" id="select-pengurutan" aria-label="Sort journal list">
+              <option value="last_updated|desc">Latest Update (Newest)</option>
+              <option value="last_updated|asc">Oldest Update</option>
+              <option value="rank|asc">SINTA Rank (S1 → S6)</option>
+              <option value="rank|desc">SINTA Rank (S6 → S1)</option>
+              <option value="journal_name|asc">Journal Name (A → Z)</option>
+              <option value="journal_name|desc">Journal Name (Z → A)</option>
+            </select>
+          </div>
+
+          <!-- Page Limit Dropdown -->
+          <div style="position: relative;">
+            <select x-model="meta.limit" @change="handleLimitChange()" class="sort-select" id="select-limit" aria-label="Select items per page">
+              <option value="10">10 per page</option>
+              <option value="20">20 per page</option>
+              <option value="50">50 per page</option>
+              <option value="100">100 per page</option>
             </select>
           </div>
         </div>
 
-        <!-- SKELETON LOADER (TAMPIL SAAT LOADING) -->
+        <!-- SKELETON LOADER (SHOWN DURING LOADING) -->
         <div x-show="isLoading" class="journal-list" aria-hidden="true">
           <template x-for="i in 5">
             <div class="skeleton-card">
@@ -53,24 +65,24 @@
           </template>
         </div>
 
-        <!-- DAFTAR KARTU JURNAL -->
+        <!-- JOURNAL CARDS LIST -->
         <div x-show="!isLoading" class="journal-list" id="daftar-jurnal">
           
           <template x-for="j in journals" :key="j.id">
             <article class="journal-card" style="animation: slide-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
               
-              <!-- Baris Atas Kartu -->
+              <!-- Card Top Row -->
               <div class="card-header-row">
                 <div style="display: flex; flex-direction: column; gap: var(--space-1);">
-                  <!-- Nama Jurnal -->
+                  <!-- Journal Title -->
                   <h3 class="journal-title">
                     <a :href="j.sinta_url" target="_blank" rel="noopener noreferrer" x-text="j.journal_name"></a>
                   </h3>
                   
-                  <!-- Tanda Perubahan Peringkat Aktif -->
+                  <!-- Rank Change Indicator -->
                   <div x-show="j.previous_rank && j.previous_rank !== j.current_rank" class="meta-item" style="margin-top: 2px;">
                     <span class="rank-change-indicator" style="font-size: 0.6875rem;">
-                      Riwayat Peringkat: 
+                      Rank History: 
                       <span x-text="j.previous_rank" style="text-decoration: line-through; opacity: 0.7;"></span>
                       <span class="change-arrow">&rarr;</span>
                       <span x-text="j.current_rank" style="font-weight: bold; color: var(--primary-color);"></span>
@@ -78,27 +90,27 @@
                   </div>
                 </div>
                 
-                <!-- Badge Akreditasi & Baru -->
+                <!-- Rank Badges & Status -->
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2);">
-                  <!-- Badge Rank S1-S6 -->
+                  <!-- Rank Badge S1-S6 -->
                   <span class="badge" :class="j.current_rank.toLowerCase()" x-text="j.current_rank"></span>
                   
-                  <!-- Badge Baru (Hanya jika belum memiliki previous_rank dan baru terdaftar) -->
-                  <span x-show="isNew(j)" class="badge-new">BARU</span>
+                  <!-- New Entry Badge -->
+                  <span x-show="isNew(j)" class="badge-new">NEW</span>
                 </div>
               </div>
 
-              <!-- Baris Bawah / Metadata Kartu -->
+              <!-- Card Bottom Row / Metadata -->
               <div class="card-meta-row">
                 <div class="meta-item">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>Diperiksa <span x-text="formatDate(j.last_updated)"></span></span>
+                  <span>Checked <span x-text="formatDate(j.last_updated)"></span></span>
                 </div>
                 
                 <a :href="j.sinta_url" target="_blank" rel="noopener noreferrer" class="meta-item" style="color: var(--primary-color); font-weight: var(--font-weight-medium);">
-                  <span>Profil SINTA</span>
+                  <span>SINTA Profile</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 12px; height: 12px;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
@@ -108,86 +120,86 @@
             </article>
           </template>
 
-          <!-- EMPTY STATES (JURNAL KOSONG) -->
+          <!-- EMPTY STATES -->
           
-          <!-- Jika Database Kosong Secara Total -->
+          <!-- Case 1: Database Completely Empty -->
           <div x-show="journals.length === 0 && !searchQuery && !selectedRank" class="empty-state-card" style="animation: slide-in 0.3s ease;">
             <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4.5m16 0h-1.172a2 2 0 00-1.414.586l-1.828 1.828A2 2 0 0111.172 18H8.828a2 2 0 01-1.414-.586l-1.828-1.828A2 2 0 004.172 13H3" />
             </svg>
-            <h3 class="empty-title">Belum Ada Data</h3>
-            <p class="empty-description">Belum ada jurnal ilmiah yang dipantau dalam sistem ini. Tambahkan daftar jurnal melalui halaman pengaturan notifikasi atau tunggu hingga sinkronisasi data pertama kali selesai.</p>
+            <h3 class="empty-title">No Journals Monitored</h3>
+            <p class="empty-description">No scientific journals are currently monitored in this system. Add journals via the notification settings page or wait for the initial database synchronization to complete.</p>
             <a href="/config" class="empty-action-btn">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 18px; height: 18px;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Konfigurasikan Saluran
+              Configure Channels
             </a>
           </div>
 
-          <!-- Jika Hasil Pencarian Kosong -->
+          <!-- Case 2: No Search Matches -->
           <div x-show="journals.length === 0 && searchQuery" class="empty-state-card" style="animation: slide-in 0.3s ease;">
             <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="empty-title">Hasil Tidak Ditemukan</h3>
-            <p class="empty-description">Tidak ada jurnal ilmiah yang cocok dengan kata kunci "<span x-text="searchQuery" style="font-weight: bold;"></span>". Coba gunakan kata kunci pencarian lain atau setel ulang filter akreditasi.</p>
-            <button @click="resetSearch()" class="empty-action-btn">Setel Ulang Pencarian</button>
+            <h3 class="empty-title">No Results Found</h3>
+            <p class="empty-description">No scientific journals matched your search query "<span x-text="searchQuery" style="font-weight: bold;"></span>". Try another search term or reset the filters.</p>
+            <button @click="resetSearch()" class="empty-action-btn">Reset Search</button>
           </div>
 
-          <!-- Jika Filter Aktif Tapi Kosong -->
+          <!-- Case 3: Selected Filter Has No Entries -->
           <div x-show="journals.length === 0 && selectedRank && !searchQuery" class="empty-state-card" style="animation: slide-in 0.3s ease;">
             <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z" />
             </svg>
-            <h3 class="empty-title">Peringkat Kosong</h3>
-            <p class="empty-description">Belum ada jurnal ilmiah dengan tingkat akreditasi peringkat <span x-text="selectedRank" style="font-weight: bold; color: var(--primary-color);"></span> yang sedang dipantau oleh sistem.</p>
-            <button @click="setRankFilter('')" class="empty-action-btn">Lihat Semua Jurnal</button>
+            <h3 class="empty-title">Accreditation Level Empty</h3>
+            <p class="empty-description">No scientific journals with rank <span x-text="selectedRank" style="font-weight: bold; color: var(--primary-color);"></span> are currently monitored.</p>
+            <button @click="setRankFilter('')" class="empty-action-btn">View All Journals</button>
           </div>
 
         </div>
 
-        <!-- PAGINATION (KONTROL HALAMAN) -->
+        <!-- PAGINATION CONTROLS -->
         <div x-show="!isLoading && meta.total_pages > 1" class="pagination-container" id="pagination">
           <div class="pagination-info">
-            Halaman <span x-text="meta.page" style="font-weight: bold;"></span> dari <span x-text="meta.total_pages" style="font-weight: bold;"></span> &bull; Menampilkan <span x-text="journals.length" style="font-weight: bold;"></span> jurnal dari <span x-text="meta.total" style="font-weight: bold;"></span>
+            Page <span x-text="meta.page" style="font-weight: bold;"></span> of <span x-text="meta.total_pages" style="font-weight: bold;"></span> &bull; Showing <span x-text="journals.length" style="font-weight: bold;"></span> journals of <span x-text="meta.total" style="font-weight: bold;"></span>
           </div>
           
           <div class="pagination-buttons">
-            <!-- Button Sebelumnya -->
-            <button @click="changePage(meta.page - 1)" :disabled="meta.page === 1" class="pagination-btn" id="btn-sebelumnya" aria-label="Halaman Sebelumnya">
-              &larr; Sebelumnya
+            <!-- Previous Button -->
+            <button @click="changePage(meta.page - 1)" :disabled="meta.page === 1" class="pagination-btn" id="btn-sebelumnya" aria-label="Previous Page">
+              &larr; Previous
             </button>
-            <!-- Button Berikutnya -->
-            <button @click="changePage(meta.page + 1)" :disabled="meta.page === meta.total_pages" class="pagination-btn" id="btn-berikutnya" aria-label="Halaman Berikutnya">
-              Berikutnya &rarr;
+            <!-- Next Button -->
+            <button @click="changePage(meta.page + 1)" :disabled="meta.page === meta.total_pages" class="pagination-btn" id="btn-berikutnya" aria-label="Next Page">
+              Next &rarr;
             </button>
           </div>
         </div>
 
       </section>
 
-      <!-- SIDEBAR (KANAN - 35%) -->
+      <!-- SIDEBAR COLUMN (RIGHT - 35%) -->
       <aside style="display: flex; flex-direction: column;">
         
-        <!-- Panel 1: Filter Peringkat SINTA (Stat Pills) -->
+        <!-- Panel 1: SINTA Rank Filters (Stat Pills) -->
         <div class="sidebar-panel">
           <h3 class="panel-title">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z" />
             </svg>
-            Filter Akreditasi
+            Accreditation Filters
           </h3>
           
-          <!-- Stat Pills Container (Horizontal Scroll di Mobile) -->
+          <!-- Stat Pills Container (Horizontal Scroll on Mobile) -->
           <div class="stat-pills-container" id="filter-akreditasi" role="tablist">
-            <!-- Pill Semua -->
+            <!-- All Pill -->
             <button @click="setRankFilter('')" 
                     class="stat-pill" 
                     :class="selectedRank === '' ? 'active' : ''"
                     role="tab"
                     :aria-selected="selectedRank === ''">
-              <span>Semua</span>
+              <span>All</span>
               <span class="stat-pill-count" x-text="meta.total || 0">0</span>
             </button>
             
@@ -205,26 +217,26 @@
           </div>
         </div>
 
-        <!-- Panel 2: Distribusi Peringkat (Progress Bars) -->
-        <!-- Sembunyikan panel jika database kosong sama sekali -->
+        <!-- Panel 2: Rank Distribution (Progress Bars) -->
+        <!-- Hide panel if database is completely empty -->
         <div x-show="meta.total > 0" class="sidebar-panel" style="animation: slide-in 0.4s ease;">
           <h3 class="panel-title">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            Distribusi Peringkat
+            Rank Distribution
           </h3>
           
           <div class="distribution-list">
             <template x-for="r in ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']">
               <div class="distribution-row" :class="meta.stats && (meta.stats[r] || 0) === 0 ? 'empty' : ''">
-                <!-- Baris Label -->
+                <!-- Label Row -->
                 <div class="distribution-labels">
                   <div class="distribution-rank-label">
                     <span class="rank-dot" :class="r.toLowerCase()"></span>
-                    <span x-text="`Peringkat ${r}`"></span>
+                    <span x-text="`${r} Accreditation`"></span>
                   </div>
-                  <span x-text="meta.stats ? `${meta.stats[r] || 0} Jurnal` : '0 Jurnal'"></span>
+                  <span x-text="meta.stats ? `${meta.stats[r] || 0} ${meta.stats[r] === 1 ? 'Journal' : 'Journals'}` : '0 Journals'"></span>
                 </div>
                 
                 <!-- Progress Bar Track -->
@@ -243,13 +255,13 @@
           </div>
         </div>
 
-        <!-- Panel 3: Perubahan Peringkat Terbaru -->
+        <!-- Panel 3: Recent Rank Changes -->
         <div class="sidebar-panel">
           <h3 class="panel-title">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Perubahan Terbaru
+            Recent Changes
           </h3>
           
           <!-- Loading state changes -->
@@ -273,9 +285,9 @@
               </div>
             </template>
 
-            <!-- Jika Riwayat Perubahan Kosong -->
+            <!-- Case: Changes Empty -->
             <div x-show="changes.length === 0" style="color: var(--text-muted); font-size: var(--font-size-sm); text-align: center; padding: var(--space-4) 0;">
-              Belum ada riwayat perubahan.
+              No change history recorded.
             </div>
 
           </div>
@@ -293,7 +305,7 @@
           meta: {
             total: 0,
             page: 1,
-            limit: 50,
+            limit: 10,
             total_pages: 1,
             stats: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0 }
           },
@@ -335,7 +347,7 @@
                 this.meta = json.data.meta || this.meta;
               }
             } catch (err) {
-              console.error("Gagal memuat daftar jurnal.", err);
+              console.error("Failed to load journal list.", err);
             } finally {
               this.isLoading = false;
               this.setSyncingState(false);
@@ -352,7 +364,7 @@
                 this.changes = json.data.changes || [];
               }
             } catch (err) {
-              console.error("Gagal memuat riwayat perubahan.", err);
+              console.error("Failed to load change history.", err);
             } finally {
               this.isLoadingChanges = false;
             }
@@ -374,6 +386,11 @@
             this.fetchJournals();
           },
 
+          handleLimitChange() {
+            this.meta.page = 1;
+            this.fetchJournals();
+          },
+
           setRankFilter(rank) {
             this.selectedRank = rank;
             this.meta.page = 1;
@@ -391,7 +408,7 @@
               this.meta.page = newPage;
               this.fetchJournals();
               
-              // Scroll ke bar pencarian
+              // Smooth scroll to search input
               const searchEl = document.getElementById('input-pencarian');
               if (searchEl) {
                 searchEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -400,7 +417,7 @@
           },
 
           isNew(j) {
-            // Jurnal dianggap baru jika tidak punya previous_rank sebelumnya, dan diperbarui dalam 3 hari terakhir
+            // Journal is considered new if it has no previous_rank and was updated in the last 3 days
             if (j.previous_rank) return false;
             try {
               const lastUpdated = new Date(j.last_updated);
@@ -417,7 +434,7 @@
             if (!isoString) return '';
             try {
               const date = new Date(isoString);
-              return date.toLocaleDateString('id-ID', {
+              return date.toLocaleDateString('en-US', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
@@ -433,7 +450,7 @@
             if (!isoString) return '';
             try {
               const date = new Date(isoString);
-              return date.toLocaleDateString('id-ID', {
+              return date.toLocaleDateString('en-US', {
                 day: 'numeric',
                 month: 'short',
                 hour: '2-digit',
@@ -451,7 +468,7 @@
                 const rootData = rootEl.__x.getDataset();
                 if (rootData && typeof rootData.fetchHeaderStatus === 'function') {
                   if (syncing) {
-                    rootData.statusText = 'Memperbarui...';
+                    rootData.statusText = 'Syncing...';
                     rootData.statusClass = 'syncing';
                   } else {
                     rootData.fetchHeaderStatus();

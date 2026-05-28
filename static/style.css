@@ -1115,7 +1115,8 @@ button, input, select, textarea {
   }
   
   .sort-select {
-    width: 240px;
+    width: auto;
+    min-width: 160px;
   }
 
   .pagination-buttons {
