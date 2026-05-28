@@ -1,0 +1,191 @@
+<!-- SINTA Journal Tracker - Elegant Settings Component -->
+<div class="settings-container" x-data="settingsForm()" style="animation: slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+  
+  <!-- Baris Judul & Tombol Kembali -->
+  <div class="settings-header-row">
+    <a href="/" aria-label="Kembali ke Beranda">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 20px; height: 20px;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+    </a>
+    <h2 style="font-family: var(--font-family-serif); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">Pengaturan Notifikasi</h2>
+  </div>
+
+  <form @submit.prevent="saveSettings">
+    
+    <!-- Bagian Konfigurasi Discord -->
+    <div class="settings-section-card">
+      <h3 class="section-card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 20px; height: 20px; color: var(--primary-color);">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+        Saluran Komunikasi Discord
+      </h3>
+      <p class="section-card-desc">Sistem akan secara otomatis mengirimkan pesan terformat khusus ke server Discord Anda setiap kali mendeteksi perubahan peringkat akreditasi jurnal ilmiah.</p>
+      
+      <div class="form-group">
+        <label for="discord_url" class="form-label">Tautan Saluran Discord</label>
+        <input type="text" id="discord_url" x-model="discordUrl" class="form-input" placeholder="Masukkan tautan pengiriman Discord (contoh: https://discord.com/api/webhooks/...)">
+      </div>
+      
+      <div class="test-connection-row">
+        <button type="button" @click="testNotification('discord')" :disabled="isTesting || !discordUrl" class="btn-secondary" aria-label="Uji coba pengiriman notifikasi ke Discord">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 16px; height: 16px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Uji Kirim Pesan
+        </button>
+      </div>
+    </div>
+
+    <!-- Bagian Konfigurasi Telegram -->
+    <div class="settings-section-card">
+      <h3 class="section-card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 20px; height: 20px; color: var(--primary-color);">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+        </svg>
+        Saluran Komunikasi Telegram
+      </h3>
+      <p class="section-card-desc">Dapatkan pemberitahuan langsung di ponsel Anda dengan mengintegrasikan bot pemantau Telegram khusus.</p>
+      
+      <div class="form-group">
+        <label for="telegram_bot_token" class="form-label">Kunci Pengenal Bot (Bot Token)</label>
+        <input type="text" id="telegram_bot_token" x-model="telegramBotToken" class="form-input" placeholder="Masukkan kunci token pengenal bot Telegram Anda">
+      </div>
+      
+      <div class="form-group" style="margin-top: var(--space-4);">
+        <label for="telegram_chat_id" class="form-label">Nomor Identitas Obrolan (Chat ID)</label>
+        <input type="text" id="telegram_chat_id" x-model="telegramChatId" class="form-input" placeholder="Masukkan nomor identitas obrolan penerima (grup/saluran/personal)">
+      </div>
+      
+      <div class="test-connection-row">
+        <button type="button" @click="testNotification('telegram')" :disabled="isTesting || !telegramBotToken || !telegramChatId" class="btn-secondary" aria-label="Uji coba pengiriman notifikasi ke Telegram">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 16px; height: 16px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Uji Kirim Pesan
+        </button>
+      </div>
+    </div>
+
+    <!-- Tombol Simpan / Batal -->
+    <div class="settings-action-row">
+      <a href="/" class="btn-secondary" style="height: 48px; border-radius: var(--radius-md); padding: 0 var(--space-6); display: inline-flex; align-items: center; justify-content: center; font-size: var(--font-size-sm);">
+        Kembali
+      </a>
+      <button type="submit" :disabled="isSaving" class="btn-primary" aria-label="Simpan seluruh konfigurasi pengaturan">
+        <template x-if="isSaving">
+          <span style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg class="status-dot syncing" style="width: 10px; height: 10px; border-radius: 50%;" aria-hidden="true"></svg>
+            Menyimpan...
+          </span>
+        </template>
+        <template x-if="!isSaving">
+          <span style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 18px; height: 18px;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            Simpan Perubahan
+          </span>
+        </template>
+      </button>
+    </div>
+  </form>
+
+  <!-- Kontainer Pemberitahuan Toast -->
+  <div class="toast-container" aria-live="polite">
+    <template x-for="t in toasts" :key="t.id">
+      <div class="toast" :class="t.type" style="animation: slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+        <svg x-show="t.type === 'success'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <svg x-show="t.type === 'error'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span x-text="t.message"></span>
+      </div>
+    </template>
+  </div>
+</div>
+
+<script>
+  function settingsForm() {
+    return {
+      discordUrl: '{{ config_data.webhook.discord_url if config_data and config_data.webhook and config_data.webhook.discord_url else "" }}',
+      telegramBotToken: '{{ config_data.webhook.telegram_bot_token if config_data and config_data.webhook and config_data.webhook.telegram_bot_token else "" }}',
+      telegramChatId: '{{ config_data.webhook.telegram_chat_id if config_data and config_data.webhook and config_data.webhook.telegram_chat_id else "" }}',
+      isSaving: false,
+      isTesting: false,
+      toasts: [],
+
+      showToast(message, type = 'success') {
+        const id = Date.now();
+        this.toasts.push({ id, message, type });
+        setTimeout(() => {
+          this.toasts = this.toasts.filter(t => t.id !== id);
+        }, 4000);
+      },
+
+      async saveSettings() {
+        this.isSaving = true;
+        try {
+          const res = await fetch('/api/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              discord_url: this.discordUrl,
+              telegram_bot_token: this.telegramBotToken,
+              telegram_chat_id: this.telegramChatId
+            })
+          });
+          
+          if (!res.ok) throw new Error();
+          const json = await res.json();
+          
+          if (json.success) {
+            this.showToast('Pengaturan notifikasi berhasil disimpan!', 'success');
+            // Sync status header jika Alpine global terdeteksi
+            if (window.Alpine) {
+              const rootEl = document.querySelector('[x-data]');
+              if (rootEl && rootEl.__x) {
+                const rootData = rootEl.__x.getDataset();
+                if (rootData && typeof rootData.fetchHeaderStatus === 'function') {
+                  rootData.fetchHeaderStatus();
+                }
+              }
+            }
+          } else {
+            this.showToast('Gagal menyimpan: ' + (json.message || 'Terjadi kesalahan sistem'), 'error');
+          }
+        } catch (err) {
+          this.showToast('Gagal terhubung dengan server untuk menyimpan pengaturan.', 'error');
+        } finally {
+          this.isSaving = false;
+        }
+      },
+
+      async testNotification(platform) {
+        this.isTesting = true;
+        this.showToast(`Memulai uji coba pengiriman pesan ke ${platform}...`, 'success');
+        try {
+          const res = await fetch('/api/config/test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ platform })
+          });
+          
+          const json = await res.json();
+          if (json.success) {
+            this.showToast(`Pesan uji coba berhasil dikirimkan ke ${platform}!`, 'success');
+          } else {
+            this.showToast(`Gagal mengirimkan uji coba: ${json.message || 'Kredensial tidak valid'}`, 'error');
+          }
+        } catch (err) {
+          this.showToast(`Gagal terhubung dengan server pengirim uji coba.`, 'error');
+        } finally {
+          this.isTesting = false;
+        }
+      }
+    };
+  }
+</script>

@@ -1,0 +1,46 @@
+<!-- SINTA Journal Tracker - Elegant Error Display Component -->
+<div class="empty-state-card" style="max-width: 550px; margin: var(--space-12) auto; animation: slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+  
+  <!-- Icon Peringatan Elegan -->
+  <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--color-new); width: 64px; height: 64px;">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+  
+  <!-- Judul Kesalahan dalam Bahasa Indonesia -->
+  <h2 class="empty-title">
+    {% if error_message and "not be found" in error_message %}
+      Halaman Tidak Ditemukan
+    {% else %}
+      Terjadi Kendala Teknis
+    {% endif %}
+  </h2>
+  
+  <!-- Deskripsi Humanis (Tanpa Jargon Teknis) -->
+  <p class="empty-description">
+    {% if error_message and "not be found" in error_message %}
+      Maaf, alamat atau halaman yang Anda tuju tidak tersedia, tidak aktif, atau telah dipindahkan. Silakan periksa kembali URL Anda atau gunakan tombol di bawah untuk kembali ke halaman beranda.
+    {% else %}
+      Maaf, sistem pemantauan sedang mengalami masalah internal saat memproses data dari server database. Tim kami sedang meninjau situasi ini. Silakan coba kembali sesaat lagi.
+    {% endif %}
+  </p>
+  
+  <!-- Informasi Teknis Ringan yang Diterjemahkan -->
+  <div style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: var(--font-weight-medium); background-color: var(--bg-app); padding: var(--space-2) var(--space-4); border-radius: var(--radius-xs); border: 1px dashed var(--border-color);">
+    Detail Pelaporan: 
+    {% if error_message and "not be found" in error_message %}
+      Kode Status 404 &bull; Rute Hilang
+    {% else %}
+      Kode Status 500 &bull; Gangguan Sistem
+    {% endif %}
+  </div>
+  
+  <!-- Tombol Aksi Nyata -->
+  <div style="margin-top: var(--space-2); display: flex; gap: var(--space-3);">
+    <a href="/" class="empty-action-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 18px; height: 18px;" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      Kembali ke Beranda
+    </a>
+  </div>
+</div>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SINTA Journal Tracker</title>
+  
+  <!-- SEO & Accessibility -->
+  <meta name="description" content="Sistem Pemantauan dan Pelacakan Akreditasi Jurnal Ilmiah SINTA Terintegrasi">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232a6f97' stroke-width='2'%3E%3Cpath d='M4 19.5V15a2 2 0 0 1 2-2h14'/%3E%3Cpath d='M20 15v6H6a2 2 0 0 1-2-2'/%3E%3Ccircle cx='12' cy='8' r='3'/%3E%3C/svg%3E">
+  
+  <!-- Google Fonts - Lora & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+  
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css">
+  
+  <!-- Prevention of Flash of Unstyled Content (FOUC) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  
+  <!-- Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body x-data="globalApp" class="skeleton-shimmer">
+
+  <!-- HEADER UTAMA (Mobile-First & Sticky) -->
+  <header class="header-wrapper">
+    <div class="header-container">
+      
+      <!-- Kiri: Identitas Brand -->
+      <a href="/" class="brand-section" id="logo-beranda" aria-label="Kembali ke Beranda">
+        <div class="logo-icon" aria-hidden="true">S</div>
+        <div class="brand-title">
+          SINTA <span style="font-weight: 400; font-family: var(--font-family-sans);">Tracker</span>
+          <span class="brand-subtitle">Pemantau Akreditasi Jurnal Ilmiah</span>
+        </div>
+      </a>
+      
+      <!-- Kanan: Kontrol Global & Indikator Status -->
+      <div class="control-section">
+        
+        <!-- Status Dot Indikator -->
+        <div class="status-indicator" :class="statusClass" role="status" aria-live="polite">
+          <span class="status-dot" :class="statusClass"></span>
+          <span x-text="statusText" style="white-space: nowrap;">Memuat...</span>
+        </div>
+        
+        <!-- Toggle Dark/Light Mode -->
+        <button @click="toggleTheme" class="icon-btn" id="btn-toggle-tema" :aria-label="theme === 'light' ? 'Aktifkan Mode Gelap' : 'Aktifkan Mode Terang'">
+          <template x-if="theme === 'light'">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </template>
+          <template x-if="theme === 'dark'">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m2.828 0l-.707-.707m12.728-12.728l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+            </svg>
+          </template>
+        </button>
+        
+        <!-- Akses Halaman Pengaturan (Bukan Tab) -->
+        <a href="/config" class="icon-btn" id="btn-pengaturan" aria-label="Pengaturan Notifikasi">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </a>
+        
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN HALAMAN UTAMA -->
+  <main class="main-wrapper" id="konten-utama">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-wrapper">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <p>&copy; 2026 SINTA Journal Tracker &bull; Dipantau Secara Real-time &bull; Seluruh Hak Cipta Dilindungi</p>
+    </div>
+  </footer>
+
+  <!-- Lucide Icons Bundle (For fallback) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Global Alpine State Controller
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('globalApp', () => ({
+        theme: localStorage.getItem('theme') || 'light',
+        statusText: 'Menghubungkan...',
+        statusClass: 'syncing',
+        journalsCount: 0,
+        
+        init() {
+          this.detectTheme();
+          this.fetchHeaderStatus();
+          
+          // Poll status every 60 seconds
+          setInterval(() => {
+            this.fetchHeaderStatus();
+          }, 60000);
+          
+          // Initialize Lucide icons
+          setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 100);
+        },
+        
+        detectTheme() {
+          document.documentElement.setAttribute('data-theme', this.theme);
+        },
+        
+        toggleTheme() {
+          this.theme = this.theme === 'light' ? 'dark' : 'light';
+          localStorage.setItem('theme', this.theme);
+          document.documentElement.setAttribute('data-theme', this.theme);
+        },
+        
+        async fetchHeaderStatus() {
+          try {
+            const res = await fetch('/api/journals?limit=1');
+            if (!res.ok) throw new Error();
+            const json = await res.json();
+            
+            if (json.success && json.data) {
+              this.journalsCount = json.data.meta.total;
+              if (this.journalsCount === 0) {
+                this.statusText = 'Belum ada data';
+                this.statusClass = 'empty';
+              } else {
+                // Find latest updated journal
+                const latest = json.data.journals[0];
+                if (latest && latest.last_updated) {
+                  const formattedTime = this.formatTime(latest.last_updated);
+                  this.statusText = `Diperbarui ${formattedTime}`;
+                  this.statusClass = 'active';
+                } else {
+                  this.statusText = 'Aktif';
+                  this.statusClass = 'active';
+                }
+              }
+            } else {
+              this.statusText = 'Koneksi Gagal';
+              this.statusClass = 'empty';
+            }
+          } catch (err) {
+            this.statusText = 'Offline';
+            this.statusClass = 'empty';
+          }
+        },
+        
+        formatTime(isoString) {
+          if (!isoString) return '';
+          try {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            });
+          } catch (e) {
+            return isoString;
+          }
+        }
+      }));
+    });
+  </script>
+</body>
+</html>

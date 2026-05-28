@@ -1,1598 +1,467 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SINTA Journal Accreditation Rank Monitor</title>
+{% extends "base.html" %}
 
-  <!-- Prevent FOUC (Flash of Unstyled Content) by setting dark theme instantly -->
-  <script>
-    const savedTheme = localStorage.getItem('jurnal-theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  </script>
-
-  <!-- Google Fonts: Lora and Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Alpine.js via CDN -->
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-  <!-- Tailored visual variables & extended configurations -->
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            appBg: 'var(--bg)',
-            cardBg: 'var(--surface)',
-            cardBorder: 'var(--border)',
-            textMain: 'var(--text-primary)',
-            textMuted: 'var(--text-secondary)',
-            brandGold: 'var(--accent)',
-            brandGoldHover: 'var(--accent-hover, var(--accent))',
-          },
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-            serif: ['"Lora"', 'Georgia', 'serif'],
-            mono: ['monospace'],
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Premium Design Styling -->
-  <style>
-    *, ::before, ::after {
-      box-sizing: border-box;
-    }
-
-    /* Prevent horizontal overflow on block-level content only */
-    img, video, iframe, canvas {
-      max-width: 100%;
-    }
-
-    :root {
-      --bg:              #F9F9F6; /* Ivory/Alabaster Warm clean bg */
-      --surface:         #FFFFFF;
-      --surface-alt:     #F0EFEA; /* Soft document warm-tint linen */
-      --text-primary:    #1E252B; /* Dark ink */
-      --text-secondary:  #55606A;
-      --accent:          #1F3A52; /* Prussian Blue academic accent */
-      --accent-hover:    #122435;
-      --border:          #E3E1DC; /* Document grid thin margin line */
-      --muted:           #8B8A85;
-
-      /* Diff colors light */
-      --diff-added-bg:      #E6F4EA;
-      --diff-added-text:    #137333;
-      --diff-added-border:  #CEEAD6;
-      --diff-removed-bg:    #FCE8E6;
-      --diff-removed-text:  #C5221F;
-      --diff-removed-border:#FAD2CF;
-      --diff-modified-bg:   #FEF7E0;
-      --diff-modified-text: #B06000;
-      --diff-modified-border:#FFE0B2;
-
-      /* Curated Sinta ranks color tokens with high legibility and prestige (light) */
-      --color-s1: #B7791F; /* Crimson Golden Aura */
-      --color-s2: #2F855A; /* Scholar Green */
-      --color-s3: #2B6CB0; /* Classic Deep Navy */
-      --color-s4: #6B46C1; /* Royal Amethyst Purple */
-      --color-s5: #4A5568; /* Charcoal Ink Slate */
-      --color-s6: #C05621; /* Ochre Amber Rust */
-      --color-s-default: #718096;
-      --status-active: #2F855A;
-
-      /* Blue badge for newly added journals (light) */
-      --badge-new-bg: #EBF8FF;
-      --badge-new-border: #BEE3F8;
-      --badge-new-text: #2B6CB0;
-    }
-
-    .dark {
-      --bg:              #0F1215; /* Deep Charcoal library dark bg */
-      --surface:         #171C21; /* Rich midnight leather vault */
-      --surface-alt:     #1E252C;
-      --text-primary:    #E2E8F0;
-      --text-secondary:  #94A3B8;
-      --accent:          #85A9C8; /* Fine light steel sky */
-      --accent-hover:    #A5C8E8;
-      --border:          #2A333C; /* Dark border -- #2A333C */
-      --muted:           #4A5560;
-
-      /* Diff colors dark */
-      --diff-added-bg:      #132B1B;
-      --diff-added-text:    #81C784;
-      --diff-added-border:  #1B3D27;
-      --diff-removed-bg:    #371618;
-      --diff-removed-text:  #E57373;
-      --diff-removed-border:#4C1F22;
-      --diff-modified-bg:   #2C220E;
-      --diff-modified-text: #F0B429;
-      --diff-modified-border:#3E3014;
-
-      /* Curated Sinta ranks color tokens dark */
-      --color-s1: #ECC94B; /* Radiant Antique Gold */
-      --color-s2: #48BB78; /* Meadow Jade */
-      --color-s3: #63B3ED; /* Celestial Light Blue */
-      --color-s4: #B794F4; /* Lavender Spark */
-      --color-s5: #A0AEC0; /* Light Slate Gray */
-      --color-s6: #ED8936; /* Warm Ochre Orange */
-      --color-s-default: #A0AEC0;
-      --status-active: #48BB78;
-
-      /* Blue badge for newly added journals (dark) */
-      --badge-new-bg: #1E3A8A;
-      --badge-new-border: #1E40AF;
-      --badge-new-text: #93C5FD;
-    }
-
-    html, body {
-      overflow-x: hidden;
-      width: 100%;
-      scrollbar-gutter: stable;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text-primary);
-      transition: background-color 0.3s, color 0.3s;
-      font-size: 1rem; /* Body minimum 16px/1rem */
-    }
-
-    h1, .clamp-h1 {
-      font-size: clamp(1.5rem, 3vw, 2.25rem) !important;
-    }
-
-    h2, .clamp-h2 {
-      font-size: clamp(1.4rem, 4vw, 2.5rem) !important;
-    }
-
-    [x-cloak] {
-      display: none !important;
-    }
-
-    /* Fluid media elements */
-    img, svg, video, iframe {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* Asymmetric, ultra-premium editorial scrollbars */
-    ::-webkit-scrollbar {
-      width: 0.3125rem;
-      height: 0.3125rem;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(92, 100, 112, 0.2);
-      border-radius: 0.625rem;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(92, 100, 112, 0.4);
-    }
-
-    /* Soft transition curves */
-    .premium-transition {
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Dashboard 2-column layout */
-    .dashboard-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 1.5rem;
-      align-items: start;
-      width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-    }
+{% block content %}
+  {% if active_tab == 'config' %}
+    {% include 'settings.html' %}
+  {% elif active_tab == 'error' %}
+    {% include 'error.html' %}
+  {% else %}
     
-    .sidebar-right {
-      position: sticky;
-      top: 4.5rem;
-      min-width: 0;
-    }
-
-    .main-content {
-      min-width: 0; /* Prevent grid blowout */
-    }
-    
-    .table-container {
-      max-height: 43.75rem;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-
-    /* Reduce border visibility in dark mode globally */
-    .dark .border-cardBorder {
-      border-color: rgba(255, 255, 255, 0.06) !important;
-    }
-    .dark .border-b.border-cardBorder {
-      border-bottom-color: rgba(255, 255, 255, 0.06) !important;
-    }
-    .dark .border-t.border-cardBorder {
-      border-top-color: rgba(255, 255, 255, 0.06) !important;
-    }
-    .dark .divide-cardBorder\/60 > :not([hidden]) ~ :not([hidden]) {
-      border-color: rgba(255, 255, 255, 0.04) !important;
-    }
-
-    /* 3A. HEADER */
-    .dark header {
-      border-bottom: 1px solid var(--border) !important;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 4px 16px rgba(0,0,0,0.3) !important;
-    }
-
-    /* 3B. CARD / SURFACE (dark mode) */
-    .dark .bg-cardBg, .dark .bg-surface {
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.04),
-        0 4px 24px rgba(0,0,0,0.25) !important;
-    }
-
-    /* 3C. FILTER TABS inactive (dark mode) */
-    .dark button[id^="statsBar"]:not([style*="color: rgb(255, 255, 255)"]):not([style*="color: #ffffff"]):not([style*="color:#ffffff"]) {
-      background-color: rgba(255, 255, 255, 0.03) !important;
-      border-color: rgba(255, 255, 255, 0.08) !important;
-      color: var(--text-secondary) !important;
-      box-shadow: none !important;
-    }
-    .dark button[id^="statsBar"]:not([style*="color: rgb(255, 255, 255)"]):not([style*="color: #ffffff"]):not([style*="color:#ffffff"]):hover {
-      background-color: rgba(255, 255, 255, 0.06) !important;
-    }
-
-    /* 3D. TABEL HEADER ROW (dark mode) */
-    .dark #journalTable thead tr {
-      background-color: rgba(255,255,255,0.025) !important;
-      border-bottom: 1px solid rgba(255,255,255,0.07) !important;
-      letter-spacing: 0.08em;
-    }
-
-    /* 3E. TABEL ROW HOVER (dark and light mode custom transition) */
-    tr.group {
-      transition: background-color 0.15s ease;
-      border-bottom: 1px solid var(--border);
-    }
-    .dark tr.group {
-      border-bottom: 1px solid rgba(255,255,255,0.07) !important;
-    }
-    tr.group:hover {
-      background-color: var(--surface-alt) !important;
-    }
-    .dark tr.group:hover {
-      background-color: rgba(255,255,255,0.03) !important;
-    }
-
-    /* 3F. SEARCH BAR (dark mode) */
-    .dark #searchInput {
-      background-color: rgba(255,255,255,0.03) !important;
-      border: 1px solid rgba(255,255,255,0.09) !important;
-    }
-    .dark #searchInput:focus {
-      border-color: var(--accent) !important;
-      box-shadow: 0 0 0 3px rgba(133,169,200,0.12) !important;
-    }
-
-    /* 3G. SIDEBAR CARDS (dark mode) */
-    .dark .sidebar-right > div {
-      background-color: var(--surface) !important;
-      border: 1px solid rgba(255,255,255,0.06) !important;
-    }
-
-    /* 3H. PROGRESS BAR DISTRIBUTION (dark mode shadow fill using color-mix on currentColor) */
-    .dark .sidebar-right .h-full {
-      box-shadow: 0 0 6px color-mix(in srgb, currentColor 40%, transparent) !important;
-    }
-
-    /* 3I. HERO H1 (dark mode) */
-    .dark h1 {
-      background: linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%) !important;
-      -webkit-background-clip: text !important;
-      -webkit-text-fill-color: transparent !important;
-      background-clip: text !important;
-    }
-
-    /* 3K. LOGO "S" (dark mode shadow) */
-    .dark span.bg-brandGold {
-      box-shadow: 0 0 12px rgba(133,169,200,0.3) !important;
-    }
-
-    /* 3L. STATUS PILL "Last updated" (dark mode) */
-    .dark .status-pill-updated {
-      background: rgba(255,255,255,0.04) !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
-    }
-
-    /* 3N. RECENT CHANGES ROW HOVER (dark mode) */
-    .dark .recent-change-item:hover {
-      background: rgba(255,255,255,0.03) !important;
-      padding: 0.5rem !important;
-      border-radius: 0.5rem !important;
-      margin: 0 -0.5rem !important;
-    }
-    
-    @media (max-width: 1024px) {
-      .dashboard-layout {
-        grid-template-columns: 1fr;
-        gap: 1.25rem;
-      }
-      .sidebar-right {
-        position: static;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .dashboard-layout {
-        gap: 1rem;
-      }
-    }
-  </style>
-</head>
-<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-brandGold/20 pb-20 md:pb-0" x-data="appState()">
-
-  <!-- Inject config and route metadata from Flask securely -->
-  <script>
-    window.CONFIG_DATA = {{ config_data|tojson|safe if config_data else 'null' }};
-    window.ACTIVE_TAB = "{{ active_tab }}";
-  </script>
-
-  <!-- 1. Floating Glassmorphic Header -->
-  <header class="sticky top-0 z-40 w-full bg-cardBg/80 dark:bg-cardBg/70 border-b border-cardBorder/60 dark:border-cardBorder/40 backdrop-blur-md transition-all duration-300">
-    <div class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-1.5 md:py-2.5 flex justify-between items-center min-h-[52px] md:min-h-[56px]">
-      <div class="flex items-center gap-2 md:gap-3">
-        <!-- Logo mark: Premium asymmetric geometric design -->
-        <span class="relative flex items-center justify-center w-7.5 h-7.5 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-brandGold text-white shadow-md shadow-brandGold/20 font-serif font-bold text-lg md:text-xl premium-transition transform active:scale-95 shrink-0">
-          S
-        </span>
-        <div>
-          <span class="text-[12px] md:text-[15px] font-extrabold uppercase tracking-widest font-sans leading-none text-textMain block">
-            <span class="block md:hidden">SINTA Tracker</span>
-            <span class="hidden md:block">SINTA JOURNAL TRACKER</span>
-          </span>
-          <span class="text-[8px] md:text-[9px] font-mono tracking-widest uppercase text-textMuted leading-none block mt-0.5 hidden md:block">
-            Journal Accreditation Monitor
-          </span>
-        </div>
-      </div>
+    <!-- DASHBOARD UTAMA -->
+    <div x-data="dashboardApp()" class="layout-grid" style="animation: slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
       
-      <!-- System status and Actions -->
-      <div class="flex items-center gap-3 sm:gap-6">
-        <div class="hidden sm:flex items-center gap-2.5">
-          <div class="status-pill-updated flex items-center gap-2 bg-appBg/80 px-2.5 py-1.5 border border-cardBorder rounded-xl shadow-inner select-none transition-all duration-300">
-            <!-- Pulse status light -->
-            <span class="relative flex h-2.5 w-2.5">
-              <span x-show="isLoading" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-blue-500"></span>
-              <span x-show="!isLoading && meta.total > 0" class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-40 bg-emerald-500"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5 transition-all duration-300"
-                    :class="isLoading ? 'bg-blue-500' : (meta.total > 0 ? 'bg-emerald-500' : 'bg-amber-500')"></span>
-            </span>
-            <!-- Text -->
-            <span class="font-mono text-[11px] text-textMuted leading-none">
-              <template x-if="isLoading">
-                <span>Updating...</span>
-              </template>
-              <template x-if="!isLoading && meta.total === 0">
-                <span>No journals monitored Monitored</span>
-              </template>
-              <template x-if="!isLoading && meta.total > 0">
-                <span>Last updated: <span class="font-bold text-textMain" x-text="formatIndonesianDateTime(lastScrape)"></span></span>
-              </template>
-            </span>
+      <!-- KOLOM UTAMA (KIRI - 65%) -->
+      <section style="display: flex; flex-direction: column;">
+        
+        <!-- Bar Pencarian & Pengurutan -->
+        <div class="controls-group">
+          <!-- Live Search Bar -->
+          <div class="search-wrapper">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" 
+                   x-model="searchQuery" 
+                   @input="debounceFetch()" 
+                   class="search-input" 
+                   id="input-pencarian"
+                   placeholder="Cari nama jurnal ilmiah..." 
+                   aria-label="Cari nama jurnal">
+          </div>
+          
+          <!-- Dropdown Pengurutan -->
+          <div style="position: relative;">
+            <select x-model="sortValue" @change="handleSortChange()" class="sort-select" id="select-pengurutan" aria-label="Urutkan daftar jurnal">
+              <option value="last_updated|desc">Pembaruan Terkini (Terbaru)</option>
+              <option value="last_updated|asc">Pembaruan Terlama</option>
+              <option value="rank|asc">Peringkat SINTA (S1 → S6)</option>
+              <option value="rank|desc">Peringkat SINTA (S6 → S1)</option>
+            </select>
           </div>
         </div>
 
-        <!-- Notification Settings Toggle Button (Gear icon) -->
-        <button @click="isSettingsOpen = true" 
-                id="headerSettingsBtn"
-                class="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center shadow-sm shrink-0"
-                title="Notification Settings"
-                aria-label="Notification Settings">
-          <svg class="w-4.5 h-4.5 md:w-5 md:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
+        <!-- SKELETON LOADER (TAMPIL SAAT LOADING) -->
+        <div x-show="isLoading" class="journal-list" aria-hidden="true">
+          <template x-for="i in 5">
+            <div class="skeleton-card">
+              <div class="card-header-row">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-badge"></div>
+              </div>
+              <div class="skeleton-meta"></div>
+            </div>
+          </template>
+        </div>
 
-        <!-- Theme preference toggle button -->
-        <button @click="toggleTheme()" 
-                id="themeToggleBtn"
-                class="w-9 h-9 md:w-11 md:h-11 rounded-lg md:rounded-xl border border-cardBorder bg-cardBg hover:bg-appBg text-textMuted hover:text-textMain hover:border-brandGold/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95 flex items-center justify-center shadow-sm shrink-0"
-                aria-label="Toggle visual theme">
-          <!-- Light icon -->
-          <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L5.636 5.636M12 8a4 4 0 100 8 4 4 0 000-8z" />
-          </svg>
-          <!-- Dark icon -->
-          <svg x-show="darkMode" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Workspace -->
-  <main class="flex-grow w-full box-border max-w-[1600px] mx-auto px-3 sm:px-6 py-4 sm:py-8">
-    
-    <!-- Title Page Hierarchy -->
-    <div class="mb-4 border-b border-[var(--border)] dark:border-[rgba(255,255,255,0.08)] pb-3">
-      <h1 class="font-serif font-bold text-textMain tracking-tight">Monitored Journals</h1>
-      <p class="text-sm text-textMuted mt-1">Real-time accreditation status tracking for national scientific journals on SINTA.</p>
-    </div>
-
-    <!-- 3. Dashboard View -->
-    <div x-show="activeTab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4">
-      
-      <!-- Asymmetric Grid: 70/30 Layout -->
-      <div class="dashboard-layout">
-        
-        <!-- MAIN PANEL (70% - Columns 1 to 7) -->
-        <div class="main-content space-y-4">
+        <!-- DAFTAR KARTU JURNAL -->
+        <div x-show="!isLoading" class="journal-list" id="daftar-jurnal">
           
-          <!-- Component 1: Combined S1-S6 Interactive Filter Pills (Horizontal Scrollable) -->
-          <div class="w-full flex flex-wrap gap-2 py-1 mb-1 items-center">
-            <!-- Total Chip -->
-            <button @click="toggleRankFilter('All')"
-                    id="statsBarTotalBtn"
-                    class="px-3.5 py-2 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2 shadow-sm"
-                    :style="selectedRanks.length === 0 ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface); color: var(--text-secondary); border-color: var(--border)'">
-              <span>All Journals</span>
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono transition-all duration-200" 
-                    :style="selectedRanks.length === 0 ? 'background-color: rgba(255,255,255,0.2); color: #ffffff' : 'background-color: var(--surface-alt); color: var(--text-primary)'" 
-                    x-text="meta.stats ? Object.values(meta.stats).reduce((a,b)=>a+b, 0) : 0">0</span>
+          <template x-for="j in journals" :key="j.id">
+            <article class="journal-card" style="animation: slide-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
+              
+              <!-- Baris Atas Kartu -->
+              <div class="card-header-row">
+                <div style="display: flex; flex-direction: column; gap: var(--space-1);">
+                  <!-- Nama Jurnal -->
+                  <h3 class="journal-title">
+                    <a :href="j.sinta_url" target="_blank" rel="noopener noreferrer" x-text="j.journal_name"></a>
+                  </h3>
+                  
+                  <!-- Tanda Perubahan Peringkat Aktif -->
+                  <div x-show="j.previous_rank && j.previous_rank !== j.current_rank" class="meta-item" style="margin-top: 2px;">
+                    <span class="rank-change-indicator" style="font-size: 0.6875rem;">
+                      Riwayat Peringkat: 
+                      <span x-text="j.previous_rank" style="text-decoration: line-through; opacity: 0.7;"></span>
+                      <span class="change-arrow">&rarr;</span>
+                      <span x-text="j.current_rank" style="font-weight: bold; color: var(--primary-color);"></span>
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Badge Akreditasi & Baru -->
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2);">
+                  <!-- Badge Rank S1-S6 -->
+                  <span class="badge" :class="j.current_rank.toLowerCase()" x-text="j.current_rank"></span>
+                  
+                  <!-- Badge Baru (Hanya jika belum memiliki previous_rank dan baru terdaftar) -->
+                  <span x-show="isNew(j)" class="badge-new">BARU</span>
+                </div>
+              </div>
+
+              <!-- Baris Bawah / Metadata Kartu -->
+              <div class="card-meta-row">
+                <div class="meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Diperiksa <span x-text="formatDate(j.last_updated)"></span></span>
+                </div>
+                
+                <a :href="j.sinta_url" target="_blank" rel="noopener noreferrer" class="meta-item" style="color: var(--primary-color); font-weight: var(--font-weight-medium);">
+                  <span>Profil SINTA</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 12px; height: 12px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+              
+            </article>
+          </template>
+
+          <!-- EMPTY STATES (JURNAL KOSONG) -->
+          
+          <!-- Jika Database Kosong Secara Total -->
+          <div x-show="journals.length === 0 && !searchQuery && !selectedRank" class="empty-state-card" style="animation: slide-in 0.3s ease;">
+            <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4.5m16 0h-1.172a2 2 0 00-1.414.586l-1.828 1.828A2 2 0 0111.172 18H8.828a2 2 0 01-1.414-.586l-1.828-1.828A2 2 0 004.172 13H3" />
+            </svg>
+            <h3 class="empty-title">Belum Ada Data</h3>
+            <p class="empty-description">Belum ada jurnal ilmiah yang dipantau dalam sistem ini. Tambahkan daftar jurnal melalui halaman pengaturan notifikasi atau tunggu hingga sinkronisasi data pertama kali selesai.</p>
+            <a href="/config" class="empty-action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" style="width: 18px; height: 18px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Konfigurasikan Saluran
+            </a>
+          </div>
+
+          <!-- Jika Hasil Pencarian Kosong -->
+          <div x-show="journals.length === 0 && searchQuery" class="empty-state-card" style="animation: slide-in 0.3s ease;">
+            <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="empty-title">Hasil Tidak Ditemukan</h3>
+            <p class="empty-description">Tidak ada jurnal ilmiah yang cocok dengan kata kunci "<span x-text="searchQuery" style="font-weight: bold;"></span>". Coba gunakan kata kunci pencarian lain atau setel ulang filter akreditasi.</p>
+            <button @click="resetSearch()" class="empty-action-btn">Setel Ulang Pencarian</button>
+          </div>
+
+          <!-- Jika Filter Aktif Tapi Kosong -->
+          <div x-show="journals.length === 0 && selectedRank && !searchQuery" class="empty-state-card" style="animation: slide-in 0.3s ease;">
+            <svg class="empty-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z" />
+            </svg>
+            <h3 class="empty-title">Peringkat Kosong</h3>
+            <p class="empty-description">Belum ada jurnal ilmiah dengan tingkat akreditasi peringkat <span x-text="selectedRank" style="font-weight: bold; color: var(--primary-color);"></span> yang sedang dipantau oleh sistem.</p>
+            <button @click="setRankFilter('')" class="empty-action-btn">Lihat Semua Jurnal</button>
+          </div>
+
+        </div>
+
+        <!-- PAGINATION (KONTROL HALAMAN) -->
+        <div x-show="!isLoading && meta.total_pages > 1" class="pagination-container" id="pagination">
+          <div class="pagination-info">
+            Halaman <span x-text="meta.page" style="font-weight: bold;"></span> dari <span x-text="meta.total_pages" style="font-weight: bold;"></span> &bull; Menampilkan <span x-text="journals.length" style="font-weight: bold;"></span> jurnal dari <span x-text="meta.total" style="font-weight: bold;"></span>
+          </div>
+          
+          <div class="pagination-buttons">
+            <!-- Button Sebelumnya -->
+            <button @click="changePage(meta.page - 1)" :disabled="meta.page === 1" class="pagination-btn" id="btn-sebelumnya" aria-label="Halaman Sebelumnya">
+              &larr; Sebelumnya
+            </button>
+            <!-- Button Berikutnya -->
+            <button @click="changePage(meta.page + 1)" :disabled="meta.page === meta.total_pages" class="pagination-btn" id="btn-berikutnya" aria-label="Halaman Berikutnya">
+              Berikutnya &rarr;
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SIDEBAR (KANAN - 35%) -->
+      <aside style="display: flex; flex-direction: column;">
+        
+        <!-- Panel 1: Filter Peringkat SINTA (Stat Pills) -->
+        <div class="sidebar-panel">
+          <h3 class="panel-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 8.293A1 1 0 013 7.586V4z" />
+            </svg>
+            Filter Akreditasi
+          </h3>
+          
+          <!-- Stat Pills Container (Horizontal Scroll di Mobile) -->
+          <div class="stat-pills-container" id="filter-akreditasi" role="tablist">
+            <!-- Pill Semua -->
+            <button @click="setRankFilter('')" 
+                    class="stat-pill" 
+                    :class="selectedRank === '' ? 'active' : ''"
+                    role="tab"
+                    :aria-selected="selectedRank === ''">
+              <span>Semua</span>
+              <span class="stat-pill-count" x-text="meta.total || 0">0</span>
             </button>
             
-            <!-- Rank Chips -->
-            <template x-for="rank in ['S1','S2','S3','S4','S5','S6','Unknown']">
-              <button x-show="rank !== 'Unknown' || (meta.stats && meta.stats.Unknown > 0)"
-                      @click="toggleRankFilter(rank)"
-                      :id="'statsBar' + rank + 'Btn'"
-                      class="px-3.5 py-2 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 active:scale-95 focus:outline-none flex items-center gap-2 shadow-sm"
-                      :style="selectedRanks.includes(rank) ? 'background-color: ' + getRankColor(rank) + '; color: #ffffff; border-color: transparent; box-shadow: 0 4px 14px -4px ' + getRankColor(rank) : 'background-color: var(--surface); color: var(--text-secondary); border-color: var(--border)'">
-                <span :style="selectedRanks.includes(rank) ? 'color: #ffffff' : 'color: ' + getRankColor(rank)" 
-                      x-text="rank === 'Unknown' ? 'Not Accredited' : rank"></span>
-                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono transition-all duration-200" 
-                      :style="selectedRanks.includes(rank) ? 'background-color: rgba(255,255,255,0.25); color: #ffffff' : 'background-color: var(--surface-alt); color: var(--text-primary)'" 
-                      x-text="meta.stats ? meta.stats[rank] : 0">0</span>
+            <!-- Pills S1 - S6 -->
+            <template x-for="r in ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']">
+              <button @click="setRankFilter(r)" 
+                      class="stat-pill" 
+                      :class="selectedRank === r ? 'active' : ''"
+                      role="tab"
+                      :aria-selected="selectedRank === r">
+                <span x-text="r"></span>
+                <span class="stat-pill-count" x-text="meta.stats ? (meta.stats[r] || 0) : 0">0</span>
               </button>
             </template>
           </div>
-          
-          <!-- Component 2: Unified Control Bar (Search & Sort) -->
-          <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 py-3 px-4 bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
-            <!-- Search Input -->
-            <div class="relative flex-grow">
-              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-textMuted">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </span>
-              <input type="text" id="searchInput" x-model="searchVal" @input="triggerSearchDebounce()"
-                     placeholder="Search journal name..." 
-                     class="w-full pl-10 pr-8 py-3.5 text-sm font-sans border border-cardBorder bg-appBg text-textMain focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold rounded-xl placeholder-textMuted/60 min-h-[44px] premium-transition">
-              <!-- Clear Button -->
-              <button x-show="searchVal.length > 0" @click="clearSearch()"
-                      id="searchClearBtn"
-                      class="absolute right-3.5 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain text-lg font-bold focus:outline-none focus-visible:text-brandGold">
-                &times;
-              </button>
-            </div>
+        </div>
 
-            <!-- Sort Dropdown -->
-            <div class="shrink-0 flex items-center gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider text-textMuted hidden sm:inline">Sort by:</span>
-              <select @change="updateSort($el.value)"
-                      id="sortSelect"
-                      class="w-full sm:w-auto px-4 py-3 text-xs font-bold uppercase tracking-wider bg-appBg border border-cardBorder text-textMain rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
-                 <option value="last_updated_desc" :selected="sortCol === 'last_updated' && sortDir === 'desc'">Recently Updated</option>
-                 <option value="name_asc" :selected="sortCol === 'name' && sortDir === 'asc'">Name A–Z</option>
-                 <option value="name_desc" :selected="sortCol === 'name' && sortDir === 'desc'">Name Z–A</option>
-                 <option value="rank_asc" :selected="sortCol === 'rank' && sortDir === 'asc'">Highest Accreditation</option>
-                 <option value="rank_desc" :selected="sortCol === 'rank' && sortDir === 'desc'">Lowest Accreditation</option>
-                 <option value="last_updated_asc" :selected="sortCol === 'last_updated' && sortDir === 'asc'">Oldest Updated</option>
-              </select>
-            </div>
-          </div>
+        <!-- Panel 2: Distribusi Peringkat (Progress Bars) -->
+        <!-- Sembunyikan panel jika database kosong sama sekali -->
+        <div x-show="meta.total > 0" class="sidebar-panel" style="animation: slide-in 0.4s ease;">
+          <h3 class="panel-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Distribusi Peringkat
+          </h3>
           
-          <!-- Search status label -->
-          <div x-show="searchVal.trim().length > 0" class="text-[12px] font-mono text-textMuted pl-1">
-            Showing <span class="font-bold text-textMain" x-text="meta.total || 0"></span> results for "<span class="italic text-textMain" x-text="searchVal.trim()"></span>"
-          </div>
-          
-          <!-- Adaptive Data List (Mobile: Cards, Desktop: Table) -->
-          <div class="space-y-4">
-            
-            <!-- MOBILE CARD VIEW (Block on <768px, Hidden on >=768px) -->
-            <div class="block md:hidden space-y-3">
-              <!-- Empty state loader / skeleton -->
-              <div x-show="isLoading" class="space-y-3 w-full">
-                <template x-for="i in [1,2,3,4,5]">
-                  <div class="h-20 w-full rounded-xl animate-pulse" style="background-color: var(--surface-alt)"></div>
-                </template>
-              </div>
-
-              <!-- Main Loop Cards -->
-              <template x-for="(j, index) in journals" :key="j.id">
-                <div @click="openDrawer(j)" 
-                     class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-xl p-4 flex gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.015)] hover:border-brandGold/60 premium-transition cursor-pointer active:scale-[0.99] group items-center">
-                  
-                  <!-- Left visual anchor: prominent solid high-contrast rank block with distinct color shadow -->
-                  <div class="flex flex-col items-center justify-center w-12 h-12 rounded-xl text-white font-extrabold text-sm shadow-md shrink-0 uppercase"
-                       :style="'background-color: ' + getRankColor(j.current_rank) + '; box-shadow: 0 4px 12px -2px ' + getRankColor(j.current_rank)">
-                    <span x-text="j.current_rank === 'Unknown' ? 'N/A' : j.current_rank"></span>
+          <div class="distribution-list">
+            <template x-for="r in ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']">
+              <div class="distribution-row" :class="meta.stats && (meta.stats[r] || 0) === 0 ? 'empty' : ''">
+                <!-- Baris Label -->
+                <div class="distribution-labels">
+                  <div class="distribution-rank-label">
+                    <span class="rank-dot" :class="r.toLowerCase()"></span>
+                    <span x-text="`Peringkat ${r}`"></span>
                   </div>
-                  
-                  <!-- Right contents: Journal Name, Serial, Relative Update Time, and Badges -->
-                  <div class="flex-grow min-w-0 space-y-1.5">
-                    <!-- Journal Name (Extremely bold, primary scanning anchor) -->
-                    <div class="flex items-start justify-between gap-2">
-                      <span class="text-[14px] sm:text-[15px] font-extrabold font-serif text-textMain group-hover:text-brandGold premium-transition leading-snug break-words" x-text="j.journal_name"></span>
-                    </div>
-                    
-                    <!-- Metadata row: Rank Serial Number & Checked Time -->
-                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-textMuted font-mono">
-                      <!-- Sequential Serial Number as secondary element -->
-                      <span class="font-bold text-[10px] bg-appBg border border-cardBorder/60 px-1.5 py-0.5 rounded text-textMuted/80 font-mono" x-text="'#' + (((currentPage - 1) * pageSize) + index + 1)"></span>
-                      
-                      <span class="text-textMuted/40 font-sans font-normal text-[14px] leading-none shrink-0">&bull;</span>
-                      
-                      <!-- Relative Update Time -->
-                      <span class="flex items-center gap-1 shrink-0 hover:text-textMain transition-colors"
-                            :title="formatIndonesianDateTime(j.last_updated)"
-                            x-text="'Checked ' + toRelativeTime(j.last_updated)"></span>
-
-                      <!-- Newly Added / Changed badges -->
-                      <div class="flex items-center gap-1 ml-auto shrink-0">
-                        <template x-if="!j.previous_rank || j.previous_rank === '' || j.previous_rank === 'None'">
-                          <span style="background-color: var(--badge-new-bg); border-color: var(--badge-new-border); color: var(--badge-new-text)"
-                                class="text-[9px] font-extrabold tracking-wide px-1.5 py-0.5 border rounded-[4px] font-sans inline-flex items-center gap-1 uppercase">
-                            NEW
-                          </span>
-                        </template>
-
-                        <template x-if="j.previous_rank && j.previous_rank !== '' && j.previous_rank !== 'None' && j.previous_rank !== j.current_rank">
-                          <span :style="isRankRise(j.previous_rank, j.current_rank) ? 
-                                        'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 
-                                        'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'"
-                                class="text-[9px] font-extrabold tracking-wide px-1.5 py-0.5 border rounded-[4px] font-sans inline-flex items-center gap-1 uppercase">
-                            <span x-text="isRankRise(j.previous_rank, j.current_rank) ? '▲' : '▼'"></span>
-                            <span x-text="j.previous_rank + ' → ' + j.current_rank"></span>
-                          </span>
-                        </template>
-                      </div>
-                    </div>
-                  </div>
+                  <span x-text="meta.stats ? `${meta.stats[r] || 0} Jurnal` : '0 Jurnal'"></span>
                 </div>
-              </template>
-              <!-- No records match -->
-              <div x-show="!isLoading && journals.length === 0" class="bg-cardBg border border-cardBorder rounded-2xl p-8 text-center text-textMuted text-[13px]">
-                No matching journal logs found in database.
-              </div>
-            </div>
-
-            <!-- DESKTOP TABULAR VIEW (Hidden on <768px, Visible on >=768px) -->
-            <div class="hidden md:block bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.01)] transition-all duration-300">
-              <div class="table-container">
-                <table id="journalTable" class="w-full text-left border-collapse table-fixed">
-                  <thead class="sticky top-0 bg-cardBg/95 backdrop-blur-sm z-10 shadow-[0_1px_0_var(--border)]">
-                    <tr class="border-b border-cardBorder/60 dark:border-cardBorder/30 text-textMuted font-mono text-[10px] font-bold uppercase tracking-wider">
-                      <th class="py-4 px-5 cursor-pointer hover:text-textMain premium-transition min-w-0" @click="updateSort(sortCol === 'name' && sortDir === 'asc' ? 'name_desc' : 'name_asc')">
-                        <div class="flex items-center gap-1.5">
-                          <span>Journal Name</span>
-                          <svg x-show="sortCol === 'name' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                          <svg x-show="sortCol === 'name' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                        </div>
-                      </th>
-                      <th class="py-4 px-4 text-center cursor-pointer hover:text-textMain premium-transition shrink-0 w-36" @click="updateSort(sortCol === 'rank' && sortDir === 'asc' ? 'rank_desc' : 'rank_asc')">
-                        <div class="flex items-center justify-center gap-1.5">
-                          <span>Accreditation</span>
-                          <svg x-show="sortCol === 'rank' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                          <svg x-show="sortCol === 'rank' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                        </div>
-                      </th>
-                      <th class="py-4 px-5 text-right cursor-pointer hover:text-textMain premium-transition shrink-0 w-24" @click="updateSort(sortCol === 'last_updated' && sortDir === 'desc' ? 'last_updated_asc' : 'last_updated_desc')">
-                        <div class="flex items-center justify-end gap-1.5">
-                          <span>Updated</span>
-                          <svg x-show="sortCol === 'last_updated' && sortDir === 'asc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
-                          <svg x-show="sortCol === 'last_updated' && sortDir === 'desc'" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                        </div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-cardBorder/60 font-sans">
-                    <!-- Empty Skeleton Loader -->
-                    <tr x-show="isLoading">
-                      <td colspan="3" class="py-6">
-                        <div class="space-y-3.5 w-full px-4">
-                          <template x-for="i in [1,2,3,4,5]">
-                            <div class="h-12 w-full rounded-xl animate-pulse" style="background-color: var(--surface-alt)"></div>
-                          </template>
-                        </div>
-                      </td>
-                    </tr>
-
-                    <!-- Reactive Table Rows -->
-                    <template x-for="(j, index) in journals" :key="j.id">
-                      <tr @click="openDrawer(j)" 
-                          :id="'journalRow' + j.id"
-                          class="hover:bg-[var(--surface-alt)] cursor-pointer transition-colors duration-150 group border-b border-cardBorder/40 dark:border-cardBorder/25">
-                        <td class="py-4 px-5 min-w-0">
-                          <div class="flex items-center gap-3 w-full min-w-0">
-                            <!-- Sequential serial number -->
-                            <span class="font-mono text-xs text-textMuted shrink-0 font-bold" x-text="'#' + (((currentPage - 1) * pageSize) + index + 1)"></span>
-                            <!-- Accreditation rank colored accent indicator -->
-                            <span class="inline-block w-1 h-3.5 rounded-full flex-shrink-0" 
-                                  :style="'background-color: ' + getRankColor(j.current_rank)"></span>
-                            <span class="text-[13px] font-bold text-textMain group-hover:text-brandGold premium-transition truncate flex-1 min-w-0" :title="j.journal_name" x-text="j.journal_name"></span>
-                            
-                            <!-- Newly Added Badge -->
-                            <template x-if="!j.previous_rank || j.previous_rank === '' || j.previous_rank === 'None'">
-                              <span style="background-color: var(--badge-new-bg); border-color: var(--badge-new-border); color: var(--badge-new-text)"
-                                    class="text-[9px] font-extrabold tracking-wide px-1.5 py-0.5 border rounded-[4px] font-sans inline-flex items-center gap-1 shrink-0 uppercase">
-                                NEW
-                              </span>
-                            </template>
-
-                            <!-- Changed Rank Badge -->
-                            <template x-if="j.previous_rank && j.previous_rank !== '' && j.previous_rank !== 'None' && j.previous_rank !== j.current_rank">
-                              <span :style="isRankRise(j.previous_rank, j.current_rank) ? 
-                                            'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 
-                                            'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'"
-                                    class="text-[9px] font-extrabold tracking-wide px-1.5 py-0.5 border rounded-[4px] font-sans inline-flex items-center gap-1 shrink-0 uppercase">
-                                <span x-text="isRankRise(j.previous_rank, j.current_rank) ? '▲' : '▼'"></span>
-                                <span x-text="(j.previous_rank === 'Unknown' ? 'Not Accredited' : j.previous_rank) + ' → ' + (j.current_rank === 'Unknown' ? 'Not Accredited' : j.current_rank)"></span>
-                              </span>
-                            </template>
-                          </div>
-                        </td>
-                        <td class="py-4 px-4 text-center shrink-0 w-36">
-                          <span class="font-extrabold text-[12px] font-sans px-2.5 py-0.5 rounded-md inline-block border" 
-                                :style="'color: ' + getRankColor(j.current_rank) + '; background: color-mix(in srgb, ' + getRankColor(j.current_rank) + ' 15%, transparent); border-color: color-mix(in srgb, ' + getRankColor(j.current_rank) + ' 30%, transparent)'" 
-                                x-text="j.current_rank === 'Unknown' ? 'Not Accredited' : j.current_rank"></span>
-                        </td>
-                        <td class="font-mono text-textMuted text-[12px] py-4 px-5 text-right shrink-0 w-24" 
-                            :title="formatIndonesianDateTime(j.last_updated)" 
-                            x-text="toRelativeTime(j.last_updated)"></td>
-                      </tr>
-                    </template>
-
-                    <!-- Empty state search -->
-                    <tr x-show="!isLoading && journals.length === 0">
-                      <td colspan="3" class="py-12 text-center text-textMuted font-mono text-[12px]">
-                        No journals found. Try a different search query.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Component 4: Adaptive Pagination Footer -->
-            <div class="px-3 sm:px-5 py-4 bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 font-sans transition-all duration-300">
-              <!-- Showing text -->
-              <span class="font-mono text-[11px] text-textMuted">
-                Showing <span class="font-bold text-textMain" x-text="meta.total === 0 ? 0 : ((currentPage - 1) * pageSize) + 1"></span> 
-                to <span class="font-bold text-textMain" x-text="Math.min(currentPage * pageSize, meta.total || 0)"></span> 
-                of <span class="font-bold text-textMain" x-text="meta.total || 0"></span> journals
-              </span>
-
-              <!-- Pagination Triggers -->
-              <div class="flex items-center gap-1.5 w-full sm:w-auto justify-center" x-show="meta.total_pages > 1">
                 
-                <!-- Desktop Pagination -->
-                <div class="hidden sm:flex items-center gap-1.5">
-                  <button @click="setPage(1)" :disabled="currentPage === 1 || isLoading"
-                          id="pageFirstBtn"
-                          class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                    &lt;&lt;
-                  </button>
-                  <button @click="setPage(currentPage - 1)" :disabled="currentPage === 1 || isLoading"
-                          id="pagePrevBtn"
-                          class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                    &larr; Prev
-                  </button>
-
-                  <template x-for="p in getVisiblePages()">
-                    <span class="flex items-center">
-                      <button x-show="p !== '...'" @click="setPage(p)" :disabled="isLoading"
-                              class="w-8 h-8 rounded-lg border text-[11px] font-bold transition flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95"
-                              :style="currentPage === p ? 'background-color: var(--accent); color: #ffffff; border-color: transparent' : 'background-color: var(--surface-alt); color: var(--text-secondary); border-color: var(--border)'"
-                              x-text="p"></button>
-                      <span x-show="p === '...'" class="px-2 text-[11px] font-mono text-textMuted" x-text="p"></span>
-                    </span>
-                  </template>
-
-                  <button @click="setPage(currentPage + 1)" :disabled="currentPage === meta.total_pages || isLoading"
-                          id="pageNextBtn"
-                          class="px-3 py-2 rounded-lg border border-cardBorder bg-cardBg text-[11px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                    Next &rarr;
-                  </button>
-                  <button @click="setPage(meta.total_pages)" :disabled="currentPage === meta.total_pages || isLoading"
-                          id="pageLastBtn"
-                          class="p-2 rounded-lg border border-cardBorder bg-cardBg text-[10px] font-mono text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40">
-                    &gt;&gt;
-                  </button>
+                <!-- Progress Bar Track -->
+                <div class="bar-container">
+                  <div class="bar-fill" 
+                       :class="r.toLowerCase()" 
+                       :style="meta.stats && meta.total > 0 ? `width: ${((meta.stats[r] || 0) / meta.total * 100).toFixed(1)}%` : 'width: 0%'"
+                       role="progressbar"
+                       :aria-valuenow="meta.stats ? (meta.stats[r] || 0) : 0"
+                       aria-valuemin="0"
+                       :aria-valuemax="meta.total">
+                  </div>
                 </div>
+              </div>
+            </template>
+          </div>
+        </div>
 
-                <!-- Mobile Pagination -->
-                <div class="flex sm:hidden items-center justify-between gap-4 w-full">
-                  <button @click="setPage(currentPage - 1)" :disabled="currentPage === 1 || isLoading"
-                          id="pagePrevMobileBtn"
-                          class="px-4 py-2.5 rounded-lg border border-cardBorder bg-cardBg text-[12px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none min-h-[48px] flex items-center">
-                    &larr; Prev
-                  </button>
-                  <span class="text-[12px] font-mono text-textMuted">
-                    Page <span class="font-extrabold text-textMain" x-text="currentPage"></span> / <span x-text="meta.total_pages"></span>
-                  </span>
-                  <button @click="setPage(currentPage + 1)" :disabled="currentPage === meta.total_pages || isLoading"
-                          id="pageNextMobileBtn"
-                          class="px-4 py-2.5 rounded-lg border border-cardBorder bg-cardBg text-[12px] font-bold text-textMuted hover:text-textMain hover:border-brandGold/40 transition disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 focus:outline-none min-h-[48px] flex items-center">
-                    Next &rarr;
-                  </button>
+        <!-- Panel 3: Perubahan Peringkat Terbaru -->
+        <div class="sidebar-panel">
+          <h3 class="panel-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Perubahan Terbaru
+          </h3>
+          
+          <!-- Loading state changes -->
+          <div x-show="isLoadingChanges" class="recent-changes-list" aria-hidden="true">
+            <div style="height: 40px; background-color: var(--border-color); border-radius: var(--radius-xs); width: 100%; margin-bottom: var(--space-2);" class="skeleton-shimmer"></div>
+            <div style="height: 40px; background-color: var(--border-color); border-radius: var(--radius-xs); width: 90%;" class="skeleton-shimmer"></div>
+          </div>
+          
+          <!-- Loaded changes -->
+          <div x-show="!isLoadingChanges" class="recent-changes-list" id="riwayat-perubahan">
+            
+            <template x-for="c in changes" :key="c.id">
+              <div class="recent-change-item" style="animation: slide-in 0.2s ease;">
+                <div class="change-journal-name" x-text="c.journal_name"></div>
+                <div class="change-arrow-row">
+                  <span class="change-badge" :class="c.previous_rank.toLowerCase()" x-text="c.previous_rank"></span>
+                  <span class="change-arrow">&rarr;</span>
+                  <span class="change-badge" :class="c.current_rank.toLowerCase()" x-text="c.current_rank"></span>
                 </div>
+                <div class="change-time" x-text="formatDateShort(c.last_updated)"></div>
+              </div>
+            </template>
+
+            <!-- Jika Riwayat Perubahan Kosong -->
+            <div x-show="changes.length === 0" style="color: var(--text-muted); font-size: var(--font-size-sm); text-align: center; padding: var(--space-4) 0;">
+              Belum ada riwayat perubahan.
+            </div>
 
           </div>
         </div>
-        
-        <!-- SIDEBAR PANEL (30% - Columns 8 to 10) -->
-        <div class="sidebar-right space-y-4">
-          
-          <!-- Visual Distribution Analytics Card (Distinct diffuse shadow) -->
-          <div x-show="meta.total > 0" class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
-            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Accreditation Distribution</h3>
-            
-            <div class="space-y-3.5 font-sans">
-              <!-- S1 to S6 bar chart visualizer -->
-              <template x-for="rank in ['S1','S2','S3','S4','S5','S6']">
-                <div class="space-y-1.5" :class="(meta.stats && meta.stats[rank] > 0) ? 'opacity-100' : 'opacity-40 pointer-events-none'">
-                  <div class="flex items-center justify-between text-[11px]">
-                    <span class="font-bold uppercase tracking-wider" :style="'color: ' + getRankColor(rank)" x-text="rank"></span>
-                    <span class="font-mono text-textMuted" x-text="(meta.stats ? (meta.stats[rank] || 0) : 0) + ' ' + (meta.stats && meta.stats[rank] === 1 ? 'journal' : 'journals')"></span>
-                  </div>
-                  <!-- Mini custom bar graph with color-mix border and fill (hidden if value is 0) -->
-                  <div x-show="meta.stats && meta.stats[rank] > 0" class="w-full bg-appBg rounded-full h-2 overflow-hidden border border-cardBorder/30 dark:border-cardBorder/20">
-                    <div class="h-full rounded-full transition-all duration-500" 
-                          :style="'width: ' + (meta.stats ? ((meta.stats[rank] || 0) / Math.max(Object.values(meta.stats).reduce((a,b)=>a+b, 0), 1) * 100) : 0) + '%; background-color: ' + getRankColor(rank) + '; color: ' + getRankColor(rank)"></div>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </div>
 
-          <!-- Empty State Distribution -->
-          <div x-show="meta.total === 0" class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] text-center space-y-4 transition-all duration-300">
-            <div class="mx-auto w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
-              <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Accreditation Distribution</h3>
-            <p class="text-[13px] text-textMuted leading-relaxed font-sans">
-              Add your first journal to view the accreditation distribution.
-            </p>
-          </div>
-
-          <!-- Perubahan Terbaru Card -->
-          <div class="bg-cardBg border border-cardBorder/70 dark:border-cardBorder/40 rounded-2xl p-4 shadow-[0_6px_24px_rgba(0,0,0,0.015)] space-y-4 transition-all duration-300">
-            <h3 class="text-[10px] font-bold font-sans tracking-widest text-textMuted uppercase">Recent Changes</h3>
-            
-            <div class="space-y-3 font-sans max-h-[350px] overflow-y-auto pr-1">
-              <!-- Loop over recently changed journals -->
-              <template x-for="c in recentChanges" :key="c.id">
-                <div @click="openDrawer(c)" class="recent-change-item group cursor-pointer py-2 border-b border-cardBorder/30 dark:border-cardBorder/20 last:border-b-0">
-                  <div class="text-[12px] font-bold text-textMain group-hover:text-brandGold transition-colors truncate" :title="c.journal_name" x-text="c.journal_name"></div>
-                  <div class="flex items-center justify-between text-[10px] text-textMuted mt-1.5 font-mono">
-                    
-                    <!-- Change Badge -->
-                    <span :style="isRankRise(c.previous_rank, c.current_rank) ? 
-                                  'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 
-                                  'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'"
-                          class="px-1.5 py-0.5 border rounded-[4px] font-sans font-extrabold text-[8px] uppercase inline-flex items-center gap-0.5 shrink-0">
-                      <span x-text="isRankRise(c.previous_rank, c.current_rank) ? '▲' : '▼'"></span>
-                      <span x-text="c.previous_rank + ' → ' + c.current_rank"></span>
-                    </span>
-                    
-                    <span class="hover:text-textMain transition-colors text-[9px]" :title="formatIndonesianDateTime(c.last_updated)" x-text="toRelativeTime(c.last_updated)"></span>
-                  </div>
-                </div>
-              </template>
-
-              <!-- Empty state for recent changes -->
-              <div x-show="recentChanges.length === 0" class="text-[11px] text-textMuted py-4 text-center">
-                No change history found.
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+      </aside>
 
     </div>
 
-  <!-- 5. Interactive Slide-Over Detail Drawer -->
-  <div x-show="isDrawerOpen" 
-       id="detailDrawer"
-       x-cloak
-       class="fixed inset-0 z-50 overflow-hidden" 
-       aria-labelledby="slide-over-title" 
-       role="dialog" 
-       aria-modal="true"
-       @keydown.window.escape="isDrawerOpen = false">
-    <div class="absolute inset-0 overflow-hidden">
-      <!-- Background backdrop with premium glass blur -->
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" 
-           @click="isDrawerOpen = false" 
-           x-show="isDrawerOpen"
-           x-transition:enter="ease-out duration-350"
-           x-transition:enter-start="opacity-0"
-           x-transition:enter-end="opacity-100"
-           x-transition:leave="ease-in duration-200"
-           x-transition:leave-start="opacity-100"
-           x-transition:leave-end="opacity-0"></div>
+    <!-- Alpine.js Dashboard App Controller -->
+    <script>
+      function dashboardApp() {
+        return {
+          journals: [],
+          meta: {
+            total: 0,
+            page: 1,
+            limit: 50,
+            total_pages: 1,
+            stats: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0 }
+          },
+          changes: [],
+          searchQuery: '',
+          selectedRank: '',
+          sortValue: 'last_updated|desc',
+          sortBy: 'last_updated',
+          sortDir: 'desc',
+          isLoading: true,
+          isLoadingChanges: true,
+          debounceTimer: null,
 
-      <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <!-- Panel Slide view -->
-        <div class="pointer-events-auto w-screen max-w-md bg-cardBg border-l border-cardBorder/60 dark:border-cardBorder/30 shadow-2xl transition-all duration-300"
-             x-show="isDrawerOpen"
-             x-transition:enter="transform transition ease-in-out duration-350"
-             x-transition:enter-start="translate-x-full"
-             x-transition:enter-end="translate-x-0"
-             x-transition:leave="transform transition ease-in-out duration-300"
-             x-transition:leave-start="translate-x-0"
-             x-transition:leave-end="translate-x-full">
-          
-          <div class="flex h-full flex-col overflow-y-auto py-6 px-6 sm:px-8 font-sans">
-            <!-- Drawer Header -->
-            <div class="flex items-start justify-between border-b border-cardBorder/50 dark:border-cardBorder/25 pb-4">
-              <h2 class="text-md sm:text-lg font-bold text-textMain font-sans" id="slide-over-title">Journal Details</h2>
-              <div class="ml-3 flex h-7 items-center">
-                <button type="button" @click="isDrawerOpen = false"
-                        id="drawerCloseBtn"
-                        class="rounded-lg text-textMuted hover:text-textMain border border-cardBorder p-1.5 hover:bg-appBg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
-                  <span class="sr-only">Close panel</span>
-                  <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Content Area inside drawer -->
-            <div class="relative flex-1 mt-6 space-y-6">
-              <div class="space-y-1">
-                <span class="text-[9px] font-mono tracking-widest text-textMuted uppercase block" x-text="'ID: #' + selectedJournal.id"></span>
-                <h3 class="text-xl font-bold font-serif text-textMain tracking-tight leading-snug" x-text="selectedJournal.journal_name"></h3>
-              </div>
-
-              <!-- Accreditation Status Card (Color-coded glowing accent container) -->
-              <div class="p-4 border rounded-2xl flex items-center justify-between gap-4"
-                   :style="'border-color: color-mix(in oklch, ' + getRankColor(selectedJournal.current_rank) + ' 35%, transparent); background-color: color-mix(in oklch, ' + getRankColor(selectedJournal.current_rank) + ' 5%, transparent); box-shadow: 0 4px 20px -6px color-mix(in oklch, ' + getRankColor(selectedJournal.current_rank) + ' 15%, transparent)'">
-                <div>
-                  <span class="text-[9px] font-bold text-textMuted uppercase tracking-widest block">Accreditation Rank</span>
-                  <span class="text-2xl font-extrabold font-sans mt-1 block" 
-                        :style="'color: ' + getRankColor(selectedJournal.current_rank)" 
-                        x-text="selectedJournal.current_rank || 'N/A'"></span>
-                </div>
-                <!-- Mini status badge -->
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-[16px] shadow-sm select-none"
-                     :style="'background-color: ' + getRankColor(selectedJournal.current_rank)">
-                  <span class="font-sans font-bold" x-text="selectedJournal.current_rank"></span>
-                </div>
-              </div>
-
-              <!-- Dynamic Premium Diff Viewer Component -->
-              <div class="space-y-2.5 border border-cardBorder/60 p-4 rounded-2xl bg-appBg/40">
-                <div class="flex flex-col gap-1.5 border-b border-cardBorder/40 pb-2">
-                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Accreditation Diff Log</span>
-                  <span class="text-[9px] font-mono text-textMuted italic block select-none leading-none">*Simulated history based on 7-day change status</span>
-                </div>
-                
-                <!-- Diff View Box (always vertical inside narrow drawer) -->
-                <div class="flex flex-col gap-3 w-full font-mono text-[13px] sm:text-[14px]">
-                  
-                  <!-- Before Box (Removed / Red) -->
-                  <div class="flex-1 p-3 border rounded-xl" style="background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)">
-                    <div class="text-[9px] font-bold uppercase tracking-wider mb-2 opacity-80 select-none flex items-center justify-between">
-                      <span>Before</span>
-                      <span class="text-xs font-mono font-extrabold select-none">-</span>
-                    </div>
-                    <div class="overflow-x-auto whitespace-pre select-all py-1 scrollbar-thin">  1 <span class="opacity-55 select-none font-bold font-mono">-</span> Journal: <span x-text="selectedJournal.journal_name"></span>
-  2 <span class="opacity-55 select-none font-bold font-mono">-</span> Rank:    <span class="font-extrabold" x-text="isUpdatedWithin7Days(selectedJournal.last_updated) ? getPreviousRank(selectedJournal.current_rank) : (selectedJournal.current_rank || 'N/A')"></span>
-  3 <span class="opacity-55 select-none font-bold font-mono">-</span> Audited: <span x-text="isUpdatedWithin7Days(selectedJournal.last_updated) ? getSimulatedDate(selectedJournal.last_updated) : (selectedJournal.last_updated || 'N/A')"></span></div>
-                  </div>
-
-                  <!-- After Box (Added / Green) -->
-                  <div class="flex-1 p-3 border rounded-xl" style="background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)">
-                    <div class="text-[9px] font-bold uppercase tracking-wider mb-2 opacity-80 select-none flex items-center justify-between">
-                      <span>After</span>
-                      <span class="text-xs font-mono font-extrabold select-none">+</span>
-                    </div>
-                    <div class="overflow-x-auto whitespace-pre select-all py-1 scrollbar-thin">  1 <span class="opacity-55 select-none font-bold font-mono">+</span> Journal: <span x-text="selectedJournal.journal_name"></span>
-  2 <span class="opacity-55 select-none font-bold font-mono">+</span> Rank:    <span class="font-extrabold" x-text="selectedJournal.current_rank || 'N/A'"></span>
-  3 <span class="opacity-55 select-none font-bold font-mono">+</span> Audited: <span x-text="selectedJournal.last_updated || 'N/A'"></span></div>
-                  </div>
-
-                </div>
-              </div>
-
-              <!-- Information Details Grid -->
-              <div class="space-y-5 font-sans">
-                <div class="space-y-1.5 border-b border-cardBorder/60 pb-4">
-                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Last Audited</span>
-                  <span class="text-[13px] font-semibold text-textMain font-mono block" x-text="selectedJournal.last_updated"></span>
-                  <span class="text-[11px] text-textMuted italic block" x-text="'Relative: ' + toRelativeTime(selectedJournal.last_updated)"></span>
-                </div>
-
-                <div class="space-y-2 border-b border-cardBorder/60 pb-4">
-                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">SINTA Profile Link</span>
-                  <div class="flex items-center justify-between gap-3 bg-appBg/60 p-2.5 rounded-xl border border-cardBorder">
-                    <span class="font-mono text-[11px] text-textMuted truncate flex-1" x-text="selectedJournal.sinta_url"></span>
-                    <a :href="selectedJournal.sinta_url" target="_blank"
-                       id="drawerSintaLink"
-                       class="px-3.5 py-2 bg-brandGold text-white font-bold text-[11px] tracking-wider uppercase rounded-lg shadow-sm hover:bg-brandGoldHover hover:shadow transition flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
-                      Visit Profile ↗
-                    </a>
-                  </div>
-                </div>
-
-                <div class="space-y-2.5">
-                  <span class="text-[9px] font-bold tracking-widest text-textMuted uppercase block">Activity Records Timeline</span>
-                  <div class="p-4 bg-appBg/40 border border-cardBorder rounded-2xl space-y-3 font-sans text-[12px]">
-                    <div class="flex items-center gap-2">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      <span class="text-textMain font-medium">Initial daemon sync successful.</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <span class="w-1.5 h-1.5 rounded-full bg-brandGold"></span>
-                      <span class="text-textMuted font-medium">Telemetry monitoring stable.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Footer of drawer -->
-            <div class="border-t border-cardBorder/50 dark:border-cardBorder/25 pt-4 mt-auto">
-              <button @click="isDrawerOpen = false" 
-                      id="drawerActionCloseBtn"
-                      class="w-full py-2.5 bg-appBg text-textMain hover:bg-cardBorder hover:border-textMain font-bold text-[11px] uppercase tracking-wider rounded-lg transition border border-cardBorder focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
-                Close Inspection
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  </main>
-
-  <!-- 6. Premium Editorial Footer -->
-  <footer class="bg-cardBg border-t border-cardBorder/50 dark:border-cardBorder/30 py-6 px-4 sm:px-6 mt-12 transition-all duration-300">
-    <div class="max-w-[1600px] w-full mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="text-[12px] text-textMuted font-sans text-center md:text-left">
-        &copy; 2026 SINTA Journal Tracker. Data updated periodically.
-      </div>
-      <div class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-textMuted">
-        <a href="https://sinta.kemdiktisaintek.go.id" target="_blank" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold text-[11px]">SINTA Portal</a>
-        <span>&middot;</span>
-        <button @click="isSettingsOpen = true" class="hover:text-textMain transition-colors focus:outline-none focus-visible:text-brandGold uppercase text-[11px]">Notification Settings</button>
-      </div>
-    </div>
-  </footer>
-
-  <!-- 7. Interactive Settings Modal (Notifikasi) -->
-  <div x-show="isSettingsOpen" 
-       id="settingsModal"
-       x-cloak
-       class="fixed inset-0 z-50 overflow-y-auto" 
-       aria-labelledby="modal-title" 
-       role="dialog" 
-       aria-modal="true"
-       @keydown.window.escape="isSettingsOpen = false">
-    <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
-      
-      <!-- Backdrop with premium glass blur -->
-      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300" 
-           @click="isSettingsOpen = false" 
-           x-show="isSettingsOpen"
-           x-transition:enter="ease-out duration-300"
-           x-transition:enter-start="opacity-0"
-           x-transition:enter-end="opacity-100"
-           x-transition:leave="ease-in duration-200"
-           x-transition:leave-start="opacity-100"
-           x-transition:leave-end="opacity-0"></div>
-
-      <!-- Modal Panel -->
-      <div class="relative transform overflow-hidden rounded-2xl bg-cardBg border border-cardBorder text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl premium-transition"
-           x-show="isSettingsOpen"
-           x-transition:enter="ease-out duration-300"
-           x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-           x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-           x-transition:leave="ease-in duration-200"
-           x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-           x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-        
-        <div class="px-6 py-6 sm:p-8 font-sans space-y-6">
-          <!-- Modal Header -->
-          <div class="flex items-start justify-between border-b border-cardBorder pb-4">
-            <div>
-              <h2 class="text-xl font-serif font-bold text-textMain tracking-tight" id="modal-title">Notification Settings</h2>
-              <p class="text-xs text-textMuted mt-1">Configure automatic notification channels for journal accreditation changes.</p>
-            </div>
-            <button type="button" @click="isSettingsOpen = false"
-                    id="modalCloseBtn"
-                    class="rounded-lg text-textMuted hover:text-textMain border border-cardBorder p-1.5 hover:bg-appBg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brandGold/40 active:scale-95">
-              <span class="sr-only">Close</span>
-              <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Configuration Content -->
-          <div class="space-y-6">
-            <!-- Discord Config Panel -->
-            <div class="p-5 bg-appBg border border-cardBorder rounded-xl space-y-4">
-              <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
-                <span class="text-sm font-bold text-textMain">Discord Notifications</span>
-                <!-- Status Badge -->
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                      :style="config?.webhook?.discord_url ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                  <span x-text="config?.webhook?.discord_url ? 'Active' : 'Inactive'"></span>
-                </span>
-              </div>
-              
-              <div class="space-y-3">
-                <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">Discord Webhook URL</label>
-                
-                <!-- Display Masked URL -->
-                <div x-show="config?.webhook?.discord_url && !editDiscord"
-                     class="flex items-center justify-between gap-3 bg-cardBg p-3 border border-cardBorder rounded-xl break-all">
-                  <span class="font-mono text-xs text-textMain" x-text="config?.webhook?.discord_url"></span>
-                  <button @click="editDiscord = true; discordUrlInput = ''" 
-                          class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition flex-shrink-0">
-                    Edit
-                  </button>
-                </div>
-                     
-                <!-- Input field for URL -->
-                <div x-show="!config?.webhook?.discord_url || editDiscord" class="flex flex-col sm:flex-row items-stretch gap-2">
-                  <input type="text" x-model="discordUrlInput" 
-                         placeholder="https://discord.com/api/webhooks/..." 
-                         class="flex-grow font-mono text-sm text-textMain bg-cardBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
-                  <button @click="saveSingleWebhook('discord')"
-                          class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Telegram Config Panel -->
-            <div class="p-5 bg-appBg border border-cardBorder rounded-xl space-y-4">
-              <div class="flex items-center justify-between border-b border-cardBorder/60 pb-3">
-                <span class="text-sm font-bold text-textMain">Telegram Notifications</span>
-                <!-- Status Badge -->
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider font-sans border shrink-0"
-                      :style="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                  <span x-text="(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) ? 'Active' : 'Inactive'"></span>
-                </span>
-              </div>
-              
-              <div class="space-y-3">
-                <label class="block text-xs font-bold text-textMuted uppercase tracking-wider">Telegram Webhook URL</label>
-                
-                <!-- Display Masked URL -->
-                <div x-show="config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id && !editTelegram"
-                     class="flex items-center justify-between gap-3 bg-cardBg p-3 border border-cardBorder rounded-xl break-all">
-                  <span class="font-mono text-xs text-textMain" x-text="`https://api.telegram.org/bot${config?.webhook?.telegram_bot_token}/sendMessage?chat_id=${config?.webhook?.telegram_chat_id}`"></span>
-                  <button @click="editTelegram = true; telegramUrlInput = ''" 
-                          class="px-2.5 py-1 text-[10px] font-sans font-bold uppercase tracking-wider text-brandGold border border-brandGold/30 hover:border-brandGold hover:bg-brandGold/5 rounded-lg premium-transition flex-shrink-0">
-                    Edit
-                  </button>
-                </div>
-                     
-                <!-- Input field for URL -->
-                <div x-show="!(config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id) || editTelegram" class="flex flex-col sm:flex-row items-stretch gap-2">
-                  <input type="text" x-model="telegramUrlInput" 
-                         placeholder="https://api.telegram.org/bot.../sendMessage" 
-                         class="flex-grow font-mono text-sm text-textMain bg-cardBg p-3 border border-cardBorder rounded-xl focus:outline-none focus:ring-2 focus:ring-brandGold/20 focus:border-brandGold transition min-h-[44px]">
-                  <button @click="saveSingleWebhook('telegram')"
-                          class="px-5 py-3 text-[12px] font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover rounded-xl shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center">
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Action buttons and Toasts -->
-            <div class="flex flex-col gap-3">
-              <div class="flex justify-center pt-2">
-                <button @click="testAllWebhooks()"
-                        :disabled="!(config?.webhook?.discord_url || (config?.webhook?.telegram_bot_token && config?.webhook?.telegram_chat_id))"
-                        class="w-full px-6 py-3.5 text-xs font-sans font-bold uppercase tracking-wider bg-brandGold text-white hover:bg-brandGoldHover disabled:opacity-40 disabled:cursor-not-allowed rounded-xl shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                  </svg>
-                  Send Test Notification
-                </button>
-              </div>
-              
-              <div x-show="saveMessage" 
-                   x-transition
-                   class="p-4 rounded-xl border flex items-center gap-3 transition-all duration-300 text-xs font-bold font-sans"
-                   :style="saveSuccess ? 'background-color: var(--diff-added-bg); border-color: var(--diff-added-border); color: var(--diff-added-text)' : 'background-color: var(--diff-removed-bg); border-color: var(--diff-removed-border); color: var(--diff-removed-text)'">
-                <span x-text="saveMessage"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // System date utilities
-    function toRelativeTime(dateStr) {
-      if (!dateStr) return '-';
-      const lastUpdated = new Date(dateStr.replace(' ', 'T'));
-      const now = new Date();
-      const diffMs = now - lastUpdated;
-      const diffSec = Math.floor(diffMs / 1000);
-      const diffMin = Math.floor(diffSec / 60);
-      const diffHour = Math.floor(diffMin / 60);
-      const diffDay = Math.floor(diffHour / 24);
-
-      if (diffMs < 0 || diffSec < 5) return 'just now';
-      if (diffSec < 60) return `${diffSec}s ago`;
-      if (diffMin < 60) return `${diffMin}m ago`;
-      if (diffHour < 24) return `${diffHour}h ago`;
-      return `${diffDay}d ago`;
-    }
-
-    function formatIndonesianDateTime(dateStr) {
-      if (!dateStr || dateStr === 'N/A') return 'No data';
-      try {
-        const months = [
-          'January', 'February', 'March', 'April', 'May', 'June',
-          'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        const d = new Date(dateStr.replace(' ', 'T'));
-        if (isNaN(d.getTime())) return dateStr;
-        const date = d.getDate();
-        const month = months[d.getMonth()];
-        const year = d.getFullYear();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        return `${month} ${date}, ${year} at ${hours}:${minutes}`;
-      } catch (e) {
-        return dateStr;
-      }
-    }
-
-    function isUpdatedWithin7Days(lastUpdatedStr) {
-      if (!lastUpdatedStr) return false;
-      const lastUpdated = new Date(lastUpdatedStr.replace(' ', 'T'));
-      const now = new Date();
-      const diffTime = Math.abs(now - lastUpdated);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays <= 7;
-    }
-
-    // Core Alpine.js state controller
-    function appState() {
-      return {
-        activeTab: 'dashboard',
-        journals: [],
-        meta: {
-          total: 0,
-          page: 1,
-          limit: 50,
-          total_pages: 1,
-          stats: {
-            S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0
-          }
-        },
-        config: {
-          webhook: {
-            discord_url: '',
-            telegram_bot_token: '',
-            telegram_chat_id: ''
-          }
-        },
-        lastScrape: 'N/A',
-        recentChanges: [],
-        
-        // Custom search & filter states
-        searchVal: '',
-        selectedRanks: [],
-        sortCol: 'last_updated',
-        sortDir: 'desc',
-
-        // Pagination states
-        currentPage: 1,
-        pageSize: 10,
-        isLoading: false,
-        debounceTimeout: null,
-        
-        // Drawer inspection states
-        isDrawerOpen: false,
-        selectedJournal: {},
-
-        // Settings modal state
-        isSettingsOpen: false,
-
-        // Webhook configuration states
-        editDiscord: false,
-        editTelegram: false,
-        discordUrlInput: '',
-        telegramBotInput: '',
-        telegramChatInput: '',
-        telegramUrlInput: '',
-        isSaving: false,
-        saveMessage: '',
-        saveSuccess: true,
-
-        // Theme preference state
-        darkMode: false,
-
-        // Expose global date helpers directly to templates
-        toRelativeTime: toRelativeTime,
-        formatIndonesianDateTime: formatIndonesianDateTime,
-        isUpdatedWithin7Days: isUpdatedWithin7Days,
-
-        init() {
-          this.darkMode = document.documentElement.classList.contains('dark');
-          this.activeTab = window.ACTIVE_TAB || 'dashboard';
-          if (this.activeTab === 'config') {
-            this.isSettingsOpen = true;
-            this.activeTab = 'dashboard';
-          }
-          
-          const params = new URLSearchParams(window.location.search);
-          this.currentPage = parseInt(params.get('page')) || 1;
-          this.searchVal = params.get('search') || '';
-          const rankParam = params.get('rank');
-          this.selectedRanks = rankParam ? rankParam.split(',') : [];
-          this.sortCol = params.get('sort') || 'last_updated';
-          this.sortDir = params.get('dir') || 'desc';
-          
-          this.fetchJournals();
-          this.fetchChanges();
-          
-          this.config = window.CONFIG_DATA || { webhook: { discord_url: '', telegram_bot_token: '', telegram_chat_id: '' } };
-          if (!this.config || !this.config.webhook) {
-            this.config = { webhook: { discord_url: '', telegram_bot_token: '', telegram_chat_id: '' } };
-          }
-        },
-
-        toggleTheme() {
-          this.darkMode = !this.darkMode;
-          if (this.darkMode) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('jurnal-theme', 'dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('jurnal-theme', 'light');
-          }
-        },
-
-        fetchJournals() {
-          this.isLoading = true;
-          
-          const params = new URLSearchParams();
-          params.set('page', this.currentPage);
-          params.set('limit', this.pageSize);
-          if (this.searchVal.trim()) {
-            params.set('search', this.searchVal.trim());
-          }
-          if (this.selectedRanks.length > 0) {
-            params.set('rank', this.selectedRanks.join(','));
-          }
-          params.set('sort', this.sortCol);
-          params.set('dir', this.sortDir);
-          
-          const newUrl = `${window.location.pathname}?${params.toString()}`;
-          window.history.replaceState({}, '', newUrl);
-          
-          fetch(`/api/journals?${params.toString()}`)
-            .then(res => res.json())
-            .then(resData => {
-              if (resData.success && resData.data) {
-                this.journals = resData.data.journals || [];
-                this.meta = resData.data.meta || {
-                  total: 0,
-                  page: 1,
-                  limit: 50,
-                  total_pages: 1,
-                  stats: { S1: 0, S2: 0, S3: 0, S4: 0, S5: 0, S6: 0, Unknown: 0 }
-                };
-                this.calculateStats();
-              } else {
-                console.error("API response returned success=false or missing data payload", resData);
-              }
-              this.isLoading = false;
-            })
-            .catch(err => {
-              console.error("Fetch failed", err);
-              this.isLoading = false;
-            });
-        },
-
-        fetchChanges() {
-          fetch('/api/changes')
-            .then(res => res.json())
-            .then(resData => {
-              if (resData.success && resData.data) {
-                this.recentChanges = resData.data.changes || [];
-              } else {
-                console.error("API response failed to load changes", resData);
-              }
-            })
-            .catch(err => {
-              console.error("Failed to fetch changes", err);
-            });
-        },
-
-        calculateStats() {
-          let latestTime = null;
-          this.journals.forEach(j => {
-            if (j.last_updated) {
-              const t = new Date(j.last_updated.replace(' ', 'T'));
-              if (!latestTime || t > latestTime) {
-                latestTime = t;
-              }
-            }
-          });
-          
-          if (latestTime) {
-            const pad = (n) => String(n).padStart(2, '0');
-            this.lastScrape = `${latestTime.getFullYear()}-${pad(latestTime.getMonth()+1)}-${pad(latestTime.getDate())} ${pad(latestTime.getHours())}:${pad(latestTime.getMinutes())}:${pad(latestTime.getSeconds())}`;
-          }
-        },
-
-        triggerSearchDebounce() {
-          if (this.debounceTimeout) {
-            clearTimeout(this.debounceTimeout);
-          }
-          this.debounceTimeout = setTimeout(() => {
-            this.currentPage = 1;
+          init() {
             this.fetchJournals();
-          }, 400);
-        },
-        
-        clearSearch() {
-          this.searchVal = '';
-          this.currentPage = 1;
-          this.fetchJournals();
-        },
-        
-        toggleRankFilter(rank) {
-          this.currentPage = 1;
-          if (rank === 'All') {
-            this.selectedRanks = [];
-          } else {
-            const idx = this.selectedRanks.indexOf(rank);
-            if (idx === -1) {
-              this.selectedRanks.push(rank);
-            } else {
-              this.selectedRanks.splice(idx, 1);
-            }
-          }
-          this.fetchJournals();
-        },
-        
-        updateSort(sortValue) {
-          const lastUnderscore = sortValue.lastIndexOf('_');
-          this.sortCol = sortValue.substring(0, lastUnderscore);
-          this.sortDir = sortValue.substring(lastUnderscore + 1);
-          this.currentPage = 1;
-          this.fetchJournals();
-        },
-        
-        setPage(page) {
-          if (page < 1 || page > this.meta.total_pages) return;
-          this.currentPage = page;
-          this.fetchJournals();
-        },
-        
-        getVisiblePages() {
-          const current = this.currentPage;
-          const total = this.meta.total_pages;
-          const pages = [];
-          
-          if (total <= 5) {
-            for (let i = 1; i <= total; i++) pages.push(i);
-          } else {
-            if (current <= 3) {
-              pages.push(1, 2, 3, 4, '...', total);
-            } else if (current >= total - 2) {
-              pages.push(1, '...', total - 3, total - 2, total - 1, total);
-            } else {
-              pages.push(1, '...', current - 1, current, current + 1, '...', total);
-            }
-          }
-          return pages;
-        },
+            this.fetchChanges();
+          },
 
-        // Color mapping for premium ranks using curated desaturated tones
-        getRankColor(rank) {
-          const map = {
-            'S1': 'var(--color-s1)',
-            'S2': 'var(--color-s2)',
-            'S3': 'var(--color-s3)',
-            'S4': 'var(--color-s4)',
-            'S5': 'var(--color-s5)',
-            'S6': 'var(--color-s6)',
-          };
-          return map[rank] || 'var(--color-s-default)';
-        },
-
-        isRankRise(prev, curr) {
-          if (!prev || !curr) return false;
-          const order = { 'S1': 1, 'S2': 2, 'S3': 3, 'S4': 4, 'S5': 5, 'S6': 6, 'Unknown': 7 };
-          const pVal = order[prev] || 7;
-          const cVal = order[curr] || 7;
-          return cVal < pVal;
-        },
-
-        getSimulatedDate(dateStr) {
-          if (!dateStr) return 'N/A';
-          const d = new Date(dateStr.replace(' ', 'T'));
-          d.setDate(d.getDate() - 7);
-          const pad = (n) => String(n).padStart(2, '0');
-          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-        },
-
-
-
-        openDrawer(journal) {
-          this.selectedJournal = journal;
-          this.isDrawerOpen = true;
-        },
-
-        resetForm() {
-          this.editDiscord = false;
-          this.editTelegram = false;
-          this.discordUrlInput = '';
-          this.telegramBotInput = '';
-          this.telegramChatInput = '';
-          this.saveMessage = '';
-        },
-
-        saveWebhookConfig() {
-          // Fallback forwarding to saveSingleWebhook
-        },
-
-        saveSingleWebhook(platform) {
-          this.isSaving = true;
-          this.saveMessage = '';
-          
-          const payload = {};
-          if (platform === 'discord') {
-            payload.discord_url = this.discordUrlInput.trim();
-          } else if (platform === 'telegram') {
-            const urlStr = this.telegramUrlInput.trim();
-            let botToken = '';
-            let chatId = '';
+          async fetchJournals() {
+            this.isLoading = true;
             try {
-              if (urlStr.startsWith('http')) {
-                const urlObj = new URL(urlStr);
-                const pathParts = urlObj.pathname.split('/');
-                for (let part of pathParts) {
-                  if (part.startsWith('bot')) {
-                    botToken = part.substring(3);
-                  }
-                }
-                chatId = urlObj.searchParams.get('chat_id') || '';
-              } else {
-                if (urlStr.includes(':')) {
-                  const parts = urlStr.split(':');
-                  if (parts.length >= 2) {
-                    botToken = parts[0] + ':' + parts[1];
-                    const remaining = urlStr.replace(botToken, '').trim();
-                    chatId = remaining.replace(/^[,\s:]+/, '');
+              let url = `/api/journals?page=${this.meta.page}&limit=${this.meta.limit}&sort=${this.sortBy}&dir=${this.sortDir}`;
+              if (this.searchQuery.trim()) {
+                url += `&search=${encodeURIComponent(this.searchQuery.trim())}`;
+              }
+              if (this.selectedRank) {
+                url += `&rank=${this.selectedRank}`;
+              }
+              
+              // Flash syncing state in header if globalApp Alpine is accessible
+              this.setSyncingState(true);
+
+              const res = await fetch(url);
+              if (!res.ok) throw new Error();
+              const json = await res.json();
+
+              if (json.success && json.data) {
+                this.journals = json.data.journals || [];
+                this.meta = json.data.meta || this.meta;
+              }
+            } catch (err) {
+              console.error("Gagal memuat daftar jurnal.", err);
+            } finally {
+              this.isLoading = false;
+              this.setSyncingState(false);
+            }
+          },
+
+          async fetchChanges() {
+            this.isLoadingChanges = true;
+            try {
+              const res = await fetch('/api/changes');
+              if (!res.ok) throw new Error();
+              const json = await res.json();
+              if (json.success && json.data) {
+                this.changes = json.data.changes || [];
+              }
+            } catch (err) {
+              console.error("Gagal memuat riwayat perubahan.", err);
+            } finally {
+              this.isLoadingChanges = false;
+            }
+          },
+
+          debounceFetch() {
+            clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(() => {
+              this.meta.page = 1;
+              this.fetchJournals();
+            }, 350);
+          },
+
+          handleSortChange() {
+            const [field, direction] = this.sortValue.split('|');
+            this.sortBy = field;
+            this.sortDir = direction;
+            this.meta.page = 1;
+            this.fetchJournals();
+          },
+
+          setRankFilter(rank) {
+            this.selectedRank = rank;
+            this.meta.page = 1;
+            this.fetchJournals();
+          },
+
+          resetSearch() {
+            this.searchQuery = '';
+            this.meta.page = 1;
+            this.fetchJournals();
+          },
+
+          changePage(newPage) {
+            if (newPage >= 1 && newPage <= this.meta.total_pages) {
+              this.meta.page = newPage;
+              this.fetchJournals();
+              
+              // Scroll ke bar pencarian
+              const searchEl = document.getElementById('input-pencarian');
+              if (searchEl) {
+                searchEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }
+          },
+
+          isNew(j) {
+            // Jurnal dianggap baru jika tidak punya previous_rank sebelumnya, dan diperbarui dalam 3 hari terakhir
+            if (j.previous_rank) return false;
+            try {
+              const lastUpdated = new Date(j.last_updated);
+              const now = new Date();
+              const diffTime = Math.abs(now - lastUpdated);
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+              return diffDays <= 3;
+            } catch (e) {
+              return false;
+            }
+          },
+
+          formatDate(isoString) {
+            if (!isoString) return '';
+            try {
+              const date = new Date(isoString);
+              return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } catch (e) {
+              return isoString;
+            }
+          },
+
+          formatDateShort(isoString) {
+            if (!isoString) return '';
+            try {
+              const date = new Date(isoString);
+              return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } catch (e) {
+              return isoString;
+            }
+          },
+
+          setSyncingState(syncing) {
+            if (window.Alpine) {
+              const rootEl = document.querySelector('[x-data]');
+              if (rootEl && rootEl.__x) {
+                const rootData = rootEl.__x.getDataset();
+                if (rootData && typeof rootData.fetchHeaderStatus === 'function') {
+                  if (syncing) {
+                    rootData.statusText = 'Memperbarui...';
+                    rootData.statusClass = 'syncing';
+                  } else {
+                    rootData.fetchHeaderStatus();
                   }
                 }
               }
-            } catch (e) {
-              console.error(e);
             }
-            
-            payload.telegram_bot_token = botToken;
-            payload.telegram_chat_id = chatId;
           }
-          
-          fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          })
-          .then(res => res.json())
-          .then(resData => {
-            this.isSaving = false;
-            if (resData.success && resData.data) {
-              this.saveSuccess = true;
-              this.saveMessage = 'Notification settings updated successfully!';
-              this.config = resData.data;
-              if (platform === 'discord') this.editDiscord = false;
-              if (platform === 'telegram') this.editTelegram = false;
-              this.resetForm();
-              setTimeout(() => { this.saveMessage = ''; }, 4000);
-            } else {
-              this.saveSuccess = false;
-              this.saveMessage = resData.message || 'Failed to save configuration changes.';
-            }
-          })
-          .catch(err => {
-            this.isSaving = false;
-            this.saveSuccess = false;
-            this.saveMessage = 'Network connection failed.';
-          });
-        },
-
-        testWebhook(platform) {
-          this.saveMessage = '';
-          fetch('/api/config/test', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ platform: platform })
-          })
-          .then(res => res.json())
-          .then(resData => {
-            if (resData.success) {
-              this.saveSuccess = true;
-              this.saveMessage = `Test notification successfully sent to ${platform}!`;
-            } else {
-              this.saveSuccess = false;
-              this.saveMessage = resData.message || `Failed to send test notification to ${platform}.`;
-            }
-          })
-          .catch(err => {
-            this.saveSuccess = false;
-            this.saveMessage = 'Test notification request timed out.';
-          });
-        },
-
-        testAllWebhooks() {
-          if (this.config?.webhook?.discord_url) {
-            this.testWebhook('discord');
-          }
-          if (this.config?.webhook?.telegram_bot_token && this.config?.webhook?.telegram_chat_id) {
-            setTimeout(() => { this.testWebhook('telegram'); }, 1000);
-          }
-        },
-
-        getPreviousRank(rank) {
-          return this.selectedJournal?.previous_rank || rank || 'N/A';
-        },
-
-        navigate(tab) {
-          if (tab === 'dashboard') {
-            window.location.href = '/';
-          } else if (tab === 'config') {
-            window.location.href = '/config';
-          }
-        }
-      };
-    }
-  </script>
-</body>
-</html>
+        };
+      }
+    </script>
+  {% endif %}
+{% endblock %}
